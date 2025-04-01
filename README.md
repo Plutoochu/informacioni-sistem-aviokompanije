@@ -4,7 +4,7 @@ Informacioni sistem za aviokompanije je platforma namijenjena za optimizaciju op
 
 Ova aplikacija je razvijena u sklopu predmeta "Napredni razvoj softvera" na Elektrotehničkom fakultetu u Sarajevu, akademske 2024./2025. godine.
 
-[Live verzija]()
+[Live verzija](https://informacioni-sistem-za-aviokompanije.vercel.app/)
 
 ## Korištene tehnologije
 
