@@ -6,6 +6,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Pocetna />} />
         <Route path="/" element={<Pocetna />} />
       </Routes>
     </BrowserRouter>
