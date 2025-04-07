@@ -1,10 +1,37 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  text-align: center;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
   background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#root {
+  height: 100vh;
+}
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App {
+  width: 100%;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 }
 
 .logo {
@@ -20,7 +47,8 @@
 }
 
 .card {
-  padding: 1.0rem;
+  padding: 2rem;
+  width: 100%;
   max-width: 420px;
   margin: 0 auto;
   background-color: rgba(255, 255, 255, 0.95);
@@ -73,6 +101,10 @@ form {
   font-size: 0.9em;
   max-width: 280px;
   text-align: center;
+  padding: 0.5rem;
+  background-color: rgba(255, 100, 100, 0.1);
+  border-radius: 4px;
+  width: 100%;
 }
 
 .link-container {
@@ -97,35 +129,527 @@ form {
   text-decoration: none;
 }
 
-.mt-4 {
-  margin-top: 1rem;
-  color: #000000; 
-  text-align: center;
+.button {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.7em 1.2em;
+  margin: 0.6em auto;
+  border-radius: 8px;
+  border: none;
+  background-color: #646cff;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.button:hover {
+  background-color: #535bf2;
 }
 
 @media (max-width: 600px) {
-  #root {
+  .App {
     padding: 1rem;
   }
-  
+
   .logo {
-    height: 5em;
-    margin-bottom: 0.5rem;
+    height: 4em;
   }
-  
+
   .card {
-    padding: 1.2rem;
-    max-width: 90%;
+    padding: 1.5rem;
   }
-  
+
   .card h1 {
     font-size: 1.4rem;
-    margin-bottom: 1rem;
   }
-  
+
   .input-field {
     max-width: 100%;
-    padding: 0.6em 1em;
-    font-size: 0.95em;
   }
+}
+
+/* Reset Password Styles */
+.reset-password-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.reset-password-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.reset-password-form h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  text-align: left;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.7em 1.2em;
+  border: 2px solid #646cff;
+  border-radius: 8px;
+  font-size: 1em;
+  background-color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.reset-password-form button {
+  width: 100%;
+  padding: 0.7em 1.2em;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.25s ease;
+}
+
+.reset-password-form button:hover {
+  background-color: #535bf2;
+}
+
+.success {
+  color: #28a745;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.text-gray-600 {
+  color: #4B5563;
+  margin: 0.5rem 0;
+}
+
+/* Profil Styles */
+.profil-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.profil-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+}
+
+.profil-card h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.profil-card .form-group {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.profil-card .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  text-align: left;
+}
+
+.profil-card .form-group input {
+  width: 100%;
+  padding: 0.7em 1.2em;
+  border: 2px solid #646cff;
+  border-radius: 8px;
+  font-size: 1em;
+  background-color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.profil-card button {
+  width: 100%;
+  padding: 0.7em 1.2em;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.25s ease;
+}
+
+.profil-card button:hover {
+  background-color: #535bf2;
+}
+
+/* Navigacija Styles */
+.navigacija {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 2rem;
+  background-color: rgba(26, 26, 26, 0.9);
+  color: white;
+  height: 50px;
+}
+
+.navigacija-lijevo {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.navigacija-desno {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navigacija-link {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.navigacija-link:hover {
+  background-color: #333;
+}
+
+.navigacija-dugme {
+  background-color: #646cff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.navigacija-dugme:hover {
+  background-color: #535bf2;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Početna Stranica Styles */
+.pocetna-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+              url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+  background-size: cover;
+  background-position: center;
+  padding: 2rem;
+}
+
+.pocetna-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.pocetna-card h2 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.pocetna-card p {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.pocetna-dugmad {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.pocetna-dugme {
+  padding: 0.8em 1.5em;
+  background-color: #646cff;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.pocetna-dugme:hover {
+  background-color: #535bf2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.pocetna-opcije {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.pocetna-opcija {
+  text-decoration: none;
+  color: inherit;
+}
+
+.pocetna-opcija-kartica {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.pocetna-opcija-kartica:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.pocetna-opcija-kartica h3 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.pocetna-opcija-kartica p {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Auth Styles */
+.auth-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+              url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+  background-size: cover;
+  background-position: center;
+  padding: 2rem;
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+}
+
+.auth-card h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.7em 1em;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.error-message {
+  color: #dc3545;
+  margin: 0.5rem 0;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 0.8em 1.5em;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.auth-button:hover {
+  background-color: #535bf2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Letovi Styles */
+.letovi-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.letovi-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.letovi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.let-kartica {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s ease;
+}
+
+.let-kartica:hover {
+  transform: translateY(-5px);
+}
+
+.let-info h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.let-info p {
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.rezervisi-dugme {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 1rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rezervisi-dugme:hover {
+  background-color: #2980b9;
+}
+
+.rezervisi-dugme:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .letovi-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .letovi-container {
+    padding: 1rem;
+  }
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+}
+
+.error-message {
+  text-align: center;
+  color: #dc3545;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+}
+
+.no-flights {
+  text-align: center;
+  color: #666;
+  font-size: 1.2rem;
+  grid-column: 1 / -1;
 }

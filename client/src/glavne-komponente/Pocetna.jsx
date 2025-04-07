@@ -1,164 +1,48 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router";
-import avionLogo from "../assets/avion.svg";
-import { prijava, registracija } from "../pomocne-funkcije/fetch-funkcije";
-import { Dugme } from "../reusable-komponente/Dugme";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../kontekst/AuthContext';
 
 const Pocetna = () => {
-  const [prijavaPodaci, setPrijavaPodaci] = useState({
-    korisnickoImeIliEmail: "",
-    sifra: ""
-  });
-  const [registracijaPodaci, setRegistracijaPodaci] = useState({
-    korisnickoIme: "",
-    email: "",
-    sifra: "",
-    potvrdaSifre: ""
-  });
-  const [greska, setGreska] = useState("");
-  const [prikazRegistracije, setPrikazRegistracije] = useState(false);
-  const navigate = useNavigate();
+  const { korisnik } = useAuth();
 
-  const handlePrijava = async (e) => {
-    e.preventDefault();
-    const { korisnickoImeIliEmail, sifra } = prijavaPodaci;
-    
-    if (!korisnickoImeIliEmail || !sifra) {
-      setGreska("Molimo popunite sva polja.");
-      return;
-    }
-
-    try {
-      const odgovor = await prijava({ 
-        usernameEmail: korisnickoImeIliEmail, 
-        password: sifra 
-      });
-      
-      if (odgovor && odgovor.uspesno) {
-        navigate("/");
-      } else {
-        setGreska(odgovor?.poruka || "Pogrešni prijavni podaci.");
-      }
-    } catch (err) {
-      setGreska(err.response?.data?.poruka || "Došlo je do greške prilikom prijave.");
-      console.error(err);
-    }
-  };
-
-  const handleRegistracija = async (e) => {
-    e.preventDefault();
-    const { korisnickoIme, email, sifra, potvrdaSifre } = registracijaPodaci;
-    
-    if (!korisnickoIme || !email || !sifra || !potvrdaSifre) {
-      setGreska("Sva polja moraju biti popunjena.");
-      return;
-    }
-    
-    if (sifra !== potvrdaSifre) {
-      setGreska("Šifre se ne podudaraju.");
-      return;
-    }
-
-    try {
-      const odgovor = await registracija({ 
-        username: korisnickoIme,
-        email: email,
-        password: sifra
-      });
-      
-      if (odgovor && odgovor.uspesno) {
-        setGreska("");
-        setPrikazRegistracije(false);
-        setGreska("Registracija uspješna! Možete se prijaviti.");
-      } else {
-        setGreska(odgovor?.poruka || "Došlo je do greške prilikom registracije.");
-      }
-    } catch (err) {
-      setGreska(err.response?.data?.poruka || "Došlo je do greške prilikom registracije.");
-      console.error(err);
-    }
-  };
+  if (!korisnik) {
+    return (
+      <div className="pocetna-container">
+        <div className="pocetna-card">
+          <h2>Dobrodošli u Aviokompaniju</h2>
+          <p>Pronađite i rezervišite svoje savršeno putovanje</p>
+          <div className="pocetna-dugmad">
+            <Link to="/prijava" className="pocetna-dugme">
+              Prijavi se
+            </Link>
+            <Link to="/registracija" className="pocetna-dugme">
+              Registruj se
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="App">
-      <div className="flex gap-8 mb-8 justify-center">
-        <img src={avionLogo} className="logo avion" alt="Avion logo" />
-      </div>
-  
-      <div className="card">
-        <h1>{prikazRegistracije ? "Registracija" : "Prijava"}</h1>
-        
-        {!prikazRegistracije ? (
-          <form onSubmit={handlePrijava}>
-            <input
-              type="text"
-              value={prijavaPodaci.korisnickoImeIliEmail}
-              onChange={(e) => setPrijavaPodaci({...prijavaPodaci, korisnickoImeIliEmail: e.target.value})}
-              placeholder="Korisničko ime ili email"
-              className="input-field"
-            />
-            <input
-              type="password"
-              value={prijavaPodaci.sifra}
-              onChange={(e) => setPrijavaPodaci({...prijavaPodaci, sifra: e.target.value})}
-              placeholder="Šifra"
-              className="input-field"
-            />
-            {greska && <p className="error">{greska}</p>}
-            <Dugme text="Prijavi se" type="submit" />
-            <p className="mt-4">
-              Nemate račun?{""}
-              <span 
-                className="link" 
-                onClick={() => setPrikazRegistracije(true)}
-              >
-                Registrujte se!
-              </span>
-            </p>
-          </form>
-        ) : (
-          <form onSubmit={handleRegistracija}>
-            <input
-              type="text"
-              value={registracijaPodaci.korisnickoIme}
-              onChange={(e) => setRegistracijaPodaci({...registracijaPodaci, korisnickoIme: e.target.value})}
-              placeholder="Korisničko ime"
-              className="input-field"
-            />
-            <input
-              type="email"
-              value={registracijaPodaci.email}
-              onChange={(e) => setRegistracijaPodaci({...registracijaPodaci, email: e.target.value})}
-              placeholder="Email"
-              className="input-field"
-            />
-            <input
-              type="password"
-              value={registracijaPodaci.sifra}
-              onChange={(e) => setRegistracijaPodaci({...registracijaPodaci, sifra: e.target.value})}
-              placeholder="Šifra"
-              className="input-field"
-            />
-            <input
-              type="password"
-              value={registracijaPodaci.potvrdaSifre}
-              onChange={(e) => setRegistracijaPodaci({...registracijaPodaci, potvrdaSifre: e.target.value})}
-              placeholder="Potvrdite šifru"
-              className="input-field"
-            />
-            {greska && <p className="error">{greska}</p>}
-            <Dugme text="Registruj se" type="submit" />
-            <p className="mt-4">
-              Već ste registrovani?{""}
-              <span 
-                className="link" 
-                onClick={() => setPrikazRegistracije(false)}
-              >
-                Prijavite se!
-              </span>
-            </p>
-          </form>
-        )}
+    <div className="pocetna-container">
+      <div className="pocetna-card">
+        <h2>Dobrodošli, {korisnik.ime}!</h2>
+        <p>Gdje želite putovati danas?</p>
+        <div className="pocetna-opcije">
+          <Link to="/profil" className="pocetna-opcija">
+            <div className="pocetna-opcija-kartica">
+              <h3>Profil</h3>
+              <p>Upravljajte svojim podacima i lozinkom</p>
+            </div>
+          </Link>
+          <Link to="/letovi" className="pocetna-opcija">
+            <div className="pocetna-opcija-kartica">
+              <h3>Letovi</h3>
+              <p>Pretražite i rezervišite letove</p>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );

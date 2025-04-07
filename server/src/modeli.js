@@ -46,10 +46,42 @@ const destinacijaSchema = new mongoose.Schema({
 
 const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
 
-export {
-  Korisnik,
-  Destinacija
-};
+// Model za avion
+const avionSchema = new mongoose.Schema({
+  model: { type: String, required: true },
+  brojSjedista: { type: Number, required: true },
+  status: { 
+    type: String, 
+    enum: ['aktivan', 'neaktivan', 'u održavanju'],
+    default: 'aktivan'
+  }
+});
 
-// Implementiran model korisnika sa osnovnim poljima (ime, prezime, email, lozinka) i rolama (admin/kupac)
+const Avion = mongoose.model('Avion', avionSchema);
+
+// Model za reset token
+const resetTokenSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true
+  },
+  token: {
+    type: String,
+    required: true
+  },
+  expiresAt: {
+    type: Date,
+    required: true,
+    default: () => new Date(Date.now() + 3600000) // 1 sat
+  }
+});
+
+const ResetToken = mongoose.model('ResetToken', resetTokenSchema);
+
+export {
+    Korisnik,
+    Destinacija,
+    Avion,
+    ResetToken
+};
 

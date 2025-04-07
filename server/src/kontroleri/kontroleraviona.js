@@ -1,4 +1,4 @@
-import Avion from '../modeli.js';
+import { Avion } from '../modeli.js';
 
 //Dodaj novi avion
 const dodajAvion = async (req, res) => {

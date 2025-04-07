@@ -4,7 +4,10 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 export const prijava = async (podaci) => {
   try {
-    const response = await axios.post(`${backendUrl}/api/auth/prijava`, podaci, {
+    const response = await axios.post(`${backendUrl}/api/user/login`, {
+      email: podaci.usernameEmail,
+      lozinka: podaci.password
+    }, {
       withCredentials: true
     });
     return response.data;
