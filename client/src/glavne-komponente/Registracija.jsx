@@ -1,50 +1,54 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import '../stilovi/Registracija.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "../stilovi/Registracija.css";
 
 const Registracija = () => {
   const [formData, setFormData] = useState({
-    ime: '',
-    prezime: '',
-    email: '',
-    lozinka: '',
-    potvrdaLozinke: ''
+    ime: "",
+    prezime: "",
+    email: "",
+    lozinka: "",
+    potvrdaLozinke: "",
   });
-  const [greska, setGreska] = useState('');
-  const [uspjesno, setUspjesno] = useState('');
+  const [greska, setGreska] = useState("");
+  const [uspjesno, setUspjesno] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setGreska('');
-    setUspjesno('');
+    setGreska("");
+    setUspjesno("");
 
     // Validacija
     if (!formData.ime || !formData.prezime || !formData.email || !formData.lozinka || !formData.potvrdaLozinke) {
-      setGreska('Molimo popunite sva polja');
+      setGreska("Molimo popunite sva polja");
       return;
     }
 
     if (formData.lozinka !== formData.potvrdaLozinke) {
-      setGreska('Lozinke se ne podudaraju');
+      setGreska("Lozinke se ne podudaraju");
       return;
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/korisnici/registracija', {
+      const adresaRute = import.meta.env.VITE_BACKEND_URL
+        ? import.meta.env.VITE_BACKEND_URL + "/api/korisnici/registracija"
+        : "http://localhost:5000/api/korisnici/registracija";
+
+      const response = await axios.post(adresaRute, {
         ime: formData.ime,
         prezime: formData.prezime,
         email: formData.email,
-        lozinka: formData.lozinka
+        lozinka: formData.lozinka,
       });
 
-      setUspjesno('Registracija uspješna! Preusmjeravanje na prijavu...');
+      setUspjesno("Registracija uspješna! Preusmjeravanje na prijavu...");
       setTimeout(() => {
-        navigate('/prijava');
+        navigate("/prijava");
       }, 2000);
     } catch (error) {
-      setGreska(error.response?.data?.message || 'Došlo je do greške prilikom registracije');
+      setGreska(error.response?.data?.message || "Došlo je do greške prilikom registracije");
     }
   };
 
@@ -114,4 +118,4 @@ const Registracija = () => {
   );
 };
 
-export default Registracija; 
+export default Registracija;

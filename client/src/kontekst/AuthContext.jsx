@@ -17,8 +17,12 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const prijaviKorisnika = async (email, lozinka) => {
+    const adresaRute = import.meta.env.VITE_BACKEND_URL
+      ? import.meta.env.VITE_BACKEND_URL + "/api/korisnici/prijava"
+      : "http://localhost:5000/api/korisnici/prijava";
+
     try {
-      const odgovor = await axios.post("http://localhost:5000/api/korisnici/prijava", {
+      const odgovor = await axios.post(adresaRute, {
         email,
         lozinka,
       });

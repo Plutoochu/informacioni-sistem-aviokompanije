@@ -1,40 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Profil = () => {
   const [podaci, setPodaci] = useState({
-    ime: '',
-    prezime: '',
-    email: '',
-    telefon: ''
+    ime: "",
+    prezime: "",
+    email: "",
+    telefon: "",
   });
-  const [poruka, setPoruka] = useState('');
-  const [greska, setGreska] = useState('');
+  const [poruka, setPoruka] = useState("");
+  const [greska, setGreska] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const dohvatiProfil = async () => {
       try {
-        const token = localStorage.getItem('token');
-        console.log('Token pri dohvatanju profila:', token);
+        const token = localStorage.getItem("token");
+        console.log("Token pri dohvatanju profila:", token);
         if (!token) {
-          console.log('Nema tokena, preusmjeravam na login');
-          navigate('/prijava');
+          console.log("Nema tokena, preusmjeravam na login");
+          navigate("/prijava");
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/api/korisnici/profil', {
+        const adresaRute = import.meta.env.VITE_BACKEND_URL
+          ? import.meta.env.VITE_BACKEND_URL + "/api/korisnici/profil"
+          : "http://localhost:5000/api/korisnici/profil";
+
+        const response = await axios.get(adresaRute, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
-        console.log('Odgovor sa servera:', response.data);
+        console.log("Odgovor sa servera:", response.data);
         setPodaci(response.data);
       } catch (error) {
-        console.error('Greška pri dohvatanju profila:', error);
-        setGreska('Došlo je do greške pri dohvatanju podataka');
+        console.error("Greška pri dohvatanju profila:", error);
+        setGreska("Došlo je do greške pri dohvatanju podataka");
       }
     };
 
@@ -43,34 +47,38 @@ const Profil = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPodaci(prev => ({
+    setPodaci((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      console.log('Token pri ažuriranju profila:', token);
-      console.log('Podaci za slanje:', podaci);
-      
-      const response = await axios.put('http://localhost:5000/api/korisnici/profil', podaci, {
+      const token = localStorage.getItem("token");
+      console.log("Token pri ažuriranju profila:", token);
+      console.log("Podaci za slanje:", podaci);
+
+      const adresaRute = import.meta.env.VITE_BACKEND_URL
+        ? import.meta.env.VITE_BACKEND_URL + "/api/korisnici/profil"
+        : "http://localhost:5000/api/korisnici/profil";
+
+      const response = await axios.put(adresaRute, podaci, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      console.log('Odgovor sa servera:', response.data);
-      setPoruka('Profil uspješno ažuriran');
-      setGreska('');
+      console.log("Odgovor sa servera:", response.data);
+      setPoruka("Profil uspješno ažuriran");
+      setGreska("");
       setPodaci(response.data);
     } catch (error) {
-      console.error('Greška pri ažuriranju profila:', error);
-      console.error('Detalji greške:', error.response?.data);
-      setGreska(error.response?.data?.message || 'Došlo je do greške pri ažuriranju profila');
-      setPoruka('');
+      console.error("Greška pri ažuriranju profila:", error);
+      console.error("Detalji greške:", error.response?.data);
+      setGreska(error.response?.data?.message || "Došlo je do greške pri ažuriranju profila");
+      setPoruka("");
     }
   };
 
@@ -78,18 +86,11 @@ const Profil = () => {
     <div className="profil-container">
       <div className="profil-card">
         <h2>Upravljanje profilom</h2>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="ime">Ime:</label>
-            <input
-              type="text"
-              id="ime"
-              name="ime"
-              value={podaci.ime}
-              onChange={handleChange}
-              className="input-field"
-            />
+            <input type="text" id="ime" name="ime" value={podaci.ime} onChange={handleChange} className="input-field" />
           </div>
 
           <div className="form-group">
@@ -128,8 +129,10 @@ const Profil = () => {
             />
           </div>
 
-          <button type="submit" className="button">Sačuvaj promjene</button>
-          
+          <button type="submit" className="button">
+            Sačuvaj promjene
+          </button>
+
           {poruka && <p className="success">{poruka}</p>}
           {greska && <p className="error">{greska}</p>}
         </form>
@@ -138,4 +141,4 @@ const Profil = () => {
   );
 };
 
-export default Profil; 
+export default Profil;
