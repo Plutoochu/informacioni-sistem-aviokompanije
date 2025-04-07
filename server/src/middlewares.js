@@ -1,6 +1,7 @@
 // Sprint 2 - User Authentication & Account Management
 
 import jwt from 'jsonwebtoken';
+import config from './config.js';
 
 export const proslijediDalje = (req, res, next) => {
   next();
@@ -15,7 +16,7 @@ export const autentifikacija = (req, res, next) => {
             return res.status(401).json({ message: 'Nije pronađen token' });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, config.secret);
         
         req.korisnik = decoded;
         

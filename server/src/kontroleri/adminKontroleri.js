@@ -1,11 +1,43 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Destinacija } from "../modeli.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const destinacijeJsonPath = path.join(__dirname, '..', 'destinacije.json');
+
+const ucitajDestinacijeIzJsonFajla = () => {
+  const rawData = fs.readFileSync(destinacijeJsonPath);
+  return JSON.parse(rawData);
+};
+
+const unesiDestinacijeIzJsonFajla = async () => {
+  const destinacije = ucitajDestinacijeIzJsonFajla();
+  
+  try {
+    await Destinacija.insertMany(destinacije);
+    console.log('Destinacije su uspješno unesene!');
+  } catch (err) {
+    console.log('Greška pri unosu destinacija u bazu', err);
+  }
+};
+
 export const provjeraAplikacije = (req, res) => {
   return res.status(200).json({ poruka: "Sve ok!" });
 };
 
+const unosDestinacijaIzJsonFajla = async (req, res) => {
+  try {
+    await unesiDestinacijeIzJsonFajla();
+    res.status(200).json({ poruka: "Destinacije uspješno unesene iz JSON fajla!" });
+  } catch (err) {
+    res.status(500).json({ poruka: "Greška pri unosu destinacija." });
+  }
+};
 
-import { Destinacija } from "../modeli.js";
-
-// Dohvati sve destinacije
+// CRUD operacije
 const dohvatiDestinacije = async (req, res) => {
   try {
     const destinacije = await Destinacija.find();
@@ -15,7 +47,6 @@ const dohvatiDestinacije = async (req, res) => {
   }
 };
 
-// Dohvati jednu destinaciju
 const jednaDestinacija = async (req, res) => {
   try {
     const destinacija = await Destinacija.findById(req.params.id);
@@ -26,7 +57,6 @@ const jednaDestinacija = async (req, res) => {
   }
 };
 
-// Dodaj novu destinaciju
 const dodajDestinaciju = async (req, res) => {
   try {
     const novaDestinacija = new Destinacija(req.body);
@@ -37,7 +67,6 @@ const dodajDestinaciju = async (req, res) => {
   }
 };
 
-// Ažuriraj destinaciju
 const azurirajDestinaciju = async (req, res) => {
   try {
     const azurirana = await Destinacija.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -48,7 +77,6 @@ const azurirajDestinaciju = async (req, res) => {
   }
 };
 
-// Obriši destinaciju
 const obrisiDestinaciju = async (req, res) => {
   try {
     const obrisana = await Destinacija.findByIdAndDelete(req.params.id);
@@ -60,6 +88,7 @@ const obrisiDestinaciju = async (req, res) => {
 };
 
 export {
+  unosDestinacijaIzJsonFajla,
   dohvatiDestinacije,
   jednaDestinacija,
   dodajDestinaciju,
