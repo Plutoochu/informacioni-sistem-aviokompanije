@@ -1,4 +1,44 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+
+const korisnikSchema = new mongoose.Schema({
+    ime: {
+        type: String,
+        required: true
+    },
+    prezime: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    lozinka: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'kupac'],
+        default: 'kupac'
+    },
+    telefon: {
+        type: String
+    },
+    datumRegistracije: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Model za destinaciju
+const destinacijaSchema = new mongoose.Schema({
+  grad: { type: String, required: true },
+  nazivAerodroma: { type: String, required: true },
+  IATA: { type: String, required: true },
+  ICAO: { type: String, required: true },
+});
 
 const avionSchema = new mongoose.Schema({
   naziv: {
@@ -17,5 +57,14 @@ const avionSchema = new mongoose.Schema({
   },
 });
 
+const Korisnik = mongoose.model('Korisnik', korisnikSchema);
+const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
 const Avion = mongoose.model("Avion", avionSchema);
-export default Avion;
+
+export {
+  Korisnik,
+  Destinacija,
+  Avion
+};
+
+// Implementiran model korisnika sa osnovnim poljima (ime, prezime, email, lozinka) i rolama (admin/kupac)
