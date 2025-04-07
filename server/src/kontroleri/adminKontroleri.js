@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { Destinacija } from "../modeli.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const destinacijeJsonPath = path.join(__dirname, '..', 'destinacije.json');
 

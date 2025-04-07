@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, registracija, azurirajKorisnika, dohvatiProfil, zaboravljenaLozinka, resetujLozinku } from "../kontroleri/userKontroleri.js";
+import { login, registracija, azurirajProfil, dohvatiProfil, zaboravljenaLozinka, resetujLozinku } from "../kontroleri/userKontroleri.js";
 import { autentifikacija } from "../middlewares.js";
 import bcrypt from 'bcryptjs';
 import { Korisnik } from '../modeli.js';
@@ -12,8 +12,8 @@ router.post('/registracija', registracija);
 
 // Rute za profil
 router.get('/profil', autentifikacija, dohvatiProfil);
-router.put('/profil', autentifikacija, azurirajKorisnika);
-router.put('/update/:id', autentifikacija, azurirajKorisnika);
+router.put('/profil', autentifikacija, azurirajProfil);
+router.put('/update/:id', autentifikacija, azurirajProfil);
 
 // Ruta za resetovanje lozinke
 router.post('/forgot-password', zaboravljenaLozinka);

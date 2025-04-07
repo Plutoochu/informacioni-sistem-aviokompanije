@@ -17,9 +17,10 @@ const Profil = () => {
     const dohvatiProfil = async () => {
       try {
         const token = localStorage.getItem('token');
-        console.log('Token:', token);
+        console.log('Token pri dohvatanju profila:', token);
         if (!token) {
-          navigate('/login');
+          console.log('Nema tokena, preusmjeravam na login');
+          navigate('/prijava');
           return;
         }
 
@@ -29,6 +30,7 @@ const Profil = () => {
           }
         });
 
+        console.log('Odgovor sa servera:', response.data);
         setPodaci(response.data);
       } catch (error) {
         console.error('Greška pri dohvatanju profila:', error);
@@ -51,17 +53,22 @@ const Profil = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
+      console.log('Token pri ažuriranju profila:', token);
+      console.log('Podaci za slanje:', podaci);
+      
       const response = await axios.put('http://localhost:5000/api/korisnici/profil', podaci, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
 
+      console.log('Odgovor sa servera:', response.data);
       setPoruka('Profil uspješno ažuriran');
       setGreska('');
       setPodaci(response.data);
     } catch (error) {
       console.error('Greška pri ažuriranju profila:', error);
+      console.error('Detalji greške:', error.response?.data);
       setGreska(error.response?.data?.message || 'Došlo je do greške pri ažuriranju profila');
       setPoruka('');
     }

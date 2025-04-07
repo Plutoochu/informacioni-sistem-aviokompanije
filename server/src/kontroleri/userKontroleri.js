@@ -131,8 +131,10 @@ export const dohvatiProfil = async (req, res) => {
 export const azurirajProfil = async (req, res) => {
   try {
     const { ime, prezime, email, telefon } = req.body;
+    
+    // Pronalazimo korisnika po ID-u iz tokena
     const korisnik = await Korisnik.findById(req.korisnik.id);
-
+    
     if (!korisnik) {
       return res.status(404).json({ message: 'Korisnik nije pronađen' });
     }
