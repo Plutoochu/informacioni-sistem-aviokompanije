@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import '../stilovi/Registracija.css';
 
 const Registracija = () => {
   const [formData, setFormData] = useState({
@@ -11,11 +12,13 @@ const Registracija = () => {
     potvrdaLozinke: ''
   });
   const [greska, setGreska] = useState('');
+  const [uspjesno, setUspjesno] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setGreska('');
+    setUspjesno('');
 
     // Validacija
     if (!formData.ime || !formData.prezime || !formData.email || !formData.lozinka || !formData.potvrdaLozinke) {
@@ -29,16 +32,17 @@ const Registracija = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3001/api/korisnici/registracija', {
+      const response = await axios.post('http://localhost:5000/api/korisnici/registracija', {
         ime: formData.ime,
         prezime: formData.prezime,
         email: formData.email,
         lozinka: formData.lozinka
       });
 
-      if (response.data.uspjesno) {
+      setUspjesno('Registracija uspješna! Preusmjeravanje na prijavu...');
+      setTimeout(() => {
         navigate('/prijava');
-      }
+      }, 2000);
     } catch (error) {
       setGreska(error.response?.data?.message || 'Došlo je do greške prilikom registracije');
     }
@@ -100,6 +104,7 @@ const Registracija = () => {
             />
           </div>
           {greska && <div className="error-message">{greska}</div>}
+          {uspjesno && <div className="success-message">{uspjesno}</div>}
           <button type="submit" className="auth-button">
             Registruj se
           </button>

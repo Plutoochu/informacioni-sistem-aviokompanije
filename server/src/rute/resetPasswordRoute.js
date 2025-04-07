@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+import { resetujLozinku } from '../kontroleri/userKontroleri.js';
+
 const router = express.Router();
-const resetPassword = require('../controllers/resetPassword');
 
+router.post('/reset-password', resetujLozinku);
 
-router.post('/reset-password', resetPassword);
-
-module.exports = router;
+export default router;

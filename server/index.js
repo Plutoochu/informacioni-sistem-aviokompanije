@@ -10,6 +10,7 @@ import userRute from "./src/rute/userRute.js";
 import adminRute from "./src/rute/adminRute.js";
 import avionRute from "./src/rute/avionRute.js";
 import letRute from "./src/rute/letRute.js";
+import resetPasswordRoute from "./src/rute/resetPasswordRoute.js";
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(compress());
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -31,6 +32,7 @@ app.use("/api/korisnici", userRute);
 app.use("/api/admin", adminRute);
 app.use("/api/avioni", avionRute);
 app.use("/api/letovi", letRute);
+app.use("/api", resetPasswordRoute);
 
 // Test ruta
 app.get("/test", (req, res) => {
