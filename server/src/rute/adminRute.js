@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { provjeraAplikacije } from "../kontroleri/adminKontroleri.js";
+import { provjeraAplikacije, unosDestinacijaIzJsonFajla } from "../kontroleri/adminKontroleri.js";
 import { proslijediDalje } from "../middlewares.js";
 import {
     dohvatiDestinacije,
@@ -7,12 +7,12 @@ import {
     dodajDestinaciju,
     azurirajDestinaciju,
     obrisiDestinaciju
-  } from "../kontroleri/adminKontroleri.js";
-
+} from "../kontroleri/adminKontroleri.js";
 
 const router = Router();
 
 router.get("/provjera", proslijediDalje, provjeraAplikacije);
+router.post("/unesi-destinacije-json", unosDestinacijaIzJsonFajla);
 
 router.get("/destinacije", dohvatiDestinacije);
 router.get("/destinacije/:id", jednaDestinacija);
