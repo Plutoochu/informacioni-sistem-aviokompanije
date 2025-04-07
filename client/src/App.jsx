@@ -9,6 +9,7 @@ import Profil from './glavne-komponente/Profil';
 import Letovi from './glavne-komponente/Letovi';
 import ForgotPassword from './glavne-komponente/ForgotPassword';
 import ResetPassword from './glavne-komponente/ResetPassword';
+import AvioniForma from './glavne-komponente/AvioniForma';
 import './stilovi/App.css';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
               <Route path="/letovi" element={<Letovi />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/avioni" element={<AvioniForma />} />
             </Routes>
           </main>
         </div>

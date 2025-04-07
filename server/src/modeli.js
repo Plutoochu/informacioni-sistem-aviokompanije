@@ -40,9 +40,6 @@ const destinacijaSchema = new mongoose.Schema({
   ICAO: { type: String, required: true },
 });
 
-const Korisnik = mongoose.model("Korisnik", korisnikSchema);
-const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
-
 // Model za avion
 const avionSchema = new mongoose.Schema({
   naziv: {
@@ -55,6 +52,14 @@ const avionSchema = new mongoose.Schema({
     required: true,
   },
   tip: {
+    type: String,
+    required: true,
+  },
+  registracijskiBroj: {
+    type: String,
+    required: true,
+  },
+  konfiguracijaSjedala: {
     type: String,
     required: true,
   },
@@ -81,13 +86,16 @@ const avionSchema = new mongoose.Schema({
     C: { type: Number, default: 0 },
     Y: { type: Number, default: 0 },
   },
+  sjedalaPoRedu: {
+    F: { type: Number, default: 0 },
+    C: { type: Number, default: 0 },
+    Y: { type: Number, default: 0 },
+  },
   datumDodavanja: {
     type: Date,
     default: Date.now,
   },
 });
-
-const Avion = mongoose.model("Avion", avionSchema);
 
 // Model za reset token
 const resetTokenSchema = new mongoose.Schema({
@@ -106,6 +114,10 @@ const resetTokenSchema = new mongoose.Schema({
   },
 });
 
+// Kreiranje modela
+const Korisnik = mongoose.model("Korisnik", korisnikSchema);
+const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
+const Avion = mongoose.model("Avion", avionSchema);
 const ResetToken = mongoose.model("ResetToken", resetTokenSchema);
 
 export { Korisnik, Destinacija, Avion, ResetToken };

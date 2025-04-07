@@ -51,4 +51,25 @@ router.post('/create-test', async (req, res) => {
     }
 });
 
+// Ruta za kreiranje testnog admin korisnika
+router.post('/create-admin', async (req, res) => {
+    try {
+        const { ime, prezime, email, lozinka } = req.body;
+        const hashedLozinka = await bcrypt.hash(lozinka, 10);
+        
+        const korisnik = new Korisnik({
+            ime,
+            prezime,
+            email,
+            lozinka: hashedLozinka,
+            role: 'admin'
+        });
+
+        await korisnik.save();
+        res.status(201).json({ message: 'Admin korisnik kreiran' });
+    } catch (error) {
+        res.status(500).json({ message: 'Greška pri kreiranju admin korisnika' });
+    }
+});
+
 export default router;
