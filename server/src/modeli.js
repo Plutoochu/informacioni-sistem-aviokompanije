@@ -36,7 +36,20 @@ const korisnikSchema = new mongoose.Schema({
 
 const Korisnik = mongoose.model('Korisnik', korisnikSchema);
 
-export default Korisnik;
+// Model za destinaciju
+const destinacijaSchema = new mongoose.Schema({
+  grad: { type: String, required: true },
+  nazivAerodroma: { type: String, required: true },
+  IATA: { type: String, required: true },
+  ICAO: { type: String, required: true },
+});
+
+const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
+
+export {
+  Korisnik,
+  Destinacija
+};
 
 // Implementiran model korisnika sa osnovnim poljima (ime, prezime, email, lozinka) i rolama (admin/kupac)
 
