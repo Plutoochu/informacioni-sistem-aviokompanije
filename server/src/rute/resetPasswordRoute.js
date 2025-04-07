@@ -1,8 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const resetPassword = require('../controllers/resetPassword');
+import { Router } from "express";
+const router = Router();
+import resetPassword from "../kontroleri/resetPassword.js";
 
+router.post("/reset-password", resetPassword);
 
-router.post('/reset-password', resetPassword);
-
-module.exports = router;
+export default router;

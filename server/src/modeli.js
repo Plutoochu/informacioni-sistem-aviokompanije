@@ -1,35 +1,35 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const korisnikSchema = new mongoose.Schema({
-    ime: {
-        type: String,
-        required: true
-    },
-    prezime: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    lozinka: {
-        type: String,
-        required: true
-    },
-    role: {
-        type: String,
-        enum: ['admin', 'kupac'],
-        default: 'kupac'
-    },
-    telefon: {
-        type: String
-    },
-    datumRegistracije: {
-        type: Date,
-        default: Date.now
-    }
+  ime: {
+    type: String,
+    required: true,
+  },
+  prezime: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  lozinka: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ["admin", "kupac"],
+    default: "kupac",
+  },
+  telefon: {
+    type: String,
+  },
+  datumRegistracije: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // Model za destinaciju
@@ -46,10 +46,23 @@ const avionSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  konfiguracijaSjedista: {
+  tip: {
+    type: String,
+    required: true,
+  },
+  registracijskiBroj: {
+    type: String,
+    required: true,
+  },
+  konfiguracijaSjedala: {
     type: String,
     required: true,
     match: /^[Ff]?\d+[Cc]?\d+[Yy]?\d+$/, // npr. F10C20Y120
+  },
+  sjedalaPoRedu: {
+    F: { type: Number, default: 0 },
+    C: { type: Number, default: 0 },
+    Y: { type: Number, default: 0 },
   },
   datumDodavanja: {
     type: Date,
@@ -57,14 +70,10 @@ const avionSchema = new mongoose.Schema({
   },
 });
 
-const Korisnik = mongoose.model('Korisnik', korisnikSchema);
+const Korisnik = mongoose.model("Korisnik", korisnikSchema);
 const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
 const Avion = mongoose.model("Avion", avionSchema);
 
-export {
-  Korisnik,
-  Destinacija,
-  Avion
-};
+export { Korisnik, Destinacija, Avion };
 
 // Implementiran model korisnika sa osnovnim poljima (ime, prezime, email, lozinka) i rolama (admin/kupac)
