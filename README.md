@@ -47,6 +47,7 @@ Deployment je obavljen na Vercel platformi za frontend dio aplikacije, a na Rend
 
 ## Kako doprinijeti razvoju sistema?
 
-1. Napravite **fork** repozitorija i klonirajte ga lokalno.
-2. Kreirajte novi **branch** za razvoj željene funkcionalnosti.
-3. Napraviti **Pull Request (PR)** sa predloženim izmjenama i sačekajte pregled i odobrenje.
+1. Napravite **fork** repozitorija i klonirajte ga lokalno. Ako ste **kolaborator** na repozitoriju, potrebno je samo klonirat ga lokalno `git clone https://github.com/AnandPap/informacioni-sistem-za-aviokompanije.git`.
+2. Kreirajte novi **branch** preko **develop** brancha kroz **Issue** za razvoj željene funkcionalnosti (opcija se nalazi sa desne strane kada se otvori Issue).
+3. Napraviti `git pull` lokalno kako bi se ucitao novi branch i prebaciti se na njega tokom rada.
+4. Napraviti **Pull Request (PR)** sa predloženim izmjenama i sačekajte pregled i odobrenje.
