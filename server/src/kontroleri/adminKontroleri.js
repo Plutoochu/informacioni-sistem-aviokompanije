@@ -1,12 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { Destinacija } from "../modeli.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { Destinacija } from "../modeli/modeli.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const destinacijeJsonPath = path.join(__dirname, '..', 'destinacije.json');
+const destinacijeJsonPath = path.join(__dirname, "..", "destinacije.json");
 
 const ucitajDestinacijeIzJsonFajla = () => {
   const rawData = fs.readFileSync(destinacijeJsonPath);
@@ -15,12 +15,12 @@ const ucitajDestinacijeIzJsonFajla = () => {
 
 const unesiDestinacijeIzJsonFajla = async () => {
   const destinacije = ucitajDestinacijeIzJsonFajla();
-  
+
   try {
     await Destinacija.insertMany(destinacije);
-    console.log('Destinacije su uspješno unesene!');
+    console.log("Destinacije su uspješno unesene!");
   } catch (err) {
-    console.log('Greška pri unosu destinacija u bazu', err);
+    console.log("Greška pri unosu destinacija u bazu", err);
   }
 };
 
@@ -93,5 +93,5 @@ export {
   jednaDestinacija,
   dodajDestinaciju,
   azurirajDestinaciju,
-  obrisiDestinaciju
+  obrisiDestinaciju,
 };

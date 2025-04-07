@@ -1,33 +1,33 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [resetInfo, setResetInfo] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setMessage('');
+    setError("");
+    setMessage("");
     setResetInfo(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/korisnici/forgot-password', {
-        email
+      const response = await axios.post("http://localhost:5000/api/reset-password", {
+        email,
       });
 
       setResetInfo({
         token: response.data.token,
-        resetLink: response.data.resetLink
+        resetLink: response.data.resetLink,
       });
-      
-      setMessage('Token za resetovanje je generisan. Koristite link ispod za resetovanje lozinke:');
+
+      setMessage("Token za resetovanje je generisan. Koristite link ispod za resetovanje lozinke:");
     } catch (err) {
-      setError(err.response?.data?.message || 'Došlo je do greške. Pokušajte ponovo.');
+      setError(err.response?.data?.message || "Došlo je do greške. Pokušajte ponovo.");
     }
   };
 
@@ -35,10 +35,8 @@ const ForgotPassword = () => {
     <div className="auth-container">
       <div className="auth-card">
         <h2>Zaboravljena lozinka</h2>
-        <p className="text-gray-600">
-          Unesite vašu email adresu da generišemo link za resetovanje lozinke.
-        </p>
-        
+        <p className="text-gray-600">Unesite vašu email adresu da generišemo link za resetovanje lozinke.</p>
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email adresa</label>
@@ -58,7 +56,9 @@ const ForgotPassword = () => {
           {resetInfo && (
             <div className="reset-info">
               <p>Token: {resetInfo.token}</p>
-              <p>Link za resetovanje: <a href={resetInfo.resetLink}>{resetInfo.resetLink}</a></p>
+              <p>
+                Link za resetovanje: <a href={resetInfo.resetLink}>{resetInfo.resetLink}</a>
+              </p>
             </div>
           )}
 
@@ -68,7 +68,7 @@ const ForgotPassword = () => {
 
           <div className="link-container">
             <span>Vratite se na </span>
-            <span className="link" onClick={() => navigate('/prijava')}>
+            <span className="link" onClick={() => navigate("/prijava")}>
               prijavu
             </span>
           </div>
@@ -78,4 +78,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword; 
+export default ForgotPassword;

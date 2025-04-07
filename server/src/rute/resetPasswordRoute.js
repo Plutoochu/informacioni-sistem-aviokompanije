@@ -1,6 +1,7 @@
 import { Router } from "express";
-const router = Router();
 import resetPassword from "../kontroleri/resetPassword.js";
+
+const router = Router();
 
 router.post("/reset-password", resetPassword);
 

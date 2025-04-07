@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const korisnikSchema = new mongoose.Schema({
+const KorisnikSchema = new mongoose.Schema({
   ime: {
     type: String,
     required: true,
@@ -32,8 +32,7 @@ const korisnikSchema = new mongoose.Schema({
   },
 });
 
-// Model za destinaciju
-const destinacijaSchema = new mongoose.Schema({
+const DestinacijaSchema = new mongoose.Schema({
   grad: { type: String, required: true },
   nazivAerodroma: { type: String, required: true },
   IATA: { type: String, required: true },
@@ -41,7 +40,7 @@ const destinacijaSchema = new mongoose.Schema({
 });
 
 // Model za avion
-const avionSchema = new mongoose.Schema({
+const AvionSchema = new mongoose.Schema({
   naziv: {
     type: String,
     required: true,
@@ -98,7 +97,7 @@ const avionSchema = new mongoose.Schema({
 });
 
 // Model za reset token
-const resetTokenSchema = new mongoose.Schema({
+const ResetTokenSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
@@ -114,10 +113,45 @@ const resetTokenSchema = new mongoose.Schema({
   },
 });
 
-// Kreiranje modela
-const Korisnik = mongoose.model("Korisnik", korisnikSchema);
-const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
-const Avion = mongoose.model("Avion", avionSchema);
-const ResetToken = mongoose.model("ResetToken", resetTokenSchema);
+const LetSchema = new mongoose.Schema(
+  {
+    polaziste: {
+      type: String,
+      required: true,
+    },
+    odrediste: {
+      type: String,
+      required: true,
+    },
+    datumPolaska: {
+      type: Date,
+      required: true,
+    },
+    cijena: {
+      type: Number,
+      required: true,
+    },
+    brojSlobodnihMjesta: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    avionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Avion",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export { Korisnik, Destinacija, Avion, ResetToken };
+// Kreiranje modela
+const Korisnik = mongoose.model("Korisnik", KorisnikSchema);
+const Destinacija = mongoose.model("Destinacija", DestinacijaSchema);
+const Avion = mongoose.model("Avion", AvionSchema);
+const ResetToken = mongoose.model("ResetToken", ResetTokenSchema);
+const Let = mongoose.model("Let", LetSchema);
+
+export { Korisnik, Destinacija, Avion, ResetToken, Let };

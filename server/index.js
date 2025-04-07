@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import helmet from "helmet";
 import compress from "compression";
 import cors from "cors";
-import dotenv from "dotenv";
 
 import config from "./src/config.js";
 import userRute from "./src/rute/userRute.js";
@@ -12,49 +11,24 @@ import avionRute from "./src/rute/avionRute.js";
 import letRute from "./src/rute/letRute.js";
 import resetPasswordRoute from "./src/rute/resetPasswordRoute.js";
 
-dotenv.config();
-
 const app = express();
-
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Change to your frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-    credentials: true, // Allow credentials (cookies, authorization tokens)
-  })
-);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(compress());
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors({ credentials: true }));
 
 // Rute
 app.use("/api/korisnici", userRute);
 app.use("/api/admin", adminRute);
 app.use("/api/avioni", avionRute);
 app.use("/api/letovi", letRute);
-app.use("/api", resetPasswordRoute);
+app.use("/api/", resetPasswordRoute);
 
-// Test ruta
-app.get("/test", (req, res) => {
-  res.json({ message: "Server radi!" });
-});
+app.listen(config.port, () => console.log(`Server pokrenut na portu: ${config.port}`));
 
 mongoose
   .connect(config.mongo)
-  .then(() => {
-    console.log("MongoDB baza uspješno spojena!");
-    const PORT = process.env.PORT || config.port;
-    app.listen(PORT, () => 
-      console.log(`Server pokrenut na portu: ${PORT}`)
-    );
-  })
+  .then(() => console.log(`MongoDB baza uspješno spojena! Adresa: ${config.mongo}`))
   .catch((err) => console.log("Greška pri povezivanju sa bazom:", err));

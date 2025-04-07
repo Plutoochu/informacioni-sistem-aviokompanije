@@ -4,12 +4,16 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 export const prijava = async (podaci) => {
   try {
-    const response = await axios.post(`${backendUrl}/api/user/login`, {
-      email: podaci.usernameEmail,
-      lozinka: podaci.password
-    }, {
-      withCredentials: true
-    });
+    const response = await axios.post(
+      `${backendUrl}/api/user/login`,
+      {
+        email: podaci.usernameEmail,
+        lozinka: podaci.password,
+      },
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Greška pri prijavi:", error);
@@ -19,13 +23,9 @@ export const prijava = async (podaci) => {
 
 export const registracija = async (podaci) => {
   try {
-    const response = await axios.post(
-      `${backendUrl}/api/auth/registracija`,
-      podaci,
-      {
-        withCredentials: true,
-      }
-    );
+    const response = await axios.post(`${backendUrl}/api/auth/registracija`, podaci, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error("Greška pri registraciji:", error);
@@ -127,16 +127,12 @@ export const dohvatiSveZrakoplove = async () => {
 
 export const dodajZrakoplov = async (podaci) => {
   try {
-    const response = await axios.post(
-      `${backendUrl}/api/admin/zrakoplovi`,
-      podaci,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    );
+    const response = await axios.post(`${backendUrl}/api/admin/zrakoplovi`, podaci, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error("Greška pri dodavanju zrakoplova:", error);
@@ -146,16 +142,12 @@ export const dodajZrakoplov = async (podaci) => {
 
 export const azurirajZrakoplov = async (id, podaci) => {
   try {
-    const response = await axios.put(
-      `${backendUrl}/api/admin/zrakoplovi/${id}`,
-      podaci,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    );
+    const response = await axios.put(`${backendUrl}/api/admin/zrakoplovi/${id}`, podaci, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error("Greška pri ažuriranju zrakoplova:", error);
@@ -165,15 +157,12 @@ export const azurirajZrakoplov = async (id, podaci) => {
 
 export const obrisiZrakoplov = async (id) => {
   try {
-    const response = await axios.delete(
-      `${backendUrl}/api/admin/zrakoplovi/${id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    );
+    const response = await axios.delete(`${backendUrl}/api/admin/zrakoplovi/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error("Greška pri brisanju zrakoplova:", error);
@@ -196,9 +185,7 @@ export const dohvatiTipoveZrakoplova = async () => {
       message: error.message,
       code: error.code,
       response: error.response,
-      request: error.request
-        ? "Request was made but no response"
-        : "No request was made",
+      request: error.request ? "Request was made but no response" : "No request was made",
     });
     throw error;
   }

@@ -1,4 +1,4 @@
-import { Avion } from "../modeli.js";
+import { Avion } from "../modeli/modeli.js";
 
 //Dodaj novi avion
 const dodajAvion = async (req, res) => {
@@ -34,13 +34,8 @@ const dohvatiAvionPoId = async (req, res) => {
 //Ažurirajnje aviona
 const azurirajAvion = async (req, res) => {
   try {
-    const azuriranAvion = await Avion.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!azuriranAvion)
-      return res.status(404).json({ poruka: "Avion nije pronađen." });
+    const azuriranAvion = await Avion.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!azuriranAvion) return res.status(404).json({ poruka: "Avion nije pronađen." });
     res.json(azuriranAvion);
   } catch (greska) {
     res.status(400).json({ poruka: greska.message });
@@ -51,8 +46,7 @@ const azurirajAvion = async (req, res) => {
 const obrisiAvion = async (req, res) => {
   try {
     const obrisanAvion = await Avion.findByIdAndDelete(req.params.id);
-    if (!obrisanAvion)
-      return res.status(404).json({ poruka: "Avion nije pronađen." });
+    if (!obrisanAvion) return res.status(404).json({ poruka: "Avion nije pronađen." });
     res.json({ poruka: "Avion uspješno obrisan." });
   } catch (greska) {
     res.status(500).json({ poruka: greska.message });

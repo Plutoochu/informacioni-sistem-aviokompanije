@@ -4,14 +4,14 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
-  overflow: hidden;
 }
 
 body {
-  background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #87ceeb, #e0f7fa);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 #root {
@@ -119,9 +119,9 @@ form {
   cursor: pointer;
   text-decoration: underline;
   transition: color 0.15s ease;
-  display: inline; 
+  display: inline;
   font-size: 0.95em;
-  margin-left: 0.3rem; 
+  margin-left: 0.3rem;
 }
 
 .link:hover {
@@ -240,7 +240,7 @@ form {
 }
 
 .text-gray-600 {
-  color: #4B5563;
+  color: #4b5563;
   margin: 0.5rem 0;
 }
 
@@ -367,7 +367,6 @@ form {
 .main-content {
   flex: 1;
   position: relative;
-  overflow: hidden;
 }
 
 /* Početna Stranica Styles */
@@ -381,7 +380,7 @@ form {
   justify-content: center;
   align-items: center;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-              url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80");
   background-size: cover;
   background-position: center;
   padding: 2rem;
@@ -484,7 +483,7 @@ form {
   justify-content: center;
   align-items: center;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-              url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80");
   background-size: cover;
   background-position: center;
   padding: 2rem;
@@ -581,7 +580,7 @@ form {
 .let-kartica {
   background: white;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   transition: transform 0.2s ease;
 }
@@ -627,7 +626,7 @@ form {
   .letovi-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .letovi-container {
     padding: 1rem;
   }

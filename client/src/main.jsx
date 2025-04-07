@@ -1,10 +1,10 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import './stilovi/App.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import AppRuter from "./AppRuter";
+import "./stilovi/App.css";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <AppRuter />
   </React.StrictMode>
-)
+);
