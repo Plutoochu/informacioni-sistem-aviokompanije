@@ -40,34 +40,37 @@ const destinacijaSchema = new mongoose.Schema({
   ICAO: { type: String, required: true },
 });
 
-const avionSchema = new mongoose.Schema({
-  naziv: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  konfiguracijaSjedista: {
-    type: String,
-    required: true,
-    match: /^[Ff]?\d+[Cc]?\d+[Yy]?\d+$/, // npr. F10C20Y120
-  },
-  datumDodavanja: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
 const Korisnik = mongoose.model('Korisnik', korisnikSchema);
 const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
 
 // Model za avion
 const avionSchema = new mongoose.Schema({
-  model: { type: String, required: true },
-  brojSjedista: { type: Number, required: true },
+  naziv: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  model: {
+    type: String,
+    required: true
+  },
+  konfiguracijaSjedista: {
+    type: String,
+    required: true,
+    match: /^[Ff]?\d+[Cc]?\d+[Yy]?\d+$/ // npr. F10C20Y120
+  },
+  brojSjedista: {
+    type: Number,
+    required: true
+  },
   status: { 
     type: String, 
     enum: ['aktivan', 'neaktivan', 'u održavanju'],
     default: 'aktivan'
+  },
+  datumDodavanja: {
+    type: Date,
+    default: Date.now
   }
 });
 
