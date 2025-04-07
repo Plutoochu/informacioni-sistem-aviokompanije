@@ -1,8 +1,7 @@
-import express from 'express';
-import { resetujLozinku } from '../kontroleri/userKontroleri.js';
+import { Router } from "express";
+const router = Router();
+import resetPassword from "../kontroleri/resetPassword.js";
 
-const router = express.Router();
-
-router.post('/reset-password', resetujLozinku);
+router.post("/reset-password", resetPassword);
 
 export default router;

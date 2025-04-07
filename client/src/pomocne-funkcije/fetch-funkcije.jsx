@@ -33,7 +33,6 @@ export const registracija = async (podaci) => {
   }
 };
 
-
 export const provjeraAplikacije = async () => {
   try {
     const res = await axios.get(`${backendUrl}/api/admin/provjera`);
@@ -109,5 +108,98 @@ export const azurirajKorisnika = async (id, token, podaci) => {
   } catch (err) {
     console.log(err);
     throw err.response.data;
+  }
+};
+
+export const dohvatiSveZrakoplove = async () => {
+  try {
+    const response = await axios.get(`${backendUrl}/api/avioni`, {
+      timeout: 5000, // 5 sekundi
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri dohvaćanju zrakoplova:", error);
+    throw error;
+  }
+};
+
+export const dodajZrakoplov = async (podaci) => {
+  try {
+    const response = await axios.post(
+      `${backendUrl}/api/admin/zrakoplovi`,
+      podaci,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri dodavanju zrakoplova:", error);
+    throw error;
+  }
+};
+
+export const azurirajZrakoplov = async (id, podaci) => {
+  try {
+    const response = await axios.put(
+      `${backendUrl}/api/admin/zrakoplovi/${id}`,
+      podaci,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri ažuriranju zrakoplova:", error);
+    throw error;
+  }
+};
+
+export const obrisiZrakoplov = async (id) => {
+  try {
+    const response = await axios.delete(
+      `${backendUrl}/api/admin/zrakoplovi/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri brisanju zrakoplova:", error);
+    throw error;
+  }
+};
+
+export const dohvatiTipoveZrakoplova = async () => {
+  try {
+    const response = await axios.get(`${backendUrl}/api/avioni`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+      timeout: 10000, // Increase timeout for debugging
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Detailed error:", {
+      message: error.message,
+      code: error.code,
+      response: error.response,
+      request: error.request
+        ? "Request was made but no response"
+        : "No request was made",
+    });
+    throw error;
   }
 };

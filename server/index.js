@@ -16,6 +16,15 @@ dotenv.config();
 
 const app = express();
 
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Change to your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+    credentials: true, // Allow credentials (cookies, authorization tokens)
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());

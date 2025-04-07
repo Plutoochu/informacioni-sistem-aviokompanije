@@ -1,35 +1,35 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const korisnikSchema = new mongoose.Schema({
-    ime: {
-        type: String,
-        required: true
-    },
-    prezime: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    lozinka: {
-        type: String,
-        required: true
-    },
-    role: {
-        type: String,
-        enum: ['admin', 'kupac'],
-        default: 'kupac'
-    },
-    telefon: {
-        type: String
-    },
-    datumRegistracije: {
-        type: Date,
-        default: Date.now
-    }
+  ime: {
+    type: String,
+    required: true,
+  },
+  prezime: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  lozinka: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ["admin", "kupac"],
+    default: "kupac",
+  },
+  telefon: {
+    type: String,
+  },
+  datumRegistracije: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // Model za destinaciju
@@ -45,11 +45,11 @@ const avionSchema = new mongoose.Schema({
   naziv: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   model: {
     type: String,
-    required: true
+    required: true,
   },
   tip: {
     type: String,
@@ -62,16 +62,29 @@ const avionSchema = new mongoose.Schema({
   konfiguracijaSjedala: {
     type: String,
     required: true,
-    match: /^[Ff]?\d+[Cc]?\d+[Yy]?\d+$/ // npr. F10C20Y120
+  },
+  registracijskiBroj: {
+    type: String,
+    required: true,
+  },
+  konfiguracijaSjedala: {
+    type: String,
+    required: true,
+    match: /^[Ff]?\d+[Cc]?\d+[Yy]?\d+$/, // npr. F10C20Y120
   },
   brojSjedista: {
     type: Number,
-    required: true
+    required: true,
   },
-  status: { 
-    type: String, 
-    enum: ['aktivan', 'neaktivan', 'u održavanju'],
-    default: 'aktivan'
+  status: {
+    type: String,
+    enum: ["aktivan", "neaktivan", "u održavanju"],
+    default: "aktivan",
+  },
+  sjedalaPoRedu: {
+    F: { type: Number, default: 0 },
+    C: { type: Number, default: 0 },
+    Y: { type: Number, default: 0 },
   },
   sjedalaPoRedu: {
     F: { type: Number, default: 0 },
@@ -80,37 +93,31 @@ const avionSchema = new mongoose.Schema({
   },
   datumDodavanja: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Model za reset token
 const resetTokenSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true
+    required: true,
   },
   token: {
     type: String,
-    required: true
+    required: true,
   },
   expiresAt: {
     type: Date,
     required: true,
-    default: () => new Date(Date.now() + 3600000) // 1 sat
-  }
+    default: () => new Date(Date.now() + 3600000), // 1 sat
+  },
 });
 
 // Kreiranje modela
-const Korisnik = mongoose.model('Korisnik', korisnikSchema);
+const Korisnik = mongoose.model("Korisnik", korisnikSchema);
 const Destinacija = mongoose.model("Destinacija", destinacijaSchema);
-const Avion = mongoose.model('Avion', avionSchema);
-const ResetToken = mongoose.model('ResetToken', resetTokenSchema);
+const Avion = mongoose.model("Avion", avionSchema);
+const ResetToken = mongoose.model("ResetToken", resetTokenSchema);
 
-export {
-    Korisnik,
-    Destinacija,
-    Avion,
-    ResetToken
-};
-
+export { Korisnik, Destinacija, Avion, ResetToken };

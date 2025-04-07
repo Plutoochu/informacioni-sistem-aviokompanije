@@ -1,0 +1,114 @@
+.upravljanje-zrakoplovima-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.actions-container {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dodaj-zrakoplov-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.dodaj-zrakoplov-btn:hover {
+  background-color: #45a049;
+}
+
+.zrakoplovi-tablica-container {
+  overflow-x: auto;
+}
+
+.zrakoplovi-tablica {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.zrakoplovi-tablica th,
+.zrakoplovi-tablica td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.zrakoplovi-tablica th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.zrakoplovi-tablica tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.zrakoplovi-tablica tr:hover {
+  background-color: #f1f1f1;
+}
+
+.akcije-celija {
+  display: flex;
+  gap: 10px;
+}
+
+.azuriraj-btn {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.azuriraj-btn:hover {
+  background-color: #0b7dda;
+}
+
+.obrisi-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.obrisi-btn:hover {
+  background-color: #d32f2f;
+}
+
+.error-message {
+  color: #f44336;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #ffebee;
+  border-radius: 4px;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #666;
+}
+
+.nema-podataka {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+}
+
+/* Modal styles will be in separate component CSS files */
