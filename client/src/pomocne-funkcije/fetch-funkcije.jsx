@@ -26,6 +26,7 @@ export const registracija = async (podaci) => {
   }
 };
 
+
 export const provjeraAplikacije = async () => {
   try {
     const res = await axios.get(`${backendUrl}/api/admin/provjera`);
@@ -34,5 +35,19 @@ export const provjeraAplikacije = async () => {
   } catch (err) {
     console.log(err);
     return false;
+  }
+};
+
+export const azurirajKorisnika = async (id, token, podaci) => {
+  try {
+    const res = await axios.put(`${backendUrl}/api/user/update/${id}`, podaci, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (err) {
+    console.log(err);
+    throw err.response.data;
   }
 };
