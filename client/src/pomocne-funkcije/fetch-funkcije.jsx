@@ -26,6 +26,7 @@ export const registracija = async (podaci) => {
   }
 };
 
+
 export const provjeraAplikacije = async () => {
   try {
     const res = await axios.get(`${backendUrl}/api/admin/provjera`);

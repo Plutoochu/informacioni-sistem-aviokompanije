@@ -14,6 +14,7 @@ export const aviosistemSlice = createSlice({
   },
 });
 
+
 export const { setPrijavljen } = aviosistemSlice.actions;
 
 export default aviosistemSlice.reducer;
