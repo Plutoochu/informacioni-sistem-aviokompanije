@@ -7,6 +7,7 @@ import cors from "cors";
 import config from "./src/config.js";
 import userRute from "./src/rute/userRute.js";
 import adminRute from "./src/rute/adminRute.js";
+import avionRute from "./src/rute/avionRute.js";
 
 import resetPasswordRoute from "./src/rute/resetPasswordRoute.js";  
 
@@ -20,6 +21,7 @@ app.use(cors({ credentials: true }));
 
 app.use("/api/user", userRute);
 app.use("/api/admin", adminRute);
+app.use("/api/avioni", avionRute);
 
 app.use("/api", resetPasswordRoute);
 
