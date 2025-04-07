@@ -1,6 +1,6 @@
 // Sprint 2 - User Authentication & Account Management
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const korisnikSchema = new mongoose.Schema({
     ime: {
@@ -34,7 +34,9 @@ const korisnikSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Korisnik', korisnikSchema);
+const Korisnik = mongoose.model('Korisnik', korisnikSchema);
+
+export default Korisnik;
 
 // Implementiran model korisnika sa osnovnim poljima (ime, prezime, email, lozinka) i rolama (admin/kupac)
 
