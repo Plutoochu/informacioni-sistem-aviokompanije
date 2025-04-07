@@ -79,4 +79,15 @@ router.post("/create-admin", async (req, res) => {
   }
 });
 
+router.get("/dobavi-korisnike", async (req, res) => {
+  try {
+    const korisnici = await Korisnik.find();
+    console.log(korisnici);
+
+    res.status(200).json(korisnici);
+  } catch (error) {
+    res.status(500).json({ message: "Desila se greska" });
+  }
+});
+
 export default router;

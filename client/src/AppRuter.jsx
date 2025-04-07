@@ -11,6 +11,10 @@ import ForgotPassword from "./glavne-komponente/ForgotPassword";
 import ResetPassword from "./glavne-komponente/ResetPassword";
 import AvioniForma from "./glavne-komponente/AvioniForma";
 import "./stilovi/App.css";
+import AdminDashboard from "./glavne-komponente/AdminDashboard";
+import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
+import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
+import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
 
 function App() {
   return (
@@ -22,6 +26,11 @@ function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/prijava" replace />} />
               <Route path="/pocetna" element={<Pocetna />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />}>
+                <Route path="korisnici" element={<UpravljanjeKorisnicima />} />
+                <Route path="avioni" element={<UpravljanjeAvionima />} />
+                <Route path="destinacije" element={<UpravljanjeDestinacijama />} />
+              </Route>
               <Route path="/prijava" element={<Prijava />} />
               <Route path="/registracija" element={<Registracija />} />
               <Route path="/profil" element={<Profil />} />

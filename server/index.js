@@ -30,5 +30,5 @@ app.listen(config.port, () => console.log(`Server pokrenut na portu: ${config.po
 
 mongoose
   .connect(config.mongo)
-  .then(() => console.log(`MongoDB baza uspješno spojena! Adresa: ${config.mongo}`))
+  .then(() => console.log(`MongoDB baza uspješno spojena!`))
   .catch((err) => console.log("Greška pri povezivanju sa bazom:", err));

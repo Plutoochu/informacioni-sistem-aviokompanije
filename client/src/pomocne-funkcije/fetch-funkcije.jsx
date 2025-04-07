@@ -2,6 +2,16 @@ import axios from "axios";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
+export const dobaviKorisnike = async () => {
+  try {
+    const response = await axios.get(`${backendUrl}/api/korisnici/dobavi-korisnike`);
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error("Greška pri prijavi:", error);
+  }
+};
+
 export const prijava = async (podaci) => {
   try {
     const response = await axios.post(
