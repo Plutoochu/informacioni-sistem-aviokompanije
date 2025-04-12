@@ -2,6 +2,14 @@ import axios from "axios";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
+const api = axios.create({
+  baseURL: backendUrl,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 export const dobaviKorisnike = async () => {
   try {
     const response = await axios.get(
@@ -129,11 +137,7 @@ export const azurirajKorisnika = async (id, token, podaci) => {
 
 export const dohvatiSveZrakoplove = async () => {
   try {
-    const response = await axios.get(`${backendUrl}/api/avioni`, {
-      timeout: 5000, // 5 sekundi
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    });
+    const response = await api.get("/api/avioni");
     return response.data;
   } catch (error) {
     console.error("Greška pri dohvaćanju zrakoplova:", error);
