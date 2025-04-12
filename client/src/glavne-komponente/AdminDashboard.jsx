@@ -6,9 +6,15 @@ const AdminDashboard = () => {
 
   return (
     <div>
-      <button onClick={() => navigate("korisnici")}>Upravljanje korisnicima</button>
-      <button onClick={() => navigate("avioni")}>Upravljanje destinacijama</button>
-      <button onClick={() => navigate("destinacije")}>Upravljanje avionima</button>
+      <button onClick={() => navigate("korisnici")}>
+        Upravljanje korisnicima
+      </button>
+      <button onClick={() => navigate("avioni")}>
+        Upravljanje destinacijama
+      </button>
+      <button onClick={() => navigate("destinacije")}>
+        Upravljanje avionima
+      </button>
       <Outlet />
     </div>
   );

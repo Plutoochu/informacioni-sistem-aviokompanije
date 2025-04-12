@@ -25,7 +25,10 @@ const UpravljanjeZrakoplovima = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [zrakoplovData, tipoviData] = await Promise.all([dohvatiSveZrakoplove(), dohvatiTipoveZrakoplova()]);
+        const [zrakoplovData, tipoviData] = await Promise.all([
+          dohvatiSveZrakoplove(),
+          dohvatiTipoveZrakoplova(),
+        ]);
         setZrakoplovi(zrakoplovData);
         setTipoviZrakoplova(tipoviData);
         setError(null);
@@ -137,7 +140,9 @@ const UpravljanjeZrakoplovima = () => {
       {error && <div className="error-message">{error}</div>}
 
       <div className="actions-container">
-        <button className="dodaj-zrakoplov-btn" onClick={() => setShowDodajModal(true)}>
+        <button
+          className="dodaj-zrakoplov-btn"
+          onClick={() => setShowDodajModal(true)}>
           Dodaj Novi Zrakoplov
         </button>
       </div>
@@ -161,18 +166,30 @@ const UpravljanjeZrakoplovima = () => {
                 zrakoplovi.map((zrakoplov) => (
                   <tr key={zrakoplov._id}>
                     <td>{zrakoplov.naziv}</td>
-                    <td>{parseKonfiguracijaSjedala(zrakoplov.konfiguracijaSjedala)}</td>
-                    <td>{izracunajUkupnoSjedala(zrakoplov.konfiguracijaSjedala)}</td>
+                    <td>
+                      {parseKonfiguracijaSjedala(
+                        zrakoplov.konfiguracijaSjedala
+                      )}
+                    </td>
+                    <td>
+                      {izracunajUkupnoSjedala(zrakoplov.konfiguracijaSjedala)}
+                    </td>
                     <td>
                       {Object.entries(zrakoplov.sjedalaPoRedu)
-                        .map(([klasa, brojSjedala]) => `${klasa}: ${brojSjedala}`)
+                        .map(
+                          ([klasa, brojSjedala]) => `${klasa}: ${brojSjedala}`
+                        )
                         .join(", ")}
                     </td>
                     <td className="akcije-celija">
-                      <button className="azuriraj-btn" onClick={() => handleOtvoriAzurirajModal(zrakoplov)}>
+                      <button
+                        className="azuriraj-btn"
+                        onClick={() => handleOtvoriAzurirajModal(zrakoplov)}>
                         Ažuriraj
                       </button>
-                      <button className="obrisi-btn" onClick={() => handleObrisiZrakoplov(zrakoplov._id)}>
+                      <button
+                        className="obrisi-btn"
+                        onClick={() => handleObrisiZrakoplov(zrakoplov._id)}>
                         Obriši
                       </button>
                     </td>
@@ -204,7 +221,9 @@ const UpravljanjeZrakoplovima = () => {
         <AzurirajZrakoplovModal
           zrakoplov={odabraniZrakoplov}
           tipoviZrakoplova={tipoviZrakoplova}
-          onAzuriraj={(azuriraniPodaci) => handleAzurirajZrakoplov(odabraniZrakoplov._id, azuriraniPodaci)}
+          onAzuriraj={(azuriraniPodaci) =>
+            handleAzurirajZrakoplov(odabraniZrakoplov._id, azuriraniPodaci)
+          }
           onClose={() => {
             setShowAzurirajModal(false);
             setOdabraniZrakoplov(null);

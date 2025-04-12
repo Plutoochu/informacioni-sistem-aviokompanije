@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider } from "./kontekst/AuthContext";
 import Navigacija from "./glavne-komponente/Navigacija";
 import Pocetna from "./glavne-komponente/Pocetna";
@@ -13,7 +18,7 @@ import AvioniForma from "./glavne-komponente/AvioniForma";
 import "./stilovi/App.css";
 import AdminDashboard from "./glavne-komponente/AdminDashboard";
 import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
-import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
+import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeZrakoplovima";
 import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
 
 function App() {
@@ -29,7 +34,10 @@ function App() {
               <Route path="/admin-dashboard" element={<AdminDashboard />}>
                 <Route path="korisnici" element={<UpravljanjeKorisnicima />} />
                 <Route path="avioni" element={<UpravljanjeAvionima />} />
-                <Route path="destinacije" element={<UpravljanjeDestinacijama />} />
+                <Route
+                  path="destinacije"
+                  element={<UpravljanjeDestinacijama />}
+                />
               </Route>
               <Route path="/prijava" element={<Prijava />} />
               <Route path="/registracija" element={<Registracija />} />

@@ -26,7 +26,9 @@ app.use("/api/avioni", avionRute);
 app.use("/api/letovi", letRute);
 app.use("/api/", resetPasswordRoute);
 
-app.listen(config.port, () => console.log(`Server pokrenut na portu: ${config.port}`));
+app.listen(config.port, () =>
+  console.log(`Server pokrenut na portu: ${config.port}`)
+);
 
 mongoose
   .connect(config.mongo)
