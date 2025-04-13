@@ -37,13 +37,26 @@ Deployment je obavljen na Vercel platformi za frontend dio aplikacije, a na Rend
 
 `npm install`
 
-3. Pokrenuti lokalno aplikaciju također iz oba folder "client" i "server" sa:
+3. Osigurati da je MongoDB pokrenut na lokalnom računaru (port 27017)
 
-`npm run dev`
+4. Pokrenuti lokalno aplikaciju iz oba foldera "client" i "server" sa:
 
-4. Aplikacija bi trebala biti dostupna na adresi:
+```bash
+# U server folderu (port 5000)
+npm run dev
+
+# U client folderu (port 5173)
+npm run dev
+```
+
+5. Aplikacija bi trebala biti dostupna na adresi:
 
 `http://localhost:5173`
+
+### Napomene za razvoj
+- Backend server mora biti pokrenut na portu 5000
+- MongoDB mora biti pokrenut na portu 27017
+- Frontend aplikacija koristi proxy konfiguraciju za preusmjeravanje API poziva na backend
 
 ## Kako doprinijeti razvoju sistema?
 
@@ -51,3 +64,60 @@ Deployment je obavljen na Vercel platformi za frontend dio aplikacije, a na Rend
 2. Kreirajte novi **branch** preko **develop** brancha kroz **Issue** za razvoj željene funkcionalnosti (opcija se nalazi sa desne strane kada se otvori Issue).
 3. Napraviti `git pull` lokalno kako bi se ucitao novi branch i prebaciti se na njega tokom rada.
 4. Napraviti **Pull Request (PR)** sa predloženim izmjenama i sačekajte pregled i odobrenje.
+
+
+
+
+/// Sprint 3 - Grupa 1 ///
+
+Implementirana je funkcionalnost pretrage i pregleda letova za korisnike:
+
+### Implementirane komponente:
+
+1. **Backend**:
+   - Modifikovan `letKontroleri.js`:
+     - Dodata pretraga po destinaciji (case-insensitive)
+     - Dodata pretraga po datumu polaska (format DD/MM/YYYY)
+     - Implementirano sortiranje letova po datumu
+     - Dodano populiranje informacija o avionu
+     - Dodan endpoint za dohvatanje svih dostupnih destinacija
+     - Implementirano kreiranje testnih podataka (avion i letovi)
+
+2. **Frontend**:
+   - Unaprijeđena `Letovi.jsx` komponenta:
+     - Implementiran dropdown menu za odabir destinacije
+     - Implementiran custom date input sa odvojenim poljima za dan, mjesec i godinu
+     - Dodana validacija datuma (ograničenja za dan i mjesec)
+     - Implementiran prikaz letova u grid layoutu
+     - Dodate informacije o avionu za svaki let
+     - Implementiran loading state i error handling
+     - Dodan prikaz "Nema rezultata" kada nema letova
+     - Dodana validacija i sigurnosne provjere za podatke
+     - Dodano dugme za kreiranje testnih podataka
+
+3. **Stilovi**:
+   - Dodani novi stilovi u `App.css`:
+     - Stiliziran dropdown menu za destinacije
+     - Dodan custom arrow indicator za dropdown
+     - Implementiran custom date input sa odvojenim poljima
+     - Dodan fokus efekat na date input grupu
+     - Responsivan grid layout za kartice letova
+     - Hover efekti i animacije
+     - Loading i error stanja
+     - Prilagođen prikaz za mobilne uređaje
+
+### Lokacija izmjena:
+- `server/src/kontroleri/letKontroleri.js`
+- `server/src/rute/letRute.js`
+- `client/src/glavne-komponente/Letovi.jsx`
+- `client/src/stilovi/App.css`
+
+### Nove funkcionalnosti:
+- Pretraga letova po destinaciji kroz dropdown menu
+- Pretraga letova po datumu polaska kroz custom date input (DD/MM/YYYY)
+- Validacija unosa datuma sa ograničenjima za dan (1-31) i mjesec (1-12)
+- Automatsko formatiranje datuma pri unosu
+- Prikaz detalja o avionu za svaki let
+- Mogućnost kreiranja testnih podataka za demonstraciju
+- Poboljšano korisničko iskustvo kroz dropdown i custom date input
+- Bolje rukovanje greškama i edge slučajevima
