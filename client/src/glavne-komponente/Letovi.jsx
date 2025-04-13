@@ -31,14 +31,34 @@ const Letovi = () => {
             const params = {};
             if (filters.odrediste) params.odrediste = filters.odrediste;
             
-            // Kreiramo datum samo ako su sva polja popunjena
+            // Kreiramo datum string samo ako su sva polja popunjena
             if (filters.dan && filters.mjesec && filters.godina) {
-                const datumString = `${filters.godina}-${filters.mjesec.padStart(2, '0')}-${filters.dan.padStart(2, '0')}`;
-                params.datumPolaska = datumString;
+                const dan = filters.dan.padStart(2, '0');
+                const mjesec = filters.mjesec.padStart(2, '0');
+                params.datumPolaska = `${dan}/${mjesec}/${filters.godina}`;
             }
             
             const response = await axios.get('/api/letovi', { params });
-            setLetovi(Array.isArray(response.data) ? response.data : []);
+            console.log('Server response:', response.data); // Debug log
+
+            const formattedLetovi = response.data.map(let_ => {
+                console.log('Processing let:', let_); // Debug log
+                return {
+                    _id: let_._id || '',
+                    polaziste: let_.polaziste || '',
+                    odrediste: let_.odrediste || '',
+                    datumPolaska: let_.datumPolaska || '',
+                    cijena: let_.cijena || 0,
+                    brojSlobodnihMjesta: let_.brojSlobodnihMjesta || 0,
+                    avionId: let_.avionId ? {
+                        naziv: let_.avionId.naziv || '',
+                        model: let_.avionId.model || ''
+                    } : null
+                };
+            });
+            
+            console.log('Formatted letovi:', formattedLetovi); // Debug log
+            setLetovi(formattedLetovi);
         } catch (err) {
             setError('Došlo je do greške pri učitavanju letova.');
             console.error('Greška:', err);
@@ -136,9 +156,9 @@ const Letovi = () => {
                         onChange={handleFilterChange}
                         className="input-field select-field"
                     >
-                        <option value="">Sve destinacije</option>
-                        {Array.isArray(destinacije) && destinacije.map((destinacija) => (
-                            <option key={destinacija} value={destinacija}>
+                        <option key="default" value="">Sve destinacije</option>
+                        {destinacije.map((destinacija) => (
+                            <option key={`dest-${destinacija}`} value={destinacija}>
                                 {destinacija}
                             </option>
                         ))}
@@ -186,32 +206,35 @@ const Letovi = () => {
             {error && <div className="error">{error}</div>}
             
             <div className="letovi-grid">
-                {Array.isArray(letovi) && letovi.map((let_) => (
-                    <div key={let_._id} className="let-kartica">
-                        <div className="let-info">
-                            <h3>{let_.polaziste} → {let_.odrediste}</h3>
-                            <p>Datum polaska: {formatDate(let_.datumPolaska)}</p>
-                            <p>Cijena: {let_.cijena} €</p>
-                            <p>Slobodna mjesta: {let_.brojSlobodnihMjesta}</p>
-                            {let_.avionId && (
-                                <p className="avion-info">
-                                    Avion: {let_.avionId.naziv} ({let_.avionId.model})
-                                </p>
-                            )}
+                {letovi.length > 0 ? (
+                    letovi.map((let_) => (
+                        <div key={let_._id || `let-${let_.polaziste}-${let_.odrediste}-${let_.datumPolaska}`} className="let-kartica">
+                            <div className="let-info">
+                                <h3>{let_.polaziste || ''} → {let_.odrediste || ''}</h3>
+                                <p>Datum polaska: {let_.datumPolaska || ''}</p>
+                                <p>Cijena: {let_.cijena || 0} €</p>
+                                <p>Slobodna mjesta: {let_.brojSlobodnihMjesta || 0}</p>
+                                {let_.avionId && (
+                                    <p className="avion-info">
+                                        Avion: {let_.avionId.naziv || ''} ({let_.avionId.model || ''})
+                                    </p>
+                                )}
+                            </div>
+                            <button 
+                                className="rezervisi-dugme" 
+                                onClick={() => alert('Funkcionalnost rezervacije će biti dostupna uskoro!')}
+                                disabled={!let_.brojSlobodnihMjesta}
+                            >
+                                {!let_.brojSlobodnihMjesta ? 'Popunjeno' : 'Rezerviši'}
+                            </button>
                         </div>
-                        <button 
-                            className="rezervisi-dugme" 
-                            onClick={() => alert('Funkcionalnost rezervacije će biti dostupna uskoro!')}
-                            disabled={let_.brojSlobodnihMjesta === 0}
-                        >
-                            {let_.brojSlobodnihMjesta === 0 ? 'Popunjeno' : 'Rezerviši'}
-                        </button>
-                    </div>
-                ))}
-                {!loading && !error && (!letovi || letovi.length === 0) && (
-                    <div className="no-results">
-                        Nema dostupnih letova za odabrane kriterije.
-                    </div>
+                    ))
+                ) : (
+                    !loading && !error && (
+                        <div className="no-results">
+                            Nema dostupnih letova za odabrane kriterije.
+                        </div>
+                    )
                 )}
             </div>
         </div>

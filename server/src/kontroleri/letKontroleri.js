@@ -1,5 +1,25 @@
 import { Let, Avion } from "../modeli/modeli.js";
 
+// Helper funkcije za rad sa datumima
+const parseCustomDate = (dateStr) => {
+  const [day, month, year] = dateStr.split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date;
+};
+
+const formatCustomDate = (date) => {
+  const d = new Date(date);
+  return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+};
+
+// Helper funkcija za validaciju datuma
+const isValidDate = (day, month, year) => {
+    const date = new Date(year, month - 1, day);
+    return date.getDate() === parseInt(day) &&
+           date.getMonth() === parseInt(month) - 1 &&
+           date.getFullYear() === parseInt(year);
+};
+
 export const dohvatiLetove = async (req, res) => {
   try {
     const { odrediste, datumPolaska } = req.query;
@@ -10,11 +30,18 @@ export const dohvatiLetove = async (req, res) => {
     }
 
     if (datumPolaska) {
-      // Kreiranje raspona za taj dan (od početka do kraja dana)
-      const startDate = new Date(datumPolaska);
+      // Parsiramo datum iz formata dd/mm/yyyy
+      const [dan, mjesec, godina] = datumPolaska.split('/').map(Number);
+      
+      // Validacija datuma
+      if (!isValidDate(dan, mjesec, godina)) {
+        return res.status(400).json({ message: "Neispravan format datuma. Koristite DD/MM/YYYY format." });
+      }
+
+      const startDate = new Date(godina, mjesec - 1, dan);
       startDate.setHours(0, 0, 0, 0);
       
-      const endDate = new Date(datumPolaska);
+      const endDate = new Date(godina, mjesec - 1, dan);
       endDate.setHours(23, 59, 59, 999);
       
       query.datumPolaska = {
@@ -25,9 +52,19 @@ export const dohvatiLetove = async (req, res) => {
 
     const letovi = await Let.find(query)
       .sort({ datumPolaska: 1 })
-      .populate('avionId', 'naziv model brojSjedista');
+      .populate('avionId', 'naziv model brojSjedista')
+      .lean();
+
+    // Formatiramo datume u response-u
+    const formattedLetovi = letovi.map(let_ => {
+      const date = new Date(let_.datumPolaska);
+      return {
+        ...let_,
+        datumPolaska: `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+      };
+    });
       
-    res.status(200).json(letovi);
+    res.status(200).json(formattedLetovi);
   } catch (error) {
     console.error("Greška pri dohvatanju letova:", error);
     res.status(500).json({ message: "Greška pri dohvatanju letova" });
@@ -79,11 +116,12 @@ export const kreirajTestneLetove = async (req, res) => {
     await Avion.deleteMany({}); // Briše sve postojeće avione
     const sacuvaniAvion = await testniAvion.save();
 
+    // Kreiramo datume u formatu dd/mm/yyyy
     const testniLetovi = [
       {
         polaziste: "Sarajevo",
         odrediste: "Istanbul",
-        datumPolaska: new Date("2024-05-01T10:00:00Z"),
+        datumPolaska: parseCustomDate("01/05/2024"),
         cijena: 250,
         brojSlobodnihMjesta: 120,
         avionId: sacuvaniAvion._id
@@ -91,7 +129,7 @@ export const kreirajTestneLetove = async (req, res) => {
       {
         polaziste: "Sarajevo",
         odrediste: "Dubai",
-        datumPolaska: new Date("2024-05-02T15:30:00Z"),
+        datumPolaska: parseCustomDate("02/05/2024"),
         cijena: 450,
         brojSlobodnihMjesta: 150,
         avionId: sacuvaniAvion._id
@@ -99,7 +137,7 @@ export const kreirajTestneLetove = async (req, res) => {
       {
         polaziste: "Sarajevo",
         odrediste: "Berlin",
-        datumPolaska: new Date("2024-05-03T08:45:00Z"),
+        datumPolaska: parseCustomDate("03/05/2024"),
         cijena: 200,
         brojSlobodnihMjesta: 100,
         avionId: sacuvaniAvion._id
@@ -109,10 +147,16 @@ export const kreirajTestneLetove = async (req, res) => {
     await Let.deleteMany({}); // Briše sve postojeće letove
     await Let.insertMany(testniLetovi);
 
+    // Formatiramo datume u response-u
+    const formattedLetovi = testniLetovi.map(let_ => ({
+      ...let_,
+      datumPolaska: formatCustomDate(let_.datumPolaska)
+    }));
+
     res.status(201).json({ 
       message: "Testni letovi su uspješno kreirani",
       avion: sacuvaniAvion,
-      brojLetova: testniLetovi.length
+      letovi: formattedLetovi
     });
   } catch (error) {
     console.error("Greška pri kreiranju testnih letova:", error);
