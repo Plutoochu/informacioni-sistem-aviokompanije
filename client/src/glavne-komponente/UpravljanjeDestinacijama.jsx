@@ -1,164 +1,145 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  dodajDestinaciju,
+  obrisiDestinaciju,
+  dohvatiDestinacije,
+  azurirajDestinaciju,
+} from "../pomocne-funkcije/fetch-funkcije";
+import "../stilovi/Destinacije.css";
 
 const UpravljanjeDestinacijama = () => {
   const [grad, setGrad] = useState("");
   const [naziv, setNaziv] = useState("");
   const [iata, setIATA] = useState("");
   const [icao, setICAO] = useState("");
-  const [aerodromi, setAerodromi] = useState([]);
+  const [destinacije, setDestinacije] = useState([]);
+  const [editId, setEditId] = useState(null);
 
-  const dodajAerodrom = () => {
-    if (!grad || !naziv || !iata || !icao) return alert("Popuni sva polja!");
+  useEffect(() => {
+    const fetchDestinacije = async () => {
+      try {
+        const podaci = await dohvatiDestinacije();
+        setDestinacije(podaci);
+      } catch (err) {
+        console.error("Greška pri dohvaćanju destinacija:", err);
+      }
+    };
 
-    const noviAerodrom = { grad, naziv, iata, icao };
-    setAerodromi([...aerodromi, noviAerodrom]);
+    fetchDestinacije();
+  }, []);
 
+  const resetForm = () => {
     setGrad("");
     setNaziv("");
     setIATA("");
     setICAO("");
+    setEditId(null);
   };
 
-  const obrisiAerodrom = (index) => {
-    const novi = aerodromi.filter((_, i) => i !== index);
-    setAerodromi(novi);
+  const handleDodajIliAzuriraj = async () => {
+    if (!grad || !naziv || !iata || !icao) {
+      return alert("Popuni sva polja!");
+    }
+
+    const novaDestinacija = {
+      grad,
+      nazivAerodroma: naziv,
+      IATA: iata.toUpperCase(),
+      ICAO: icao.toUpperCase(),
+    };
+
+    try {
+      if (editId) {
+        const azurirano = await azurirajDestinaciju(editId, novaDestinacija);
+        setDestinacije((prev) =>
+          prev.map((d) => (d._id === editId ? azurirano : d))
+        );
+      } else {
+        const dodana = await dodajDestinaciju(novaDestinacija);
+        setDestinacije([...destinacije, dodana]);
+      }
+
+      resetForm();
+    } catch (err) {
+      console.error("Greška pri spremanju destinacije:", err);
+    }
+  };
+
+  const handleBrisanje = async (id) => {
+    try {
+      await obrisiDestinaciju(id);
+      setDestinacije(destinacije.filter((d) => d._id !== id));
+    } catch (err) {
+      console.error("Greška pri brisanju destinacije:", err);
+    }
+  };
+
+  const handleEdit = (destinacija) => {
+    setGrad(destinacija.grad);
+    setNaziv(destinacija.nazivAerodroma);
+    setIATA(destinacija.IATA);
+    setICAO(destinacija.ICAO);
+    setEditId(destinacija._id);
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}>
+    <div className="destination-container">
       <h2>Upravljanje destinacijama</h2>
 
-      <input
-        type="text"
-        placeholder="Grad"
-        value={grad}
-        onChange={(e) => setGrad(e.target.value)}
-        style={{ marginBottom: "10px", width: "100%", padding: "8px" }}
-      />
-      <input
-        type="text"
-        placeholder="Naziv aerodroma"
-        value={naziv}
-        onChange={(e) => setNaziv(e.target.value)}
-        style={{ marginBottom: "10px", width: "100%", padding: "8px" }}
-      />
-      <input
-        type="text"
-        placeholder="IATA kod (npr. SJJ)"
-        value={iata}
-        onChange={(e) => setIATA(e.target.value.toUpperCase())}
-        style={{ marginBottom: "10px", width: "100%", padding: "8px" }}
-      />
-      <input
-        type="text"
-        placeholder="ICAO kod (npr. LQSA)"
-        value={icao}
-        onChange={(e) => setICAO(e.target.value.toUpperCase())}
-        style={{ marginBottom: "10px", width: "100%", padding: "8px" }}
-      />
+      <div className="form-container">
+        <input
+          type="text"
+          placeholder="Grad"
+          value={grad}
+          onChange={(e) => setGrad(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Naziv aerodroma"
+          value={naziv}
+          onChange={(e) => setNaziv(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="IATA kod (npr. SJJ)"
+          value={iata}
+          onChange={(e) => setIATA(e.target.value.toUpperCase())}
+        />
+        <input
+          type="text"
+          placeholder="ICAO kod (npr. LQSA)"
+          value={icao}
+          onChange={(e) => setICAO(e.target.value.toUpperCase())}
+        />
+        <button onClick={handleDodajIliAzuriraj}>
+          {editId ? "Ažuriraj" : "Dodaj"} destinaciju
+        </button>
+      </div>
 
-      <button
-        onClick={dodajAerodrom}
-        style={{
-          padding: "10px",
-          width: "100%",
-          backgroundColor: "#007bff",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          marginBottom: "20px",
-        }}>
-        Dodaj destinaciju
-      </button>
-
-      <h3>Dodani aerodromi:</h3>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ backgroundColor: "#007bff" }}>
-            <th
-              style={{
-                padding: "10px",
-                border: "1px solid #ccc",
-                color: "white",
-              }}>
-              GRAD
-            </th>
-            <th
-              style={{
-                padding: "10px",
-                border: "1px solid #ccc",
-                color: "white",
-              }}>
-              NAZIV AERODROMA
-            </th>
-            <th
-              style={{
-                padding: "10px",
-                border: "1px solid #ccc",
-                color: "white",
-              }}>
-              IATA / ICAO
-            </th>
-            <th
-              style={{
-                padding: "10px",
-                border: "1px solid #ccc",
-                color: "white",
-              }}>
-              AKCIJA
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {aerodromi.map((a, index) => (
-            <tr key={index}>
-              <td
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  color: "white",
-                }}>
-                {a.grad}
-              </td>
-              <td
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  color: "white",
-                }}>
-                {a.naziv}
-              </td>
-              <td
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  color: "white",
-                }}>
-                {a.iata} / {a.icao}
-              </td>
-              <td
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  color: "white",
-                }}>
-                <button
-                  onClick={() => obrisiAerodrom(index)}
-                  style={{
-                    backgroundColor: "red",
-                    color: "white",
-                    border: "none",
-                    padding: "5px 10px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}>
-                  Obriši
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h3>Postojeće destinacije</h3>
+      <div className="destination-list">
+        {destinacije.map((d) => (
+          <div key={d._id} className="destination-card">
+            <div className="destination-info">
+              <p>
+                <strong>{d.grad}</strong>
+              </p>
+              <p>{d.nazivAerodroma}</p>
+              <p>
+                {d.IATA} / {d.ICAO}
+              </p>
+            </div>
+            <div className="destination-actions">
+              <button className="edit" onClick={() => handleEdit(d)}>
+                Uredi
+              </button>
+              <button className="delete" onClick={() => handleBrisanje(d._id)}>
+                Obriši
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

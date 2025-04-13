@@ -47,11 +47,10 @@ export const provjeraAplikacije = async () => {
 
 export const dobijSveKorisnike = async () => {
   try {
-    const token = localStorage.getItem("token");
     const response = await axios.get(`${backendUrl}/api/admin/korisnici`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
     return response.data;
@@ -63,14 +62,13 @@ export const dobijSveKorisnike = async () => {
 
 export const dodajKorisnika = async (noviKorisnik) => {
   try {
-    const token = localStorage.getItem("token");
     const response = await axios.post(
       `${backendUrl}/api/admin/korisnici`,
       noviKorisnik,
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
@@ -139,11 +137,15 @@ export const obrisiKorisnika = async (userId) => {
 
 export const azurirajKorisnika = async (id, token, podaci) => {
   try {
-    const res = await axios.put(`${backendUrl}/api/user/update/${id}`, podaci, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await axios.put(
+      `${backendUrl}/api/korisnici/update/${id}`,
+      podaci,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return res.data;
   } catch (err) {
     console.log(err);
@@ -153,7 +155,12 @@ export const azurirajKorisnika = async (id, token, podaci) => {
 
 export const dohvatiSveZrakoplove = async () => {
   try {
-    const response = await axios.get("/api/avioni");
+    const response = await axios.get(`${backendUrl}/api/admin/avioni`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Greška pri dohvaćanju zrakoplova:", error);
@@ -167,8 +174,10 @@ export const dodajZrakoplov = async (podaci) => {
       `${backendUrl}/api/admin/avioni`,
       podaci,
       {
-        method: "DELETE",
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       }
     );
     return response.data;
@@ -203,6 +212,7 @@ export const obrisiZrakoplov = async (id) => {
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
@@ -232,6 +242,77 @@ export const dohvatiTipoveZrakoplova = async () => {
         ? "Request was made but no response"
         : "No request was made",
     });
+    throw error;
+  }
+};
+
+export const dohvatiDestinacije = async () => {
+  try {
+    const response = await axios.get(`${backendUrl}/api/admin/destinacije`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri dohvaćanju destinacija:", error);
+    throw error;
+  }
+};
+
+export const dodajDestinaciju = async (podaci) => {
+  try {
+    const response = await axios.post(
+      `${backendUrl}/api/admin/destinacije`,
+      podaci,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri dodavanju destinacije:", error);
+    throw error;
+  }
+};
+
+export const azurirajDestinaciju = async (id, podaci) => {
+  try {
+    const response = await axios.put(
+      `${backendUrl}/api/admin/destinacije/${id}`,
+      podaci,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri ažuriranju destinacije:", error);
+    throw error;
+  }
+};
+
+export const obrisiDestinaciju = async (id) => {
+  try {
+    const response = await axios.delete(
+      `${backendUrl}/api/admin/destinacije/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri brisanju destinacije:", error);
     throw error;
   }
 };

@@ -1,11 +1,5 @@
 import { Router } from "express";
-import { unesiDestinacijeIzJsona } from "../kontroleri/adminKontroleri.js";
 import {
-  dohvatiSveDestinacije,
-  dohvatiJednuDestinaciju,
-  dodajNovuDestinaciju,
-  azurirajDestinaciju,
-  obrisiDestinaciju,
   dohvatiSveKorisnike,
   dohvatiKorisnikaPoId,
   promovirajUAdmina,
@@ -13,34 +7,31 @@ import {
   obrisiKorisnika,
   dodajNovogKorisnika,
 } from "../kontroleri/adminKontroleri.js";
-import { adminOnly, autentifikacija } from "../middlewares.js";
+import avionKontroler from "../kontroleri/kontrolerAviona.js";
+import kontrolerDestinacija from "../kontroleri/kontrolerDestinacija.js";
 
 const router = Router();
 
 router
-  .post("/unesi-destinacije-json", unesiDestinacijeIzJsona)
-  .get("/destinacije", dohvatiSveDestinacije)
-  .get("/destinacije/:id", dohvatiJednuDestinaciju)
-  .post("/destinacije", dodajNovuDestinaciju)
-  .put("/destinacije/:id", azurirajDestinaciju)
-  .delete("/destinacije/:id", obrisiDestinaciju);
+  .post("/korisnici", dodajNovogKorisnika)
+  .get("/korisnici", dohvatiSveKorisnike)
+  .get("/korisnici/:id", dohvatiKorisnikaPoId)
+  .put("/korisnici/:id/promoviraj", promovirajUAdmina)
+  .put("/korisnici/:id/demoviraj", demovirajUKorisnika)
+  .delete("/korisnici/:id", obrisiKorisnika);
 
 router
-  .post("/korisnici", autentifikacija, adminOnly, dodajNovogKorisnika)
-  .get("/korisnici", autentifikacija, adminOnly, dohvatiSveKorisnike)
-  .get("/korisnici/:id", autentifikacija, adminOnly, dohvatiKorisnikaPoId)
-  .put(
-    "/korisnici/:id/promoviraj",
-    autentifikacija,
-    adminOnly,
-    promovirajUAdmina
-  )
-  .put(
-    "/korisnici/:id/demoviraj",
-    autentifikacija,
-    adminOnly,
-    demovirajUKorisnika
-  )
-  .delete("/korisnici/:id", autentifikacija, adminOnly, obrisiKorisnika);
+  .post("/avioni", avionKontroler.dodajAvion)
+  .get("/avioni", avionKontroler.dohvatiAvione)
+  .get("/avioni/:id", avionKontroler.dohvatiAvionPoId)
+  .put("/avioni/:id", avionKontroler.azurirajAvion)
+  .delete("/avioni/:id", avionKontroler.obrisiAvion);
+
+router
+  .post("/destinacije", kontrolerDestinacija.dodajDestinaciju)
+  .get("/destinacije", kontrolerDestinacija.dohvatiDestinacije)
+  .get("/destinacije/:id", kontrolerDestinacija.dohvatiDestinacijuPoId)
+  .put("/destinacije/:id", kontrolerDestinacija.azurirajDestinaciju)
+  .delete("/destinacije/:id", kontrolerDestinacija.obrisiDestinaciju);
 
 export default router;

@@ -33,12 +33,11 @@ const KorisnikSchema = new mongoose.Schema({
 });
 
 const DestinacijaSchema = new mongoose.Schema({
-  grad: { type: String, required: true },
-  nazivAerodroma: { type: String, required: true },
-  IATA: { type: String, required: true },
-  ICAO: { type: String, required: true },
+  grad: { type: String, required: true }, // City name
+  nazivAerodroma: { type: String, required: true }, // Airport name
+  IATA: { type: String, required: true, uppercase: true, unique: true }, // IATA code (uppercase)
+  ICAO: { type: String, required: true, uppercase: true, unique: true }, // ICAO code (uppercase)
 });
-
 // Model za avion
 const AvionSchema = new mongoose.Schema({
   naziv: {
