@@ -61,14 +61,6 @@ const AvionSchema = new mongoose.Schema({
   konfiguracijaSjedala: {
     type: String,
     required: true,
-  },
-  registracijskiBroj: {
-    type: String,
-    required: true,
-  },
-  konfiguracijaSjedala: {
-    type: String,
-    required: true,
     match: /^[Ff]?\d+[Cc]?\d+[Yy]?\d+$/, // npr. F10C20Y120
   },
   brojSjedista: {
@@ -79,11 +71,6 @@ const AvionSchema = new mongoose.Schema({
     type: String,
     enum: ["aktivan", "neaktivan", "u održavanju"],
     default: "aktivan",
-  },
-  sjedalaPoRedu: {
-    F: { type: Number, default: 0 },
-    C: { type: Number, default: 0 },
-    Y: { type: Number, default: 0 },
   },
   sjedalaPoRedu: {
     F: { type: Number, default: 0 },

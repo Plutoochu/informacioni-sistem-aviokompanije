@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, Outlet } from "react-router";
 import {
   dohvatiSveZrakoplove,
   dodajZrakoplov,
@@ -12,6 +13,7 @@ import AzurirajZrakoplovModal from "../glavne-komponente/AzurirajZrakoplovModal"
 import "../stilovi/UpravljanjeZrakoplovima.css";
 
 const UpravljanjeAvionima = () => {
+  const navigate = useNavigate();
   const [zrakoplovi, setZrakoplovi] = useState([]);
   const [tipoviZrakoplova, setTipoviZrakoplova] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -142,8 +144,8 @@ const UpravljanjeAvionima = () => {
       <div className="actions-container">
         <button
           className="dodaj-zrakoplov-btn"
-          onClick={() => setShowDodajModal(true)}>
-          Dodaj Novi Zrakoplov
+          onClick={() => navigate("/avioni")}>
+          Dodaj Novi Avion
         </button>
       </div>
 

@@ -19,3 +19,12 @@ export const autentifikacija = (req, res, next) => {
     res.status(401).json({ message: "Nevažeći token" });
   }
 };
+
+export const adminOnly = (req, res, next) => {
+  if (req.korisnik?.role !== "admin") {
+    return res
+      .status(403)
+      .json({ message: "Nemate dopuštenje za ovu radnju!" });
+  }
+  next();
+};

@@ -2,26 +2,6 @@ import axios from "axios";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-const api = axios.create({
-  baseURL: backendUrl,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-export const dobaviKorisnike = async () => {
-  try {
-    const response = await axios.get(
-      `${backendUrl}/api/korisnici/dobavi-korisnike`
-    );
-    console.log(response);
-    return response;
-  } catch (error) {
-    console.error("Greška pri prijavi:", error);
-  }
-};
-
 export const prijava = async (podaci) => {
   try {
     const response = await axios.post(
@@ -45,10 +25,7 @@ export const registracija = async (podaci) => {
   try {
     const response = await axios.post(
       `${backendUrl}/api/auth/registracija`,
-      podaci,
-      {
-        withCredentials: true,
-      }
+      podaci
     );
     return response.data;
   } catch (error) {
@@ -70,15 +47,36 @@ export const provjeraAplikacije = async () => {
 
 export const dobijSveKorisnike = async () => {
   try {
+    const token = localStorage.getItem("token");
     const response = await axios.get(`${backendUrl}/api/admin/korisnici`, {
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
     return response.data;
   } catch (error) {
     console.error("Greška pri dohvaćanju korisnika:", error);
+    throw error;
+  }
+};
+
+export const dodajKorisnika = async (noviKorisnik) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.post(
+      `${backendUrl}/api/admin/korisnici`,
+      noviKorisnik,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri dodavanju korisnika:", error);
     throw error;
   }
 };
@@ -91,8 +89,8 @@ export const promovisiNaAdmina = async (userId) => {
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        withCredentials: true,
       }
     );
     return response.data;
@@ -110,13 +108,31 @@ export const demovisiToKorisnika = async (userId) => {
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        withCredentials: true,
       }
     );
     return response.data;
   } catch (error) {
     console.error("Greška pri demoviranje korisnika:", error);
+    throw error;
+  }
+};
+
+export const obrisiKorisnika = async (userId) => {
+  try {
+    const response = await axios.delete(
+      `${backendUrl}/api/admin/korisnici/${userId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri brisanju korisnika:", error);
     throw error;
   }
 };
@@ -137,7 +153,7 @@ export const azurirajKorisnika = async (id, token, podaci) => {
 
 export const dohvatiSveZrakoplove = async () => {
   try {
-    const response = await api.get("/api/avioni");
+    const response = await axios.get("/api/avioni");
     return response.data;
   } catch (error) {
     console.error("Greška pri dohvaćanju zrakoplova:", error);
@@ -148,13 +164,11 @@ export const dohvatiSveZrakoplove = async () => {
 export const dodajZrakoplov = async (podaci) => {
   try {
     const response = await axios.post(
-      `${backendUrl}/api/admin/zrakoplovi`,
+      `${backendUrl}/api/admin/avioni`,
       podaci,
       {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
+        method: "DELETE",
+        credentials: "include",
       }
     );
     return response.data;
@@ -167,13 +181,12 @@ export const dodajZrakoplov = async (podaci) => {
 export const azurirajZrakoplov = async (id, podaci) => {
   try {
     const response = await axios.put(
-      `${backendUrl}/api/admin/zrakoplovi/${id}`,
+      `${backendUrl}/api/admin/avioni${id}`,
       podaci,
       {
         headers: {
           "Content-Type": "application/json",
         },
-        withCredentials: true,
       }
     );
     return response.data;
@@ -186,12 +199,11 @@ export const azurirajZrakoplov = async (id, podaci) => {
 export const obrisiZrakoplov = async (id) => {
   try {
     const response = await axios.delete(
-      `${backendUrl}/api/admin/zrakoplovi/${id}`,
+      `${backendUrl}/api/admin/avioni/${id}`,
       {
         headers: {
           "Content-Type": "application/json",
         },
-        withCredentials: true,
       }
     );
     return response.data;
@@ -207,7 +219,7 @@ export const dohvatiTipoveZrakoplova = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      withCredentials: true,
+
       timeout: 10000, // Increase timeout for debugging
     });
     return response.data;

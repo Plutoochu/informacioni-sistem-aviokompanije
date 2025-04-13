@@ -5,8 +5,11 @@ import {
   dobijSveKorisnike,
   promovisiNaAdmina,
   demovisiToKorisnika,
+  obrisiKorisnika,
+  dodajKorisnika,
 } from "../pomocne-funkcije/fetch-funkcije";
 import "../stilovi/AdminUserManagement.css";
+import DodajKorisnikaModal from "./DodajKorisnikaModal";
 
 const UpravljanjeKorisnicima = () => {
   const [users, setUsers] = useState([]);
@@ -14,6 +17,7 @@ const UpravljanjeKorisnicima = () => {
   const [error, setError] = useState(null);
   const [actionInProgress, setActionInProgress] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [modalOtvoren, setModalOtvoren] = useState(false);
 
   useEffect(() => {
     dobijKorisnike();
@@ -30,6 +34,16 @@ const UpravljanjeKorisnicima = () => {
       console.error("Error fetching users:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const dodajNovogKorisnika = async (noviKorisnik) => {
+    try {
+      const dodani = await dodajKorisnika(noviKorisnik);
+      setUsers((prev) => [...prev, dodani]);
+    } catch (err) {
+      console.error("Dodavanje korisnika nije uspjelo:", err);
+      throw err;
     }
   };
 
@@ -58,12 +72,29 @@ const UpravljanjeKorisnicima = () => {
       await demovisiToKorisnika(userId);
       setUsers(
         users.map((user) =>
-          user._id === userId ? { ...user, role: "customer" } : user
+          user._id === userId ? { ...user, role: "kupac" } : user
         )
       );
     } catch (err) {
       setError("Failed to demote user.");
       console.error("Error demoting admin:", err);
+    } finally {
+      setActionInProgress(false);
+    }
+  };
+
+  const upravaljajBrisanjemKorisnika = async (userId) => {
+    if (actionInProgress) return;
+    const potvrda = confirm("Are you sure you want to delete this user?");
+    if (!potvrda) return;
+
+    try {
+      setActionInProgress(true);
+      await obrisiKorisnika(userId);
+      setUsers(users.filter((user) => user._id !== userId));
+    } catch (err) {
+      setError("Failed to delete user.");
+      console.error("Error deleting user:", err);
     } finally {
       setActionInProgress(false);
     }
@@ -92,6 +123,18 @@ const UpravljanjeKorisnicima = () => {
       <h1>User Management</h1>
 
       {error && <div className="error-message">{error}</div>}
+
+      <button
+        onClick={() => setModalOtvoren(true)}
+        className="promote-btn add-user-btn">
+        Dodaj korisnika
+      </button>
+
+      <DodajKorisnikaModal
+        otvoren={modalOtvoren}
+        onZatvori={() => setModalOtvoren(false)}
+        onDodajKorisnika={dodajNovogKorisnika}
+      />
 
       <div className="controls">
         <div className="search-container">
@@ -170,7 +213,7 @@ const UpravljanjeKorisnicima = () => {
                     )}
                   </td>
                   <td>
-                    {user.role === "customer" ? (
+                    {user.role === "kupac" ? (
                       <button
                         onClick={() => upravljajPromocijomKorisnika(user._id)}
                         disabled={actionInProgress}
@@ -187,6 +230,14 @@ const UpravljanjeKorisnicima = () => {
                     ) : (
                       "-"
                     )}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => upravaljajBrisanjemKorisnika(user._id)}
+                      disabled={actionInProgress}
+                      className="demote-btn delete-btn">
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))

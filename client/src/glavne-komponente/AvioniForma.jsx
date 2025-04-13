@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../stilovi/AvioniForma.css";
 
 const AvioniForma = () => {
   const [avioni, setAvioni] = useState([]);
   const [formData, setFormData] = useState({
-    naziv: '',
-    model: '',
-    tip: '',
-    registracijskiBroj: '',
-    konfiguracijaSjedala: '',
-    brojSjedista: '',
-    status: 'aktivan',
+    naziv: "",
+    model: "",
+    tip: "",
+    registracijskiBroj: "",
+    konfiguracijaSjedala: "",
+    brojSjedista: "",
+    status: "aktivan",
     sjedalaPoRedu: {
       F: 0,
       C: 0,
-      Y: 0
-    }
+      Y: 0,
+    },
   });
 
   useEffect(() => {
@@ -24,60 +25,60 @@ const AvioniForma = () => {
 
   const dohvatiAvione = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/avioni');
+      const response = await axios.get("http://localhost:5000/api/avioni");
       setAvioni(response.data);
     } catch (error) {
-      console.error('Greška pri dohvatanju aviona:', error);
+      console.error("Greška pri dohvatanju aviona:", error);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSjedalaChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       sjedalaPoRedu: {
         ...prev.sjedalaPoRedu,
-        [name]: parseInt(value) || 0
-      }
+        [name]: parseInt(value) || 0,
+      },
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/avioni', formData);
+      await axios.post("http://localhost:5000/api/avioni", formData);
       dohvatiAvione();
       setFormData({
-        naziv: '',
-        model: '',
-        tip: '',
-        registracijskiBroj: '',
-        konfiguracijaSjedala: '',
-        brojSjedista: '',
-        status: 'aktivan',
+        naziv: "",
+        model: "",
+        tip: "",
+        registracijskiBroj: "",
+        konfiguracijaSjedala: "",
+        brojSjedista: "",
+        status: "aktivan",
         sjedalaPoRedu: {
           F: 0,
           C: 0,
-          Y: 0
-        }
+          Y: 0,
+        },
       });
     } catch (error) {
-      console.error('Greška pri dodavanju aviona:', error);
+      console.error("Greška pri dodavanju aviona:", error);
     }
   };
 
   return (
     <div className="avioni-container">
       <h2>Upravljanje avionima</h2>
-      
+
       <form onSubmit={handleSubmit} className="avioni-forma">
         <div className="form-group">
           <label>Naziv:</label>
@@ -151,8 +152,7 @@ const AvioniForma = () => {
             name="status"
             value={formData.status}
             onChange={handleChange}
-            required
-          >
+            required>
             <option value="aktivan">Aktivan</option>
             <option value="neaktivan">Neaktivan</option>
             <option value="u održavanju">U održavanju</option>
@@ -216,7 +216,10 @@ const AvioniForma = () => {
                 <td>{avion.tip}</td>
                 <td>{avion.registracijskiBroj}</td>
                 <td>{avion.status}</td>
-                <td>F:{avion.sjedalaPoRedu.F} C:{avion.sjedalaPoRedu.C} Y:{avion.sjedalaPoRedu.Y}</td>
+                <td>
+                  F:{avion.sjedalaPoRedu.F} C:{avion.sjedalaPoRedu.C} Y:
+                  {avion.sjedalaPoRedu.Y}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -226,4 +229,4 @@ const AvioniForma = () => {
   );
 };
 
-export default AvioniForma; 
+export default AvioniForma;
