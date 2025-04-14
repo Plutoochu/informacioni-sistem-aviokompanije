@@ -101,26 +101,58 @@ const ResetTokenSchema = new mongoose.Schema({
 
 const LetSchema = new mongoose.Schema(
   {
-    polaziste: {
+    flightNumber: {
       type: String,
       required: true,
     },
-    odrediste: {
+    schedule: {
       type: String,
       required: true,
+      validate: {
+        validator: function (v) {
+          // Validate that the schedule is a valid pattern (e.g., "1234567" or "x56")
+          return /^[1234567x]+$/.test(v);
+        },
+        message: (props) => `${props.value} is not a valid schedule format!`,
+      },
     },
-    datumPolaska: {
+    departureTime: {
       type: Date,
       required: true,
     },
-    cijena: {
-      type: Number,
+    arrivalTime: {
+      type: Date,
+      required: true,
+      validate: {
+        validator: function (v) {
+          return v > this.departureTime; // Ensure arrival is after departure
+        },
+        message: "Arrival time must be after departure time.",
+      },
+    },
+    origin: {
+      type: String,
       required: true,
     },
-    brojSlobodnihMjesta: {
-      type: Number,
+    destination: {
+      type: String,
       required: true,
-      min: 0,
+    },
+    aircraftType: {
+      type: String,
+      required: true,
+    },
+    seatConfiguration: {
+      type: String,
+      required: true,
+    },
+    validityFrom: {
+      type: Date,
+      required: true,
+    },
+    validityTo: {
+      type: Date,
+      required: true,
     },
     avionId: {
       type: mongoose.Schema.Types.ObjectId,

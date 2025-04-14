@@ -40,9 +40,14 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Prazna opcija radi simetrije */}
-          <div className="pocetna-opcija">
-            <div className="pocetna-opcija-kartica"></div>
+          <div
+            className="pocetna-opcija"
+            onClick={() => navigate("/raspored-letova")}
+            style={{ cursor: "pointer" }}>
+            <div className="pocetna-opcija-kartica">
+              <h3>Letovi</h3>
+              <p>Dodavanje i uređivanje letova</p>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../kontekst/AuthContext';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../kontekst/AuthContext";
 
 const Navigacija = () => {
   const { korisnik, odjaviKorisnika } = useAuth();
@@ -8,18 +8,23 @@ const Navigacija = () => {
 
   const handleOdjava = () => {
     odjaviKorisnika();
-    navigate('/prijava');
+    navigate("/prijava");
   };
 
   return (
     <nav className="navigacija">
       <div className="navigacija-lijevo">
-        <Link to="/" className="logo">Aviokompanija</Link>
+        <Link to="/" className="logo">
+          Aviokompanija
+        </Link>
       </div>
-      
+
       <div className="navigacija-desno">
         {korisnik ? (
           <>
+            <Link to="/pocetna" className="navigacija-link">
+              Početna
+            </Link>
             <Link to="/profil" className="navigacija-link">
               Profil
             </Link>
@@ -42,4 +47,4 @@ const Navigacija = () => {
   );
 };
 
-export default Navigacija; 
+export default Navigacija;

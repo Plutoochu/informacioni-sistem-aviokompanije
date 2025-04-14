@@ -1,0 +1,148 @@
+/* Container for the flight schedule form */
+.flight-schedule-form {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
+}
+
+/* Form title */
+.flight-schedule-form h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Form group for labels and inputs */
+.form-group {
+  margin-bottom: 20px;
+}
+
+/* Label styling */
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* General input styling */
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+/* Input focus effect */
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Specific styling for datetime and date input types */
+.form-group input[type="datetime-local"],
+.form-group input[type="date"] {
+  cursor: pointer;
+}
+
+/* Styling for specific input fields */
+#flightNumber {
+  border-color: #ddd;
+}
+
+#departureTime {
+  border-color: #ddd;
+}
+
+#arrivalTime {
+  border-color: #ddd;
+}
+
+#origin {
+  border-color: #ddd;
+}
+
+#destination {
+  border-color: #ddd;
+}
+
+#aircraftType {
+  border-color: #ddd;
+}
+
+#seatConfiguration {
+  border-color: #ddd;
+}
+
+#schedule {
+  border-color: #ddd;
+}
+
+#validityFrom {
+  border-color: #ddd;
+}
+
+#validityTo {
+  border-color: #ddd;
+}
+
+/* Submit button styling */
+.btn-submit {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 6px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+.btn-submit:hover {
+  background-color: #0056b3;
+}
+
+/* Placeholder styling */
+input::placeholder {
+  color: #aaa;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+  .flight-schedule-form {
+    padding: 15px;
+  }
+
+  .flight-schedule-form h2 {
+    font-size: 22px;
+  }
+
+  .form-group input,
+  .btn-submit {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .flight-schedule-form h2 {
+    font-size: 20px;
+  }
+
+  .btn-submit {
+    font-size: 14px;
+    padding: 12px;
+  }
+}

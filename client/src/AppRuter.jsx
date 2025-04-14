@@ -20,6 +20,7 @@ import AdminDashboard from "./glavne-komponente/AdminDashboard";
 import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
 import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
 import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
+import RasporedLetovaForma from "./glavne-komponente/RasporedLetovaForma";
 
 function App() {
   return (
@@ -32,6 +33,10 @@ function App() {
               <Route path="/" element={<Navigate to="/prijava" replace />} />
               <Route path="/pocetna" element={<Pocetna />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route
+                path="/raspored-letova"
+                element={<RasporedLetovaForma />}
+              />
               <Route path="/korisnici" element={<UpravljanjeKorisnicima />} />
               <Route
                 path="/upravljanje-avionima"
