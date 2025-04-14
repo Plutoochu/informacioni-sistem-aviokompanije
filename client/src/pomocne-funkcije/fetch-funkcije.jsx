@@ -190,11 +190,12 @@ export const dodajZrakoplov = async (podaci) => {
 export const azurirajZrakoplov = async (id, podaci) => {
   try {
     const response = await axios.put(
-      `${backendUrl}/api/admin/avioni${id}`,
+      `${backendUrl}/api/admin/avioni/${id}`,
       podaci,
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
