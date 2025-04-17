@@ -7,8 +7,17 @@ import {
   obrisiKorisnika,
   dodajNovogKorisnika,
 } from "../kontroleri/adminKontroleri.js";
+import {
+  dohvatiLetove,
+  dohvatiLet,
+  dodajLet,
+  azurirajLet,
+  obrisatiLet,
+  dohvatiDestinacije,
+} from "../kontroleri/letKontroleri.js";
 import avionKontroler from "../kontroleri/kontrolerAviona.js";
 import kontrolerDestinacija from "../kontroleri/kontrolerDestinacija.js";
+
 import { autentifikacija, adminOnly } from "../middlewares.js";
 
 const router = Router();
@@ -81,5 +90,12 @@ router
     adminOnly,
     kontrolerDestinacija.obrisiDestinaciju
   );
+
+router
+  .get("/letovi", autentifikacija, adminOnly, dohvatiLetove)
+  .get("/letovi/:id", autentifikacija, adminOnly, dohvatiLet)
+  .post("/letovi", autentifikacija, adminOnly, dodajLet)
+  .put("/letovi/:id", autentifikacija, adminOnly, azurirajLet)
+  .delete("/letovi/:id", autentifikacija, adminOnly, obrisatiLet);
 
 export default router;

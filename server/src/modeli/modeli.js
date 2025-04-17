@@ -117,11 +117,11 @@ const LetSchema = new mongoose.Schema(
       },
     },
     departureTime: {
-      type: Date,
+      type: String,
       required: true,
     },
     arrivalTime: {
-      type: Date,
+      type: String,
       required: true,
       validate: {
         validator: function (v) {
@@ -135,10 +135,6 @@ const LetSchema = new mongoose.Schema(
       required: true,
     },
     destination: {
-      type: String,
-      required: true,
-    },
-    aircraftType: {
       type: String,
       required: true,
     },
