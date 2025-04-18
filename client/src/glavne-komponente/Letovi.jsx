@@ -16,10 +16,20 @@ const Letovi = () => {
 
     const fetchDestinacije = async () => {
         try {
+            console.log('Pokušavam dohvatiti destinacije...');
             const response = await axios.get('/api/letovi/destinacije');
-            setDestinacije(Array.isArray(response.data) ? response.data : []);
+            console.log('Response od destinacija:', response);
+            
+            if (!response.data) {
+                throw new Error('Nema podataka o destinacijama');
+            }
+
+            const destinacijeArray = Array.isArray(response.data) ? response.data : [];
+            console.log('Dohvaćene destinacije:', destinacijeArray);
+            setDestinacije(destinacijeArray);
         } catch (err) {
             console.error('Greška pri dohvatanju destinacija:', err);
+            setError('Greška pri dohvatanju destinacija. Molimo pokušajte ponovo.');
             setDestinacije([]);
         }
     };
@@ -31,37 +41,42 @@ const Letovi = () => {
             const params = {};
             if (filters.odrediste) params.odrediste = filters.odrediste;
             
-            // Kreiramo datum string samo ako su sva polja popunjena
             if (filters.dan && filters.mjesec && filters.godina) {
                 const dan = filters.dan.padStart(2, '0');
                 const mjesec = filters.mjesec.padStart(2, '0');
                 params.datumPolaska = `${dan}/${mjesec}/${filters.godina}`;
             }
             
+            console.log('Pokušavam dohvatiti letove sa parametrima:', params);
             const response = await axios.get('/api/letovi', { params });
-            console.log('Server response:', response.data); // Debug log
-
-            const formattedLetovi = response.data.map(let_ => {
-                console.log('Processing let:', let_); // Debug log
-                return {
-                    _id: let_._id || '',
-                    polaziste: let_.polaziste || '',
-                    odrediste: let_.odrediste || '',
-                    datumPolaska: let_.datumPolaska || '',
-                    cijena: let_.cijena || 0,
-                    brojSlobodnihMjesta: let_.brojSlobodnihMjesta || 0,
-                    avionId: let_.avionId ? {
-                        naziv: let_.avionId.naziv || '',
-                        model: let_.avionId.model || ''
-                    } : null
-                };
-            });
+            console.log('Response od letova:', response);
             
-            console.log('Formatted letovi:', formattedLetovi); // Debug log
+            if (!response.data) {
+                throw new Error('Nema podataka o letovima');
+            }
+
+            if (!Array.isArray(response.data)) {
+                throw new Error('Neočekivani format podataka sa servera');
+            }
+
+            const formattedLetovi = response.data.map(let_ => ({
+                _id: let_._id || '',
+                polaziste: let_.polaziste || '',
+                odrediste: let_.odrediste || '',
+                datumPolaska: let_.datumPolaska || '',
+                cijena: let_.cijena || 0,
+                brojSlobodnihMjesta: let_.brojSlobodnihMjesta || 0,
+                avionId: let_.avionId ? {
+                    naziv: let_.avionId.naziv || '',
+                    model: let_.avionId.model || ''
+                } : null
+            }));
+            
+            console.log('Formatirani letovi:', formattedLetovi);
             setLetovi(formattedLetovi);
         } catch (err) {
-            setError('Došlo je do greške pri učitavanju letova.');
             console.error('Greška:', err);
+            setError('Došlo je do greške pri učitavanju letova. Molimo pokušajte ponovo.');
             setLetovi([]);
         } finally {
             setLoading(false);
@@ -85,6 +100,7 @@ const Letovi = () => {
     };
 
     useEffect(() => {
+        console.log('Komponenta se mountala, pokrećem fetchDestinacije i fetchLetovi');
         fetchDestinacije();
         fetchLetovi();
     }, []);
