@@ -388,3 +388,40 @@ export const obrisiLet = async (id) => {
     throw error;
   }
 };
+
+export const otkaziLet = async (otkazivanjePodaci) => {
+  try {
+    const response = await axios.post(
+      `${backendUrl}/api/admin/letovi/otkazivanje`,
+      otkazivanjePodaci,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri otkazivanju leta:", error);
+    throw error;
+  }
+};
+
+export const dohvatiOtkazaneLetove = async () => {
+  try {
+    const response = await axios.get(
+      `${backendUrl}/api/admin/letovi/otkazani`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data; // očekujemo array sa flightId
+  } catch (error) {
+    console.error("Greška pri dohvaćanju otkazanih letova:", error);
+    throw error;
+  }
+};

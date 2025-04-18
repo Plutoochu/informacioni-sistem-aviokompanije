@@ -68,7 +68,7 @@ const AvionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["aktivan", "neaktivan", "u održavanju"],
+    enum: ["aktivan", "otkazan", "u održavanju"],
     default: "aktivan",
   },
   sjedalaPoRedu: {
@@ -161,11 +161,36 @@ const LetSchema = new mongoose.Schema(
   }
 );
 
+const OtkazaniLetSchema = new mongoose.Schema({
+  flightId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Let",
+    required: true,
+  },
+  from: {
+    type: Date,
+    required: true,
+  },
+  to: {
+    type: Date,
+    required: true,
+  },
+  days: {
+    type: [String], // npr: ["1", "3", "5"] za pon, sri, pet
+    default: [],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 // Kreiranje modela
 const Korisnik = mongoose.model("Korisnik", KorisnikSchema);
 const Destinacija = mongoose.model("Destinacija", DestinacijaSchema);
 const Avion = mongoose.model("Avion", AvionSchema);
 const ResetToken = mongoose.model("ResetToken", ResetTokenSchema);
 const Let = mongoose.model("Let", LetSchema);
+const OtkazaniLet = mongoose.model("OtkazaniLet", OtkazaniLetSchema);
 
-export { Korisnik, Destinacija, Avion, ResetToken, Let };
+export { Korisnik, Destinacija, Avion, ResetToken, Let, OtkazaniLet };

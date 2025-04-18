@@ -13,7 +13,8 @@ import {
   dodajLet,
   azurirajLet,
   obrisatiLet,
-  dohvatiDestinacije,
+  otkaziLet,
+  dohvatiOtkazaneLetove,
 } from "../kontroleri/letKontroleri.js";
 import avionKontroler from "../kontroleri/kontrolerAviona.js";
 import kontrolerDestinacija from "../kontroleri/kontrolerDestinacija.js";
@@ -96,6 +97,8 @@ router
   .get("/letovi/:id", autentifikacija, adminOnly, dohvatiLet)
   .post("/letovi", autentifikacija, adminOnly, dodajLet)
   .put("/letovi/:id", autentifikacija, adminOnly, azurirajLet)
-  .delete("/letovi/:id", autentifikacija, adminOnly, obrisatiLet);
+  .delete("/letovi/:id", autentifikacija, adminOnly, obrisatiLet)
+  .post("/letovi/otkazivanje", autentifikacija, adminOnly, otkaziLet)
+  .get("/letovi/otkazani", autentifikacija, adminOnly, dohvatiOtkazaneLetove);
 
 export default router;

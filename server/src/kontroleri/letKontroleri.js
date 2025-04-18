@@ -1,4 +1,4 @@
-import { Let, Avion } from "../modeli/modeli.js";
+import { Let, Avion, OtkazaniLet } from "../modeli/modeli.js";
 
 // Helper funkcije za rad sa datumima
 const parseCustomDate = (dateStr) => {
@@ -239,5 +239,43 @@ export const obrisatiLet = async (req, res) => {
   } catch (error) {
     console.error("Greška pri brisanju leta:", error);
     res.status(500).json({ message: "Greška pri brisanju leta" });
+  }
+};
+
+export const otkaziLet = async (req, res) => {
+  const { flightId, from, to, days } = req.body;
+
+  try {
+    // Validacija da let postoji
+    const flight = await Let.findById(flightId);
+    if (!flight) {
+      return res.status(404).json({ poruka: "Let nije pronađen." });
+    }
+
+    const noviOtkaz = new OtkazaniLet({
+      flightId,
+      from,
+      to,
+      days,
+    });
+
+    await noviOtkaz.save();
+
+    // TODO: Slanje obavijesti korisnicima (email/sistem)
+    // npr. notifyAffectedPassengers(flightId, from, to, days);
+
+    res.status(201).json({ poruka: "Let uspješno otkazan." });
+  } catch (err) {
+    console.error("Greška pri otkazivanju leta:", err);
+    res.status(500).json({ poruka: "Greška na serveru." });
+  }
+};
+
+export const dohvatiOtkazaneLetove = async (req, res) => {
+  try {
+    const otkazani = await OtkazaniLet.find({}, "flightId").lean();
+    res.status(200).json(otkazani.map((o) => o.flightId.toString()));
+  } catch (err) {
+    res.status(500).json({ message: "Greška pri dohvaćanju otkazanih letova" });
   }
 };
