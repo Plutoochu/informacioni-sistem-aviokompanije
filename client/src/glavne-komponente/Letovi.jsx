@@ -16,16 +16,11 @@ const Letovi = () => {
 
     const fetchDestinacije = async () => {
         try {
-            console.log('Pokušavam dohvatiti destinacije...');
             const response = await axios.get('/api/letovi/destinacije');
-            console.log('Response od destinacija:', response);
-            
             if (!response.data) {
                 throw new Error('Nema podataka o destinacijama');
             }
-
             const destinacijeArray = Array.isArray(response.data) ? response.data : [];
-            console.log('Dohvaćene destinacije:', destinacijeArray);
             setDestinacije(destinacijeArray);
         } catch (err) {
             console.error('Greška pri dohvatanju destinacija:', err);
@@ -47,9 +42,7 @@ const Letovi = () => {
                 params.datumPolaska = `${dan}/${mjesec}/${filters.godina}`;
             }
             
-            console.log('Pokušavam dohvatiti letove sa parametrima:', params);
             const response = await axios.get('/api/letovi', { params });
-            console.log('Response od letova:', response);
             
             if (!response.data) {
                 throw new Error('Nema podataka o letovima');
@@ -72,7 +65,6 @@ const Letovi = () => {
                 } : null
             }));
             
-            console.log('Formatirani letovi:', formattedLetovi);
             setLetovi(formattedLetovi);
         } catch (err) {
             console.error('Greška:', err);
@@ -83,24 +75,7 @@ const Letovi = () => {
         }
     };
 
-    const kreirajTestneLetove = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            await axios.post('/api/letovi/kreiraj-testne');
-            await fetchLetovi();
-            await fetchDestinacije();
-            alert('Testni letovi su uspješno kreirani!');
-        } catch (err) {
-            setError('Došlo je do greške pri kreiranju testnih letova.');
-            console.error('Greška:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        console.log('Komponenta se mountala, pokrećem fetchDestinacije i fetchLetovi');
         fetchDestinacije();
         fetchLetovi();
     }, []);
@@ -108,7 +83,6 @@ const Letovi = () => {
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         
-        // Validacija unosa
         if (name === 'dan') {
             const dan = parseInt(value);
             if (value && (dan < 1 || dan > 31)) return;
@@ -123,7 +97,6 @@ const Letovi = () => {
             if (value && value.length > 4) return;
         }
         
-        // Dozvoljavamo samo brojeve za datum
         if (['dan', 'mjesec', 'godina'].includes(name) && value !== '') {
             if (!/^\d+$/.test(value)) return;
         }
@@ -139,31 +112,21 @@ const Letovi = () => {
         fetchLetovi();
     };
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleString('bs-BA', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+    if (letovi.length === 0) {
+        return (
+            <div className="letovi-container">
+                <div className="letovi-card">
+                    <h2>Trenutno nema dostupnih letova</h2>
+                    <p>Molimo vas da pokušate kasnije ili kontaktirajte administratora za više informacija.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="letovi-container">
             <h2>Pretraga Letova</h2>
             
-            <div className="admin-controls" style={{ marginBottom: '1rem' }}>
-                <button 
-                    onClick={kreirajTestneLetove} 
-                    className="kreiraj-testne-dugme"
-                    disabled={loading}
-                >
-                    Kreiraj testne letove
-                </button>
-            </div>
-
             <form onSubmit={handleSearch} className="pretraga-forma">
                 <div className="form-group">
                     <select

@@ -5,7 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider } from "./kontekst/AuthContext";
+import { AuthProvider, useAuth } from "./kontekst/AuthContext";
 import Navigacija from "./glavne-komponente/Navigacija";
 import Pocetna from "./glavne-komponente/Pocetna";
 import Prijava from "./glavne-komponente/Prijava";
@@ -22,6 +22,28 @@ import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
 import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
 import RasporedLetovaForma from "./glavne-komponente/RasporedLetovaForma";
 
+// Komponenta za zaštićene admin rute
+const ProtectedAdminRoute = ({ children }) => {
+  const { korisnik } = useAuth();
+  
+  if (!korisnik || korisnik.role !== "admin") {
+    return <Navigate to="/prijava" replace />;
+  }
+  
+  return children;
+};
+
+// Komponenta za preusmjeravanje admina
+const AdminRedirect = () => {
+  const { korisnik } = useAuth();
+  
+  if (korisnik && korisnik.role === "admin") {
+    return <Navigate to="/admin-dashboard" replace />;
+  }
+  
+  return <Pocetna />;
+};
+
 function App() {
   return (
     <Router>
@@ -31,22 +53,36 @@ function App() {
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Navigate to="/prijava" replace />} />
-              <Route path="/pocetna" element={<Pocetna />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              <Route
-                path="/raspored-letova"
-                element={<RasporedLetovaForma />}
-              />
-              <Route path="/korisnici" element={<UpravljanjeKorisnicima />} />
-              <Route
-                path="/upravljanje-avionima"
-                element={<UpravljanjeAvionima />}
-              />
+              <Route path="/pocetna" element={<AdminRedirect />} />
+              
+              {/* Zaštićene admin rute */}
+              <Route path="/admin-dashboard" element={
+                <ProtectedAdminRoute>
+                  <AdminDashboard />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/raspored-letova" element={
+                <ProtectedAdminRoute>
+                  <RasporedLetovaForma />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/korisnici" element={
+                <ProtectedAdminRoute>
+                  <UpravljanjeKorisnicima />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/upravljanje-avionima" element={
+                <ProtectedAdminRoute>
+                  <UpravljanjeAvionima />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/destinacije" element={
+                <ProtectedAdminRoute>
+                  <UpravljanjeDestinacijama />
+                </ProtectedAdminRoute>
+              } />
 
-              <Route
-                path="/destinacije"
-                element={<UpravljanjeDestinacijama />}
-              />
+              {/* Ostale rute */}
               <Route path="/prijava" element={<Prijava />} />
               <Route path="/registracija" element={<Registracija />} />
               <Route path="/profil" element={<Profil />} />
