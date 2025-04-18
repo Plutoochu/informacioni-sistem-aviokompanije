@@ -34,10 +34,8 @@ export const dohvatiLetove = async (req, res) => {
     }
 
     if (datumPolaska) {
-      // Parsiramo datum iz formata dd/mm/yyyy
       const [dan, mjesec, godina] = datumPolaska.split("/").map(Number);
 
-      // Validacija datuma
       if (!isValidDate(dan, mjesec, godina)) {
         return res.status(400).json({
           message: "Neispravan format datuma. Koristite DD/MM/YYYY format.",
@@ -61,7 +59,6 @@ export const dohvatiLetove = async (req, res) => {
       .populate("avionId", "naziv model brojSjedista")
       .lean();
 
-    // Formatiramo datume u response-u
     const formattedLetovi = letovi.map((let_) => {
       const date = new Date(let_.datumPolaska);
       return {
@@ -76,7 +73,6 @@ export const dohvatiLetove = async (req, res) => {
 
     res.status(200).json(formattedLetovi);
   } catch (error) {
-    console.error("Greška pri dohvatanju letova:", error);
     res.status(500).json({ message: "Greška pri dohvatanju letova" });
   }
 };
@@ -87,7 +83,6 @@ export const dodajLet = async (req, res) => {
     await noviLet.save();
     res.status(201).json(noviLet);
   } catch (error) {
-    console.error("Greška pri dodavanju leta:", error);
     res.status(500).json({ message: "Greška pri dodavanju leta" });
   }
 };
@@ -100,117 +95,16 @@ export const dohvatiLet = async (req, res) => {
     }
     res.status(200).json(let_);
   } catch (error) {
-    console.error("Greška pri dohvatanju leta:", error);
     res.status(500).json({ message: "Greška pri dohvatanju leta" });
-  }
-};
-
-export const kreirajTestneLetove = async (req, res) => {
-  try {
-    // Prvo kreiramo testni avion
-    const testniAvion = new Avion({
-      naziv: "Boeing 737",
-      model: "737-800",
-      tip: "Putnički",
-      registracijskiBroj: "TC-JFV",
-      konfiguracijaSjedala: "F10C20Y120",
-      brojSjedista: 150,
-      status: "aktivan",
-      sjedalaPoRedu: {
-        F: 2,
-        C: 3,
-        Y: 6,
-      },
-    });
-
-    await Avion.deleteMany({}); // Briše sve postojeće avione
-    const sacuvaniAvion = await testniAvion.save();
-
-    // Kreiramo datume u formatu dd/mm/yyyy
-    const testniLetovi = [
-      {
-        polaziste: "Sarajevo",
-        odrediste: "Istanbul",
-        datumPolaska: parseCustomDate("01/05/2024"),
-        cijena: 250,
-        brojSlobodnihMjesta: 120,
-        avionId: sacuvaniAvion._id,
-      },
-      {
-        polaziste: "Sarajevo",
-        odrediste: "Dubai",
-        datumPolaska: parseCustomDate("02/05/2024"),
-        cijena: 450,
-        brojSlobodnihMjesta: 150,
-        avionId: sacuvaniAvion._id,
-      },
-      {
-        polaziste: "Sarajevo",
-        odrediste: "Berlin",
-        datumPolaska: parseCustomDate("03/05/2024"),
-        cijena: 200,
-        brojSlobodnihMjesta: 100,
-        avionId: sacuvaniAvion._id,
-      },
-    ];
-
-    await Let.deleteMany({}); // Briše sve postojeće letove
-    await Let.insertMany(testniLetovi);
-
-    // Formatiramo datume u response-u
-    const formattedLetovi = testniLetovi.map((let_) => ({
-      ...let_,
-      datumPolaska: formatCustomDate(let_.datumPolaska),
-    }));
-
-    res.status(201).json({
-      message: "Testni letovi su uspješno kreirani",
-      avion: sacuvaniAvion,
-      letovi: formattedLetovi,
-    });
-  } catch (error) {
-    console.error("Greška pri kreiranju testnih letova:", error);
-    res.status(500).json({ message: "Greška pri kreiranju testnih letova" });
   }
 };
 
 export const dohvatiDestinacije = async (req, res) => {
   try {
-    // Dohvatamo jedinstvene destinacije iz svih letova
     const destinacije = await Let.distinct("odrediste");
-    res.status(200).json(destinacije.sort()); // Sortiramo abecedno
+    res.status(200).json(destinacije.sort());
   } catch (error) {
-    console.error("Greška pri dohvatanju destinacija:", error);
     res.status(500).json({ message: "Greška pri dohvatanju destinacija" });
-  }
-};
-
-export const filtrirajLetove = async (req, res) => {
-  try {
-    const { raspored, datumPolaska } = req.body;
-
-    // Validacija rasporeda i datuma
-    const parsedSchedule = parsirajRaspored(raspored);
-    const parsedDate = datumPolaska ? parsirajCustomDatum(datumPolaska) : null;
-
-    let query = {};
-
-    if (parsedSchedule) {
-      query.schedule = parsedSchedule;
-    }
-    if (parsedDate) {
-      query.datumPolaska = { $gte: parsedDate };
-    }
-
-    const letovi = await Let.find(query)
-      .sort({ datumPolaska: 1 })
-      .populate("avionId", "naziv model brojSjedista")
-      .lean();
-
-    res.status(200).json(letovi);
-  } catch (error) {
-    console.error("Greška pri filtriranju letova:", error);
-    res.status(500).json({ message: "Greška pri filtriranju letova" });
   }
 };
 
@@ -224,7 +118,6 @@ export const azurirajLet = async (req, res) => {
     }
     res.status(200).json(let_);
   } catch (error) {
-    console.error("Greška pri ažuriranju leta:", error);
     res.status(500).json({ message: "Greška pri ažuriranju leta" });
   }
 };
@@ -237,7 +130,6 @@ export const obrisatiLet = async (req, res) => {
     }
     res.status(200).json({ message: "Let uspješno obrisan" });
   } catch (error) {
-    console.error("Greška pri brisanju leta:", error);
     res.status(500).json({ message: "Greška pri brisanju leta" });
   }
 };
@@ -246,36 +138,32 @@ export const otkaziLet = async (req, res) => {
   const { flightId, from, to, days } = req.body;
 
   try {
-    // Validacija da let postoji
     const flight = await Let.findById(flightId);
     if (!flight) {
-      return res.status(404).json({ poruka: "Let nije pronađen." });
+      return res.status(404).json({ message: "Let nije pronađen" });
     }
 
-    const noviOtkaz = new OtkazaniLet({
+    const otkazaniLet = new OtkazaniLet({
       flightId,
-      from,
-      to,
+      from: new Date(from),
+      to: new Date(to),
       days,
     });
 
-    await noviOtkaz.save();
-
-    // TODO: Slanje obavijesti korisnicima (email/sistem)
-    // npr. notifyAffectedPassengers(flightId, from, to, days);
-
-    res.status(201).json({ poruka: "Let uspješno otkazan." });
-  } catch (err) {
-    console.error("Greška pri otkazivanju leta:", err);
-    res.status(500).json({ poruka: "Greška na serveru." });
+    await otkazaniLet.save();
+    res.status(200).json({ message: "Let uspješno otkazan" });
+  } catch (error) {
+    res.status(500).json({ message: "Greška pri otkazivanju leta" });
   }
 };
 
 export const dohvatiOtkazaneLetove = async (req, res) => {
   try {
-    const otkazani = await OtkazaniLet.find({}, "flightId").lean();
-    res.status(200).json(otkazani.map((o) => o.flightId.toString()));
-  } catch (err) {
-    res.status(500).json({ message: "Greška pri dohvaćanju otkazanih letova" });
+    const otkazaniLetovi = await OtkazaniLet.find()
+      .populate("flightId")
+      .sort({ from: 1 });
+    res.status(200).json(otkazaniLetovi);
+  } catch (error) {
+    res.status(500).json({ message: "Greška pri dohvatanju otkazanih letova" });
   }
 };

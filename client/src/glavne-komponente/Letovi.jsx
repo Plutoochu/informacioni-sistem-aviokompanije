@@ -23,7 +23,6 @@ const Letovi = () => {
             const destinacijeArray = Array.isArray(response.data) ? response.data : [];
             setDestinacije(destinacijeArray);
         } catch (err) {
-            console.error('Greška pri dohvatanju destinacija:', err);
             setError('Greška pri dohvatanju destinacija. Molimo pokušajte ponovo.');
             setDestinacije([]);
         }
@@ -67,7 +66,6 @@ const Letovi = () => {
             
             setLetovi(formattedLetovi);
         } catch (err) {
-            console.error('Greška:', err);
             setError('Došlo je do greške pri učitavanju letova. Molimo pokušajte ponovo.');
             setLetovi([]);
         } finally {
@@ -201,7 +199,7 @@ const Letovi = () => {
                             </div>
                             <button 
                                 className="rezervisi-dugme" 
-                                onClick={() => alert('Funkcionalnost rezervacije će biti dostupna uskoro!')}
+                                onClick={() => window.location.href = '/rezervacija/' + let_._id}
                                 disabled={!let_.brojSlobodnihMjesta}
                             >
                                 {!let_.brojSlobodnihMjesta ? 'Popunjeno' : 'Rezerviši'}

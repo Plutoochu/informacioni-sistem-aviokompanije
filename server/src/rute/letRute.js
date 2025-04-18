@@ -3,11 +3,11 @@ import {
   dohvatiLetove,
   dodajLet,
   dohvatiLet,
-  kreirajTestneLetove,
   dohvatiDestinacije,
-  filtrirajLetove,
   azurirajLet,
   obrisatiLet,
+  otkaziLet,
+  dohvatiOtkazaneLetove
 } from "../kontroleri/letKontroleri.js";
 
 const router = Router();
@@ -24,16 +24,16 @@ router.post("/", dodajLet);
 // GET /api/letovi/:id - Dohvati jedan let
 router.get("/:id", dohvatiLet);
 
-// POST /api/letovi/kreiraj-testne - Kreiraj testne letove
-router.post("/kreiraj-testne", kreirajTestneLetove);
-
-// POST /api/letovi/filtriraj - Filtriraj letove prema rasporedu i datumu (novi endpoint)
-router.post("/filtriraj", filtrirajLetove);
-
-// PUT /api/letovi/:id - Ažuriraj postojeći let (novi endpoint)
+// PUT /api/letovi/:id - Ažuriraj postojeći let
 router.put("/:id", azurirajLet);
 
-// DELETE /api/letovi/:id - Obriši let (novi endpoint)
+// DELETE /api/letovi/:id - Obriši let
 router.delete("/:id", obrisatiLet);
+
+// POST /api/letovi/otkazi - Otkaži let
+router.post("/otkazi", otkaziLet);
+
+// GET /api/letovi/otkazani - Dohvati otkazane letove
+router.get("/otkazani", dohvatiOtkazaneLetove);
 
 export default router;
