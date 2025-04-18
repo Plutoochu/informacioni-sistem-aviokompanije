@@ -1,9 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../kontekst/AuthContext';
 
 const Pocetna = () => {
   const { korisnik } = useAuth();
+
+  // Ako je korisnik admin, preusmjeri ga na admin dashboard
+  if (korisnik && korisnik.uloga === 'admin') {
+    return <Navigate to="/admin-dashboard" replace />;
+  }
 
   if (!korisnik) {
     return (
