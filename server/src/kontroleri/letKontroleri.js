@@ -27,6 +27,8 @@ const isValidDate = (day, month, year) => {
 export const dohvatiLetove = async (req, res) => {
   try {
     const { odrediste, datumPolaska } = req.query;
+    console.log('Server primio zahtjev sa parametrima:', { odrediste, datumPolaska });
+    
     let query = {};
 
     if (odrediste) {
@@ -37,6 +39,7 @@ export const dohvatiLetove = async (req, res) => {
       const [dan, mjesec, godina] = datumPolaska.split("/").map(Number);
 
       if (!isValidDate(dan, mjesec, godina)) {
+        console.log('Neispravan format datuma:', datumPolaska);
         return res.status(400).json({
           message: "Neispravan format datuma. Koristite DD/MM/YYYY format.",
         });
@@ -54,10 +57,13 @@ export const dohvatiLetove = async (req, res) => {
       };
     }
 
+    console.log('MongoDB query:', query);
     const letovi = await Let.find(query)
       .sort({ datumPolaska: 1 })
       .populate("avionId", "naziv model brojSjedista")
       .lean();
+
+    console.log('Pronađeni letovi:', letovi);
 
     const formattedLetovi = letovi.map((let_) => {
       const date = new Date(let_.datumPolaska);
@@ -71,8 +77,10 @@ export const dohvatiLetove = async (req, res) => {
       };
     });
 
+    console.log('Formatirani letovi za slanje:', formattedLetovi);
     res.status(200).json(formattedLetovi);
   } catch (error) {
+    console.error('Greška pri dohvatanju letova:', error);
     res.status(500).json({ message: "Greška pri dohvatanju letova" });
   }
 };

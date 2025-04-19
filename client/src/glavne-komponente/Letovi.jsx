@@ -41,7 +41,9 @@ const Letovi = () => {
                 params.datumPolaska = `${dan}/${mjesec}/${filters.godina}`;
             }
             
+            console.log('Pozivam API sa parametrima:', params);
             const response = await axios.get('/api/letovi', { params });
+            console.log('API odgovor:', response.data);
             
             if (!response.data) {
                 throw new Error('Nema podataka o letovima');
@@ -64,8 +66,10 @@ const Letovi = () => {
                 } : null
             }));
             
+            console.log('Formatirani letovi:', formattedLetovi);
             setLetovi(formattedLetovi);
         } catch (err) {
+            console.error('Greška pri dohvatanju letova:', err);
             setError('Došlo je do greške pri učitavanju letova. Molimo pokušajte ponovo.');
             setLetovi([]);
         } finally {
