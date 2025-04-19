@@ -39,7 +39,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const response = await axios.post(`${getBaseUrl()}/api/korisnici/reset-password`, {
+      const response = await axios.post(`${getBaseUrl()}/api/reset-password`, {
         token,
         novaLozinka
       });
