@@ -40,7 +40,7 @@ export const dohvatiLetove = async (req, res) => {
     let query = {};
 
     if (odrediste) {
-      query.destination = odrediste;
+      query.odrediste = { $regex: new RegExp(odrediste, "i") };
     }
 
     if (datumPolaska) {
@@ -59,37 +59,29 @@ export const dohvatiLetove = async (req, res) => {
       const endDate = new Date(godina, mjesec - 1, dan);
       endDate.setHours(23, 59, 59, 999);
 
-      // Provjera da li je let važeći na traženi datum
-      query.validityFrom = { $lte: endDate };
-      query.validityTo = { $gte: startDate };
-
-      // Provjera da li let leti na traženi dan u sedmici
-      const dayOfWeek = startDate.getDay() || 7; // Pretvaramo 0 (nedjelja) u 7
-      query.schedule = new RegExp(dayOfWeek.toString());
+      query.datumPolaska = {
+        $gte: startDate,
+        $lte: endDate,
+      };
     }
 
     console.log("MongoDB query:", query);
     const letovi = await Let.find(query)
+      .sort({ datumPolaska: 1 })
       .populate("avionId", "naziv model brojSjedista")
       .lean();
 
     console.log("Pronađeni letovi:", letovi);
 
-    // Konvertujemo admin model u korisnički model
     const formattedLetovi = letovi.map((let_) => {
+      const date = new Date(let_.datumPolaska);
       return {
-        _id: let_._id,
-        polaziste: let_.origin,
-        odrediste: let_.destination,
-        datumPolaska: let_.departureTime,
-        cijena: let_.cijena || 250, // Koristimo cijenu iz leta ako postoji, inače default
-        brojSlobodnihMjesta: let_.availableSeats || let_.avionId?.brojSjedista || 0,
-        avionId: let_.avionId ? {
-          naziv: let_.avionId.naziv,
-          model: let_.avionId.model,
-          tip: let_.avionId.tip,
-          konfiguracijaSjedala: let_.avionId.konfiguracijaSjedala
-        } : null
+        ...let_,
+        datumPolaska: `${date.getDate().toString().padStart(2, "0")}/${(
+          date.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, "0")}/${date.getFullYear()}`,
       };
     });
 
@@ -132,7 +124,7 @@ export const dohvatiLet = async (req, res) => {
 
 export const dohvatiDestinacije = async (req, res) => {
   try {
-    const destinacije = await Let.distinct("destination"); // Promijenili smo iz odrediste u destination
+    const destinacije = await Let.distinct("odrediste");
     res.status(200).json(destinacije.sort());
   } catch (error) {
     res.status(500).json({ message: "Greška pri dohvatanju destinacija" });
@@ -152,7 +144,6 @@ export const azurirajLet = async (req, res) => {
     res.status(500).json({ message: "Greška pri ažuriranju leta" });
   }
 };
-
 export const otkaziLet = async (req, res) => {
   const { flightId, from, to, days } = req.body;
 

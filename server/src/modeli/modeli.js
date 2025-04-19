@@ -168,21 +168,6 @@ const LetSchema = new mongoose.Schema(
       ref: "Avion",
       required: true,
     },
-    cijena: {
-      type: Number,
-      required: true,
-      default: 250
-    },
-    availableSeats: {
-      type: Number,
-      required: true,
-      validate: {
-        validator: function(v) {
-          return v >= 0;
-        },
-        message: "Broj dostupnih sjedišta ne može biti negativan"
-      }
-    }
   },
   {
     timestamps: true,

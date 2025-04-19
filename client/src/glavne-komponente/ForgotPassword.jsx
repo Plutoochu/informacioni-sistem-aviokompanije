@@ -24,7 +24,7 @@ const ForgotPassword = () => {
     setResetInfo(null);
 
     try {
-      const response = await axios.post(`${getBaseUrl()}/api/forgot-password`, {
+      const response = await axios.post(`${getBaseUrl()}/api/reset-password`, {
         email,
       });
 
