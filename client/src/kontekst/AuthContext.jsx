@@ -17,12 +17,10 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const getBaseUrl = () => {
-    // Ako je development okruženje, koristi localhost
     if (window.location.hostname === 'localhost') {
       return "http://localhost:5000";
     }
-    // Inače koristi produkcijski URL
-    return "https://informacioni-sistem-za-aviokompanije.vercel.app";
+    return "https://informacioni-sistem-za-aviokompanije.onrender.com";
   };
 
   const prijaviKorisnika = async (email, lozinka) => {

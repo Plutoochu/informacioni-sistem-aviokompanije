@@ -7,7 +7,7 @@ const getBaseUrl = () => {
   if (window.location.hostname === 'localhost') {
     return "http://localhost:5000";
   }
-  return "https://informacioni-sistem-za-aviokompanije.vercel.app";
+  return "https://informacioni-sistem-za-aviokompanije.onrender.com";
 };
 
 const ForgotPassword = () => {
