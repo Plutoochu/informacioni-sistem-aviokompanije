@@ -1,6 +1,6 @@
 import {
   Let,
-  Avion,
+  Destinacija,
   OtkazaniLet,
   Notifikacija,
   Korisnik,
@@ -31,62 +31,25 @@ const isValidDate = (day, month, year) => {
 
 export const dohvatiLetove = async (req, res) => {
   try {
-    const { odrediste, datumPolaska } = req.query;
-    console.log("Server primio zahtjev sa parametrima:", {
-      odrediste,
-      datumPolaska,
-    });
+    const { odrediste } = req.query;
+    console.log("Server primio zahtjev sa parametrima:", { odrediste });
 
     let query = {};
 
     if (odrediste) {
-      query.odrediste = { $regex: new RegExp(odrediste, "i") };
-    }
-
-    if (datumPolaska) {
-      const [dan, mjesec, godina] = datumPolaska.split("/").map(Number);
-
-      if (!isValidDate(dan, mjesec, godina)) {
-        console.log("Neispravan format datuma:", datumPolaska);
-        return res.status(400).json({
-          message: "Neispravan format datuma. Koristite DD/MM/YYYY format.",
-        });
-      }
-
-      const startDate = new Date(godina, mjesec - 1, dan);
-      startDate.setHours(0, 0, 0, 0);
-
-      const endDate = new Date(godina, mjesec - 1, dan);
-      endDate.setHours(23, 59, 59, 999);
-
-      query.datumPolaska = {
-        $gte: startDate,
-        $lte: endDate,
-      };
+      query.destination = { $regex: new RegExp(odrediste, "i") };
     }
 
     console.log("MongoDB query:", query);
+
     const letovi = await Let.find(query)
-      .sort({ datumPolaska: 1 })
+      .sort({ flightNumber: 1 })
       .populate("avionId", "naziv model brojSjedista")
       .lean();
 
     console.log("Pronađeni letovi:", letovi);
 
-    const formattedLetovi = letovi.map((let_) => {
-      const date = new Date(let_.datumPolaska);
-      return {
-        ...let_,
-        datumPolaska: `${date.getDate().toString().padStart(2, "0")}/${(
-          date.getMonth() + 1
-        )
-          .toString()
-          .padStart(2, "0")}/${date.getFullYear()}`,
-      };
-    });
-
-    console.log("Formatirani letovi za slanje:", formattedLetovi);
-    res.status(200).json(formattedLetovi);
+    res.status(200).json(letovi); // ✅ direktan odgovor bez pogrešnog formata
   } catch (error) {
     console.error("Greška pri dohvatanju letova:", error);
     res.status(500).json({ message: "Greška pri dohvatanju letova" });
@@ -124,10 +87,10 @@ export const dohvatiLet = async (req, res) => {
 
 export const dohvatiDestinacije = async (req, res) => {
   try {
-    const destinacije = await Let.distinct("odrediste");
-    res.status(200).json(destinacije.sort());
-  } catch (error) {
-    res.status(500).json({ message: "Greška pri dohvatanju destinacija" });
+    const destinacije = await Destinacija.find();
+    res.json(destinacije);
+  } catch (greska) {
+    res.status(500).json({ poruka: greska.message });
   }
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../stilovi/App.css";
+import { dohvatiDestinacije } from "../pomocne-funkcije/fetch-funkcije";
 
 const getBaseUrl = () => {
   if (window.location.hostname === "localhost") {
@@ -26,15 +27,14 @@ const Letovi = () => {
       const response = await axios.get(
         `${getBaseUrl()}/api/letovi/destinacije`
       );
-      if (!response.data) {
-        throw new Error("Nema podataka o destinacijama");
-      }
-      const destinacijeArray = Array.isArray(response.data)
-        ? response.data
-        : [];
-      setDestinacije(destinacijeArray);
+      const data = response.data;
+
+      if (!Array.isArray(data)) throw new Error("Nepodržan format");
+
+      setDestinacije(data);
     } catch (err) {
-      setError("Greška pri dohvatanju destinacija. Molimo pokušajte ponovo.");
+      console.error("Greška pri dohvatanju destinacija:", err);
+      setError("Greška pri dohvatanju destinacija.");
       setDestinacije([]);
     }
   };
@@ -68,11 +68,13 @@ const Letovi = () => {
 
       const formattedLetovi = response.data.map((let_) => ({
         _id: let_._id || "",
-        polaziste: let_.polaziste || "",
-        odrediste: let_.odrediste || "",
-        datumPolaska: let_.datumPolaska || "",
-        cijena: let_.cijena || 0,
-        brojSlobodnihMjesta: let_.brojSlobodnihMjesta || 0,
+        origin: let_.origin || "",
+        destination: let_.destination || "",
+        departureTime: let_.departureTime || "",
+        arrivalTime: let_.arrivalTime || "",
+        dolazakSljedeciDan: let_.dolazakSljedeciDan || false,
+        flightNumber: let_.flightNumber || "",
+        cijena: generisiCijenu(),
         avionId: let_.avionId
           ? {
               naziv: let_.avionId.naziv || "",
@@ -92,6 +94,10 @@ const Letovi = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const generisiCijenu = () => {
+    return Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
   };
 
   useEffect(() => {
@@ -159,45 +165,12 @@ const Letovi = () => {
             <option key="default" value="">
               Sve destinacije
             </option>
-            {destinacije.map((destinacija) => (
-              <option key={`dest-${destinacija}`} value={destinacija}>
-                {destinacija}
+            {destinacije.map((dest) => (
+              <option key={dest._id} value={dest.grad}>
+                {dest.grad} - {dest.nazivAerodroma}
               </option>
             ))}
           </select>
-        </div>
-        <div className="form-group date-group">
-          <div className="date-inputs">
-            <input
-              type="text"
-              name="dan"
-              placeholder="DD"
-              value={filters.dan}
-              onChange={handleFilterChange}
-              className="input-field date-input"
-              maxLength="2"
-            />
-            <span className="date-separator">/</span>
-            <input
-              type="text"
-              name="mjesec"
-              placeholder="MM"
-              value={filters.mjesec}
-              onChange={handleFilterChange}
-              className="input-field date-input"
-              maxLength="2"
-            />
-            <span className="date-separator">/</span>
-            <input
-              type="text"
-              name="godina"
-              placeholder="YYYY"
-              value={filters.godina}
-              onChange={handleFilterChange}
-              className="input-field date-input year-input"
-              maxLength="4"
-            />
-          </div>
         </div>
         <button type="submit" className="pretrazi-dugme" disabled={loading}>
           Pretraži
@@ -211,32 +184,31 @@ const Letovi = () => {
         {letovi.length > 0
           ? letovi.map((let_) => (
               <div
-                key={
-                  let_._id ||
-                  `let-${let_.polaziste}-${let_.odrediste}-${let_.datumPolaska}`
-                }
+                key={let_._id || `let-${let_.origin}-${let_.destinatione}`}
                 className="let-kartica">
                 <div className="let-info">
-                  <h3>
-                    {let_.polaziste || ""} → {let_.odrediste || ""}
-                  </h3>
-                  <p>Datum polaska: {let_.datumPolaska || ""}</p>
-                  <p>Cijena: {let_.cijena || 0} €</p>
-                  <p>Slobodna mjesta: {let_.brojSlobodnihMjesta || 0}</p>
+                  <h3>Let {let_.flightNumber}</h3>
+                  <p>
+                    Ruta: {let_.origin} → {let_.destination}
+                  </p>
+                  <p>
+                    Vrijeme: {let_.departureTime} – {let_.arrivalTime}{" "}
+                    {let_.dolazakSljedeciDan ? "(dolazak sljedeći dan)" : ""}
+                  </p>
+                  <p>Cijena: {let_.cijena} €</p>{" "}
                   {let_.avionId && (
                     <p className="avion-info">
-                      Avion: {let_.avionId.naziv || ""} (
-                      {let_.avionId.model || ""})
+                      Avion: {let_.avionId.naziv} ({let_.avionId.model})
                     </p>
                   )}
                 </div>
+
                 <button
                   className="rezervisi-dugme"
                   onClick={() =>
                     (window.location.href = "/rezervacija/" + let_._id)
-                  }
-                  disabled={!let_.brojSlobodnihMjesta}>
-                  {!let_.brojSlobodnihMjesta ? "Popunjeno" : "Rezerviši"}
+                  }>
+                  Rezerviši
                 </button>
               </div>
             ))
