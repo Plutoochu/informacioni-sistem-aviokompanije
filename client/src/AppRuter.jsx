@@ -21,6 +21,7 @@ import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
 import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
 import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
 import RasporedLetovaForma from "./glavne-komponente/RasporedLetovaForma";
+import Rezervacija from "./stranice/Rezervacija";
 
 // Komponenta za zaštićene admin rute
 const ProtectedAdminRoute = ({ children }) => {
@@ -90,6 +91,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/avioni" element={<AvioniForma />} />
+              <Route path="/rezervacija/:id" element={<Rezervacija />} />
             </Routes>
           </main>
         </div>
