@@ -269,7 +269,7 @@ export const zaboravljenaLozinka = async (req, res) => {
     });
 
     // Kreiraj reset link
-    const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+    const resetLink = `https://informacioni-sistem-za-aviokompanije.onrender.com/reset-password?token=${token}`;
 
     // Loguj token i link za testiranje
     console.log("Reset token:", token);

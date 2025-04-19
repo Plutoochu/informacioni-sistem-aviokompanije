@@ -201,6 +201,8 @@ const RasporedLetovaForma = ({ flightData }) => {
     validityTo: "",
     avionId: "",
     dolazakSljedeciDan: false,
+    cijena: 250,
+    availableSeats: 0
   });
 
   const handleEdit = (let_) => {
@@ -216,6 +218,8 @@ const RasporedLetovaForma = ({ flightData }) => {
       validityTo: let_.validityTo?.slice(0, 10),
       avionId: let_.avionId?._id || let_.avionId,
       dolazakSljedeciDan: false,
+      cijena: let_.cijena || 250,
+      availableSeats: let_.availableSeats || let_.avionId?.brojSjedista || 0
     });
     setIsEditing(true);
     setSelectedFlightId(let_._id);
@@ -288,6 +292,9 @@ const RasporedLetovaForma = ({ flightData }) => {
         validityFrom: "",
         validityTo: "",
         avionId: "",
+        dolazakSljedeciDan: false,
+        cijena: 250,
+        availableSeats: 0
       });
       setErrorMessage(""); // Očisti eventualnu staru poruku
     } catch (error) {
@@ -421,6 +428,28 @@ const RasporedLetovaForma = ({ flightData }) => {
                 required
               />
             </div>
+            <div className="form-group">
+              <label>Cijena leta (KM)</label>
+              <input
+                type="number"
+                name="cijena"
+                value={formData.cijena}
+                onChange={handleChange}
+                min="0"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Dostupna sjedišta</label>
+              <input
+                type="number"
+                name="availableSeats"
+                value={formData.availableSeats}
+                onChange={handleChange}
+                min="0"
+                required
+              />
+            </div>
             <button className="btn-submit" type="submit">
               {isEditing ? "Ažuriraj" : "Spremi"}
             </button>
@@ -451,6 +480,8 @@ const RasporedLetovaForma = ({ flightData }) => {
               validityTo: "",
               avionId: "",
               dolazakSljedeciDan: false,
+              cijena: 250,
+              availableSeats: 0
             });
             setIsEditing(false);
             setSelectedFlightId(null);
