@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../stilovi/App.css';
 
+const getBaseUrl = () => {
+  if (window.location.hostname === 'localhost') {
+    return "http://localhost:5000";
+  }
+  return "https://informacioni-sistem-za-aviokompanije.onrender.com";
+};
+
 const Letovi = () => {
     const [letovi, setLetovi] = useState([]);
     const [destinacije, setDestinacije] = useState([]);
@@ -16,7 +23,7 @@ const Letovi = () => {
 
     const fetchDestinacije = async () => {
         try {
-            const response = await axios.get('/api/letovi/destinacije');
+            const response = await axios.get(`${getBaseUrl()}/api/letovi/destinacije`);
             if (!response.data) {
                 throw new Error('Nema podataka o destinacijama');
             }
@@ -42,7 +49,7 @@ const Letovi = () => {
             }
             
             console.log('Pozivam API sa parametrima:', params);
-            const response = await axios.get('/api/letovi', { params });
+            const response = await axios.get(`${getBaseUrl()}/api/letovi`, { params });
             console.log('API odgovor:', response.data);
             
             if (!response.data) {
