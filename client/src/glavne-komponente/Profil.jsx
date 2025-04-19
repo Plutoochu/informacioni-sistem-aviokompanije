@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import '../stilovi/App.css';
+import "../stilovi/App.css";
 
 const getBaseUrl = () => {
-  if (window.location.hostname === 'localhost') {
+  if (window.location.hostname === "localhost") {
     return "http://localhost:5000";
   }
   return "https://informacioni-sistem-za-aviokompanije.onrender.com";
@@ -25,7 +25,6 @@ const Profil = () => {
     const dohvatiProfil = async () => {
       try {
         const token = localStorage.getItem("token");
-        console.log("Token pri dohvatanju profila:", token);
         if (!token) {
           console.log("Nema tokena, preusmjeravam na login");
           navigate("/prijava");
@@ -38,7 +37,6 @@ const Profil = () => {
           },
         });
 
-        console.log("Odgovor sa servera:", response.data);
         setPodaci(response.data);
       } catch (error) {
         console.error("Greška pri dohvatanju profila:", error);
@@ -59,25 +57,33 @@ const Profil = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Client-side validation
+    if (!podaci.email || !podaci.telefon || !podaci.ime || !podaci.prezime) {
+      setGreska("Sva polja moraju biti popunjena.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
-      console.log("Token pri ažuriranju profila:", token);
-      console.log("Podaci za slanje:", podaci);
+      const response = await axios.put(
+        `${getBaseUrl()}/api/korisnici/profil`,
+        podaci,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const response = await axios.put(`${getBaseUrl()}/api/korisnici/profil`, podaci, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      console.log("Odgovor sa servera:", response.data);
       setPoruka("Profil uspješno ažuriran");
       setGreska("");
       setPodaci(response.data);
     } catch (error) {
-      console.error("Greška pri ažuriranju profila:", error);
-      console.error("Detalji greške:", error.response?.data);
-      setGreska(error.response?.data?.message || "Došlo je do greške pri ažuriranju profila");
+      setGreska(
+        error.response?.data?.message ||
+          "Došlo je do greške pri ažuriranju profila"
+      );
       setPoruka("");
     }
   };
@@ -90,7 +96,15 @@ const Profil = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="ime">Ime:</label>
-            <input type="text" id="ime" name="ime" value={podaci.ime} onChange={handleChange} className="input-field" />
+            <input
+              type="text"
+              id="ime"
+              name="ime"
+              value={podaci.ime}
+              onChange={handleChange}
+              className="input-field"
+              required
+            />
           </div>
 
           <div className="form-group">
@@ -102,6 +116,7 @@ const Profil = () => {
               value={podaci.prezime}
               onChange={handleChange}
               className="input-field"
+              required
             />
           </div>
 
@@ -114,6 +129,7 @@ const Profil = () => {
               value={podaci.email}
               onChange={handleChange}
               className="input-field"
+              required
             />
           </div>
 
@@ -126,6 +142,7 @@ const Profil = () => {
               value={podaci.telefon}
               onChange={handleChange}
               className="input-field"
+              required
             />
           </div>
 

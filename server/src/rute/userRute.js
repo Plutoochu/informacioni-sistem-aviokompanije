@@ -20,9 +20,8 @@ router.post("/prijava", login);
 router.post("/registracija", registracija);
 
 // Rute za profil
-router.get("/profil", autentifikacija, dohvatiProfil);
+router.get("/me", autentifikacija, dohvatiProfil);
 router.put("/profil", autentifikacija, azurirajProfil);
-router.put("/update/:id", autentifikacija, azurirajProfil);
 
 // Ruta za resetovanje lozinke
 router.post("/forgot-password", zaboravljenaLozinka);
