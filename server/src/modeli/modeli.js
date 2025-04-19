@@ -125,10 +125,23 @@ const LetSchema = new mongoose.Schema(
       required: true,
       validate: {
         validator: function (v) {
-          return v > this.departureTime; // Ensure arrival is after departure
+          const [h1, m1] = this.departureTime.split(":").map(Number);
+          const [h2, m2] = v.split(":").map(Number);
+          const departureMinutes = h1 * 60 + m1;
+          const arrivalMinutes = h2 * 60 + m2;
+
+          // Ako je dolazak sljedeći dan, validacija uvijek prolazi
+          if (this.dolazakSljedeciDan) return true;
+
+          return arrivalMinutes > departureMinutes;
         },
-        message: "Arrival time must be after departure time.",
+        message:
+          "Vrijeme dolaska mora biti nakon vremena polaska (osim ako nije sljedeći dan).",
       },
+    },
+    dolazakSljedeciDan: {
+      type: Boolean,
+      default: false,
     },
     origin: {
       type: String,
@@ -161,36 +174,65 @@ const LetSchema = new mongoose.Schema(
   }
 );
 
-const OtkazaniLetSchema = new mongoose.Schema({
-  flightId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Let",
-    required: true,
+const OtkazaniLetSchema = new mongoose.Schema(
+  {
+    flightId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Let",
+      required: true,
+    },
+    from: {
+      type: Date,
+      required: true,
+    },
+    to: {
+      type: Date,
+      required: true,
+    },
+    days: [
+      {
+        type: String, // "1" = ponedjeljak, "2" = utorak...
+        enum: ["1", "2", "3", "4", "5", "6", "7"],
+      },
+    ],
   },
-  from: {
-    type: Date,
-    required: true,
-  },
-  to: {
-    type: Date,
-    required: true,
-  },
-  days: {
-    type: [String], // npr: ["1", "3", "5"] za pon, sri, pet
-    default: [],
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
-// Kreiranje modela
+const NotifikacijaSchema = new mongoose.Schema(
+  {
+    korisnik: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Korisnik",
+      required: true,
+    },
+    poruka: {
+      type: String,
+      required: true,
+    },
+    procitano: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+const Notifikacija = mongoose.model("Notifikacija", NotifikacijaSchema);
+
+const OtkazaniLet = mongoose.model("OtkazaniLet", OtkazaniLetSchema);
 const Korisnik = mongoose.model("Korisnik", KorisnikSchema);
 const Destinacija = mongoose.model("Destinacija", DestinacijaSchema);
 const Avion = mongoose.model("Avion", AvionSchema);
 const ResetToken = mongoose.model("ResetToken", ResetTokenSchema);
 const Let = mongoose.model("Let", LetSchema);
-const OtkazaniLet = mongoose.model("OtkazaniLet", OtkazaniLetSchema);
 
-export { Korisnik, Destinacija, Avion, ResetToken, Let, OtkazaniLet };
+export {
+  Korisnik,
+  Destinacija,
+  Avion,
+  ResetToken,
+  Let,
+  OtkazaniLet,
+  Notifikacija,
+};

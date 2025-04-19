@@ -6,6 +6,8 @@ import {
   dohvatiProfil,
   zaboravljenaLozinka,
   resetujLozinku,
+  dohvatiNotifikacijeZaKorisnika,
+  oznaciKaoProcitano,
 } from "../kontroleri/userKontroleri.js";
 import { autentifikacija } from "../middlewares.js";
 import bcrypt from "bcryptjs";
@@ -89,5 +91,17 @@ router.get("/dobavi-korisnike", async (req, res) => {
     res.status(500).json({ message: "Desila se greska" });
   }
 });
+
+router.get(
+  "/moje-notifikacije",
+  autentifikacija,
+  dohvatiNotifikacijeZaKorisnika
+);
+
+router.put(
+  "/notifikacije/:notificationId",
+  autentifikacija,
+  oznaciKaoProcitano
+);
 
 export default router;

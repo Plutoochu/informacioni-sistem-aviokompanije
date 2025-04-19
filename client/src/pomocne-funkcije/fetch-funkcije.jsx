@@ -348,6 +348,11 @@ export const dodajLet = async (podaci) => {
     return response.data;
   } catch (error) {
     console.error("Greška pri dodavanju leta:", error);
+
+    if (error.response) {
+      console.error("Backend response:", error.response.data);
+    }
+
     throw error;
   }
 };
@@ -371,29 +376,11 @@ export const azurirajLet = async (id, podaci) => {
   }
 };
 
-export const obrisiLet = async (id) => {
-  try {
-    const response = await axios.delete(
-      `${backendUrl}/api/admin/letovi/${id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Greška pri brisanju leta:", error);
-    throw error;
-  }
-};
-
-export const otkaziLet = async (otkazivanjePodaci) => {
+export const otkaziLet = async (podaci) => {
   try {
     const response = await axios.post(
-      `${backendUrl}/api/admin/letovi/otkazivanje`,
-      otkazivanjePodaci,
+      `${backendUrl}/api/admin/letovi/otkazi`,
+      podaci,
       {
         headers: {
           "Content-Type": "application/json",
@@ -404,6 +391,11 @@ export const otkaziLet = async (otkazivanjePodaci) => {
     return response.data;
   } catch (error) {
     console.error("Greška pri otkazivanju leta:", error);
+
+    if (error.response) {
+      console.error("Backend response:", error.response.data);
+    }
+
     throw error;
   }
 };
@@ -411,7 +403,7 @@ export const otkaziLet = async (otkazivanjePodaci) => {
 export const dohvatiOtkazaneLetove = async () => {
   try {
     const response = await axios.get(
-      `${backendUrl}/api/admin/letovi/otkazani`,
+      `${backendUrl}/api/admin/otkazani-letovi`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -419,9 +411,62 @@ export const dohvatiOtkazaneLetove = async () => {
         },
       }
     );
-    return response.data; // očekujemo array sa flightId
+    return response.data;
   } catch (error) {
     console.error("Greška pri dohvaćanju otkazanih letova:", error);
     throw error;
+  }
+};
+
+export const aktivirajLet = async (data) => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.delete(`${backendUrl}/api/admin/letovi/otkazi`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    data: data,
+  });
+
+  return response.data;
+};
+
+export const dohvatiNotifikacije = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await axios.get(
+      `${backendUrl}/api/korisnici/moje-notifikacije`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri dohvaćanju notifikacija:", error);
+    throw error;
+  }
+};
+
+export const oznaciKaoProcitano = async (notificationId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.put(
+      `${backendUrl}/api/korisnici/notifikacije/${notificationId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (err) {
+    console.error("Greška pri označavanju notifikacije:", err);
+    throw err;
   }
 };

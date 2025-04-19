@@ -2,7 +2,7 @@
 
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { Korisnik, ResetToken } from "../modeli/modeli.js";
+import { Korisnik, ResetToken, Notifikacija } from "../modeli/modeli.js";
 import config from "../config.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
@@ -22,7 +22,9 @@ export const azurirajKorisnika = async (req, res) => {
     const { ime, prezime, email, telefon } = req.body;
 
     if (req.korisnik.id !== id && req.korisnik.role !== "admin") {
-      return res.status(403).json({ poruka: "Nemate dozvolu za ažuriranje ovog korisnika." });
+      return res
+        .status(403)
+        .json({ poruka: "Nemate dozvolu za ažuriranje ovog korisnika." });
     }
 
     const korisnik = await Korisnik.findById(id);
@@ -31,13 +33,17 @@ export const azurirajKorisnika = async (req, res) => {
     }
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ poruka: "Neispravan format e-mail adrese." });
+      return res
+        .status(400)
+        .json({ poruka: "Neispravan format e-mail adrese." });
     }
 
     if (email && email !== korisnik.email) {
       const postojiEmail = await Korisnik.findOne({ email });
       if (postojiEmail) {
-        return res.status(400).json({ poruka: "E-mail adresa je već u upotrebi." });
+        return res
+          .status(400)
+          .json({ poruka: "E-mail adresa je već u upotrebi." });
       }
       korisnik.email = email;
     }
@@ -54,10 +60,14 @@ export const azurirajKorisnika = async (req, res) => {
 
     await korisnik.save();
 
-    return res.status(200).json({ poruka: "Podaci uspješno ažurirani.", korisnik });
+    return res
+      .status(200)
+      .json({ poruka: "Podaci uspješno ažurirani.", korisnik });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ poruka: "Greška prilikom ažuriranja korisnika." });
+    return res
+      .status(500)
+      .json({ poruka: "Greška prilikom ažuriranja korisnika." });
   }
 };
 
@@ -81,7 +91,11 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Neispravan email ili lozinka" });
     }
 
-    const token = jwt.sign({ id: korisnik._id, role: korisnik.role }, config.secret, { expiresIn: "24h" });
+    const token = jwt.sign(
+      { id: korisnik._id, role: korisnik.role },
+      config.secret,
+      { expiresIn: "24h" }
+    );
 
     console.log("Uspješna prijava");
 
@@ -103,7 +117,9 @@ export const login = async (req, res) => {
 
 export const dohvatiProfil = async (req, res) => {
   try {
-    const korisnik = await Korisnik.findById(req.korisnik.id).select("-lozinka");
+    const korisnik = await Korisnik.findById(req.korisnik.id).select(
+      "-lozinka"
+    );
     if (!korisnik) {
       return res.status(404).json({ message: "Korisnik nije pronađen" });
     }
@@ -127,20 +143,26 @@ export const azurirajProfil = async (req, res) => {
 
     // Provjera email formata
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ message: "Neispravan format e-mail adrese" });
+      return res
+        .status(400)
+        .json({ message: "Neispravan format e-mail adrese" });
     }
 
     // Provjera da li email već postoji
     if (email && email !== korisnik.email) {
       const postojiEmail = await Korisnik.findOne({ email });
       if (postojiEmail) {
-        return res.status(400).json({ message: "E-mail adresa je već u upotrebi" });
+        return res
+          .status(400)
+          .json({ message: "E-mail adresa je već u upotrebi" });
       }
     }
 
     // Provjera formata telefona
     if (telefon && !/^\d{6,}$/.test(telefon)) {
-      return res.status(400).json({ message: "Neispravan format telefona. Dozvoljene su samo cifre (min 6)" });
+      return res.status(400).json({
+        message: "Neispravan format telefona. Dozvoljene su samo cifre (min 6)",
+      });
     }
 
     // Ažuriranje podataka
@@ -170,13 +192,17 @@ export const registracija = async (req, res) => {
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ message: "Neispravan format e-mail adrese" });
+      return res
+        .status(400)
+        .json({ message: "Neispravan format e-mail adrese" });
     }
 
     // Provjera da li korisnik već postoji
     const postojeciKorisnik = await Korisnik.findOne({ email });
     if (postojeciKorisnik) {
-      return res.status(400).json({ message: "Korisnik sa ovom email adresom već postoji" });
+      return res
+        .status(400)
+        .json({ message: "Korisnik sa ovom email adresom već postoji" });
     }
 
     // Hashiranje lozinke
@@ -194,7 +220,11 @@ export const registracija = async (req, res) => {
     await noviKorisnik.save();
 
     // Generisanje JWT tokena
-    const token = jwt.sign({ id: noviKorisnik._id, role: noviKorisnik.role }, config.secret, { expiresIn: "24h" });
+    const token = jwt.sign(
+      { id: noviKorisnik._id, role: noviKorisnik.role },
+      config.secret,
+      { expiresIn: "24h" }
+    );
 
     res.status(201).json({
       message: "Korisnik uspješno registrovan",
@@ -220,7 +250,9 @@ export const zaboravljenaLozinka = async (req, res) => {
     // Pronađi korisnika
     const korisnik = await Korisnik.findOne({ email });
     if (!korisnik) {
-      return res.status(404).json({ message: "Korisnik sa ovom email adresom nije pronađen" });
+      return res
+        .status(404)
+        .json({ message: "Korisnik sa ovom email adresom nije pronađen" });
     }
 
     // Obriši postojeći token ako postoji
@@ -293,4 +325,43 @@ export const resetujLozinku = async (req, res) => {
   }
 };
 
-// Implementiran login kontroler sa JWT autentifikacijom
+export const dohvatiNotifikacijeZaKorisnika = async (req, res) => {
+  try {
+    const korisnikId = req.korisnik.id;
+    const notifikacije = await Notifikacija.find({
+      korisnik: korisnikId,
+      procitano: false,
+    }).sort({ createdAt: -1 });
+
+    console.log("Fetched unread notifications for user:", notifikacije);
+    res.status(200).json(notifikacije);
+  } catch (err) {
+    console.error("Greška pri dohvaćanju notifikacija:", err);
+    res.status(500).json({ message: "Greška na serveru." });
+  }
+};
+
+// In your user controller (userKontroleri.js)
+
+export const oznaciKaoProcitano = async (req, res) => {
+  const { notificationId } = req.params;
+
+  try {
+    const notifikacija = await Notifikacija.findByIdAndUpdate(
+      notificationId,
+      { procitano: true },
+      { new: true } // to return the updated document
+    );
+
+    if (!notifikacija) {
+      return res.status(404).json({ message: "Notifikacija nije pronađena" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Notifikacija označena kao pročitana", notifikacija });
+  } catch (err) {
+    console.error("Greška pri označavanju notifikacije:", err);
+    res.status(500).json({ message: "Greška pri označavanju notifikacije" });
+  }
+};
