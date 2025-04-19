@@ -2,6 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../stilovi/Registracija.css";
+import "../stilovi/App.css";
+
+const getBaseUrl = () => {
+  if (window.location.hostname === 'localhost') {
+    return "http://localhost:5000";
+  }
+  return "https://informacioni-sistem-za-aviokompanije.vercel.app";
+};
 
 const Registracija = () => {
   const [formData, setFormData] = useState({
@@ -32,11 +40,7 @@ const Registracija = () => {
     }
 
     try {
-      const adresaRute = import.meta.env.VITE_BACKEND_URL
-        ? import.meta.env.VITE_BACKEND_URL + "/api/korisnici/registracija"
-        : "http://localhost:5000/api/korisnici/registracija";
-
-      const response = await axios.post(adresaRute, {
+      const response = await axios.post(`${getBaseUrl()}/api/korisnici/registracija`, {
         ime: formData.ime,
         prezime: formData.prezime,
         email: formData.email,

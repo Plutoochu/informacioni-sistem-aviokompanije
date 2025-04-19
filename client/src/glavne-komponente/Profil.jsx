@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import '../stilovi/App.css';
+
+const getBaseUrl = () => {
+  if (window.location.hostname === 'localhost') {
+    return "http://localhost:5000";
+  }
+  return "https://informacioni-sistem-za-aviokompanije.vercel.app";
+};
 
 const Profil = () => {
   const [podaci, setPodaci] = useState({
@@ -24,11 +32,7 @@ const Profil = () => {
           return;
         }
 
-        const adresaRute = import.meta.env.VITE_BACKEND_URL
-          ? import.meta.env.VITE_BACKEND_URL + "/api/korisnici/profil"
-          : "http://localhost:5000/api/korisnici/profil";
-
-        const response = await axios.get(adresaRute, {
+        const response = await axios.get(`${getBaseUrl()}/api/korisnici/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -60,11 +64,7 @@ const Profil = () => {
       console.log("Token pri ažuriranju profila:", token);
       console.log("Podaci za slanje:", podaci);
 
-      const adresaRute = import.meta.env.VITE_BACKEND_URL
-        ? import.meta.env.VITE_BACKEND_URL + "/api/korisnici/profil"
-        : "http://localhost:5000/api/korisnici/profil";
-
-      const response = await axios.put(adresaRute, podaci, {
+      const response = await axios.put(`${getBaseUrl()}/api/korisnici/profil`, podaci, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -16,10 +16,17 @@ export const AuthProvider = ({ children }) => {
   const [korisnik, setKorisnik] = useState(null);
   const navigate = useNavigate();
 
+  const getBaseUrl = () => {
+    // Ako je development okruženje, koristi localhost
+    if (window.location.hostname === 'localhost') {
+      return "http://localhost:5000";
+    }
+    // Inače koristi produkcijski URL
+    return "https://informacioni-sistem-za-aviokompanije.vercel.app";
+  };
+
   const prijaviKorisnika = async (email, lozinka) => {
-    const adresaRute = import.meta.env.VITE_BACKEND_URL
-      ? import.meta.env.VITE_BACKEND_URL + "/api/korisnici/prijava"
-      : "http://localhost:5000/api/korisnici/prijava";
+    const adresaRute = `${getBaseUrl()}/api/korisnici/prijava`;
 
     try {
       const odgovor = await axios.post(adresaRute, {
@@ -45,6 +52,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const resetujLozinku = async (email) => {
+    const adresaRute = `${getBaseUrl()}/api/korisnici/reset-lozinke`;
+    
+    try {
+      const odgovor = await axios.post(adresaRute, { email });
+      return {
+        uspjesno: true,
+        poruka: "Zahtjev za resetovanje lozinke je poslan na vaš email"
+      };
+    } catch (error) {
+      console.error("Greška pri resetovanju lozinke:", error);
+      return {
+        uspjesno: false,
+        poruka: error.response?.data?.message || "Došlo je do greške prilikom resetovanja lozinke"
+      };
+    }
+  };
+
   const odjaviKorisnika = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("korisnik");
@@ -65,6 +90,7 @@ export const AuthProvider = ({ children }) => {
     korisnik,
     prijaviKorisnika,
     odjaviKorisnika,
+    resetujLozinku
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import '../stilovi/App.css';
+
+const getBaseUrl = () => {
+  if (window.location.hostname === 'localhost') {
+    return "http://localhost:5000";
+  }
+  return "https://informacioni-sistem-za-aviokompanije.vercel.app";
+};
 
 export default function ResetPassword() {
   const [novaLozinka, setNovaLozinka] = useState("");
@@ -31,7 +39,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/korisnici/reset-password", {
+      const response = await axios.post(`${getBaseUrl()}/api/korisnici/reset-password`, {
         token,
         novaLozinka
       });

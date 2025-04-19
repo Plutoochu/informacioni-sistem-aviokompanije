@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../stilovi/AvioniForma.css";
+import "../stilovi/App.css";
+
+const getBaseUrl = () => {
+  if (window.location.hostname === 'localhost') {
+    return "http://localhost:5000";
+  }
+  return "https://informacioni-sistem-za-aviokompanije.vercel.app";
+};
 
 const AvioniForma = () => {
   const [avioni, setAvioni] = useState([]);
@@ -25,7 +33,7 @@ const AvioniForma = () => {
 
   const dohvatiAvione = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/avioni");
+      const response = await axios.get(`${getBaseUrl()}/api/avioni`);
       setAvioni(response.data);
     } catch (error) {
       console.error("Greška pri dohvatanju aviona:", error);
@@ -54,7 +62,7 @@ const AvioniForma = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/avioni", formData);
+      await axios.post(`${getBaseUrl()}/api/avioni`, formData);
       dohvatiAvione();
       setFormData({
         naziv: "",

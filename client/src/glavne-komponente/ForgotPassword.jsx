@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import '../stilovi/App.css';
+
+const getBaseUrl = () => {
+  if (window.location.hostname === 'localhost') {
+    return "http://localhost:5000";
+  }
+  return "https://informacioni-sistem-za-aviokompanije.vercel.app";
+};
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +24,7 @@ const ForgotPassword = () => {
     setResetInfo(null);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/reset-password", {
+      const response = await axios.post(`${getBaseUrl()}/api/reset-password`, {
         email,
       });
 
