@@ -16,15 +16,15 @@ const router = Router();
 router.get("/destinacije", dohvatiDestinacije);
 
 // GET /api/letovi - Dohvati sve letove
-router.get("/", dohvatiLetove);
+router.get("", dohvatiLetove);
 
 // POST /api/letovi - Dodaj novi let
-router.post("/", dodajLet);
+router.post("", dodajLet);
 
 // GET /api/letovi/:id - Dohvati jedan let
 router.get("/:id", dohvatiLet);
 
-// PUT /api/letovi/:id - Ažuriraj postojeći let
+// PUT /api/letovi/:id - Ažuriraj let
 router.put("/:id", azurirajLet);
 
 // DELETE /api/letovi/:id - Obriši let
