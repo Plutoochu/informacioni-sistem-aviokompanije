@@ -21,9 +21,9 @@ const Rezervacija = () => {
     return "BK-" + Math.floor(100000 + Math.random() * 900000); // npr. BK-458239
   };
 
-  /*const generisiCijenu = () => {
+  const generisiCijenu = () => {
     return Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
-  };*/
+  };
 
   useEffect(() => {
     const fetchLet = async () => {
@@ -64,7 +64,7 @@ const Rezervacija = () => {
       </p>
 
       <p><strong>Prtljag dozvoljen:</strong> 1 ručni + 1 čekirani (23kg)</p>
-      <p><strong>Cijena karte:</strong> {letInfo.cijena} €</p>
+      <p><strong>Cijena karte:</strong> {cijena} €</p>
 
       <h3>Unesite podatke putnika</h3>
       <form className="rezervacija-forma">
