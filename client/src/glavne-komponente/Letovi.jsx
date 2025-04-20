@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "../stilovi/App.css";
 import { dohvatiDestinacije } from "../pomocne-funkcije/fetch-funkcije";
 
@@ -22,6 +23,9 @@ const Letovi = () => {
     godina: "",
   });
 
+  // Inicijalizacija navigacije iz React Router-a
+  const navigate = useNavigate();
+
   const fetchDestinacije = async () => {
     try {
       const response = await axios.get(
@@ -39,11 +43,14 @@ const Letovi = () => {
     }
   };
 
+  const generisiCijenu = () => {
+    return Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
+  };
+
   const fetchLetovi = async () => {
     try {
       setLoading(true);
       setError(null);
-
 
       const params = {};
       if (filters.odrediste) params.odrediste = filters.odrediste;
@@ -96,10 +103,6 @@ const Letovi = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const generisiCijenu = () => {
-    return Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
   };
 
   useEffect(() => {
@@ -163,7 +166,8 @@ const Letovi = () => {
             name="odrediste"
             value={filters.odrediste}
             onChange={handleFilterChange}
-            className="input-field select-field">
+            className="input-field select-field"
+          >
             <option key="default" value="">
               Sve destinacije
             </option>
@@ -186,8 +190,9 @@ const Letovi = () => {
         {letovi.length > 0
           ? letovi.map((let_) => (
               <div
-                key={let_._id || `let-${let_.origin}-${let_.destinatione}`}
-                className="let-kartica">
+                key={let_._id || `let-${let_.origin}-${let_.destination}`}
+                className="let-kartica"
+              >
                 <div className="let-info">
                   <h3>Let {let_.flightNumber}</h3>
                   <p>
@@ -197,7 +202,7 @@ const Letovi = () => {
                     Vrijeme: {let_.departureTime} – {let_.arrivalTime}{" "}
                     {let_.dolazakSljedeciDan ? "(dolazak sljedeći dan)" : ""}
                   </p>
-                  <p>Cijena: {let_.cijena} €</p>{" "}
+                  <p>Cijena: {let_.cijena} €</p>
                   {let_.avionId && (
                     <p className="avion-info">
                       Avion: {let_.avionId.naziv} ({let_.avionId.model})
@@ -208,8 +213,9 @@ const Letovi = () => {
                 <button
                   className="rezervisi-dugme"
                   onClick={() =>
-                    (window.location.href = "/rezervacija/" + let_._id)
-                  }>
+                    navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })
+                  }
+                >
                   Rezerviši
                 </button>
               </div>
