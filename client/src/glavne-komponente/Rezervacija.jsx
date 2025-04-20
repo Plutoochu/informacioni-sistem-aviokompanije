@@ -64,7 +64,7 @@ const Rezervacija = () => {
       </p>
 
       <p><strong>Prtljag dozvoljen:</strong> 1 ručni + 1 čekirani (23kg)</p>
-      <p><strong>Cijena karte:</strong> {cijena} €</p>
+      <p><strong>Cijena karte:</strong> {letInfo.cijena} €</p>
 
       <h3>Unesite podatke putnika</h3>
       <form className="rezervacija-forma">
