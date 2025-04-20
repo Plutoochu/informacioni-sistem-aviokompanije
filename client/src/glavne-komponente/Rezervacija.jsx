@@ -21,9 +21,9 @@ const Rezervacija = () => {
     return "BK-" + Math.floor(100000 + Math.random() * 900000); // npr. BK-458239
   };
 
-  const generisiCijenu = () => {
+  /*const generisiCijenu = () => {
     return Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
-  };
+  };*/
 
   useEffect(() => {
     const fetchLet = async () => {
