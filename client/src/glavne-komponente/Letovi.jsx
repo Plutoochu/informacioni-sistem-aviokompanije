@@ -43,6 +43,8 @@ const Letovi = () => {
     try {
       setLoading(true);
       setError(null);
+
+
       const params = {};
       if (filters.odrediste) params.odrediste = filters.odrediste;
 

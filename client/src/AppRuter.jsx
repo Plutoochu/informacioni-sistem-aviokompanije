@@ -21,7 +21,7 @@ import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
 import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
 import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
 import RasporedLetovaForma from "./glavne-komponente/RasporedLetovaForma";
-import Rezervacija from "./stranice/Rezervacija";
+import Rezervacija from "./glavne-komponente/Rezervacija";
 
 // Komponenta za zaštićene admin rute
 const ProtectedAdminRoute = ({ children }) => {
