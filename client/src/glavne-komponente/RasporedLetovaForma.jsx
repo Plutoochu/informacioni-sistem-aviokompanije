@@ -201,6 +201,7 @@ const RasporedLetovaForma = ({ flightData }) => {
     validityTo: "",
     avionId: "",
     dolazakSljedeciDan: false,
+    aviokompanija: ""
   });
 
   const handleEdit = (let_) => {
@@ -216,6 +217,7 @@ const RasporedLetovaForma = ({ flightData }) => {
       validityTo: let_.validityTo?.slice(0, 10),
       avionId: let_.avionId?._id || let_.avionId,
       dolazakSljedeciDan: false,
+      aviokompanija: let_.aviokompanija || ""
     });
     setIsEditing(true);
     setSelectedFlightId(let_._id);
@@ -288,6 +290,7 @@ const RasporedLetovaForma = ({ flightData }) => {
         validityFrom: "",
         validityTo: "",
         avionId: "",
+        aviokompanija: ""
       });
       setErrorMessage(""); // Očisti eventualnu staru poruku
     } catch (error) {
@@ -366,6 +369,21 @@ const RasporedLetovaForma = ({ flightData }) => {
                 </select>
               </div>
             ))}
+
+              {/* NOVO polje za unos naziv aviokompanije */}
+            <div className="form-group">
+              <label htmlFor="aviokompanija">Aviokompanija</label>
+              <input
+                type="text"
+                id="aviokompanija"
+                name="aviokompanija"
+                value={formData.aviokompanija}
+                onChange={handleChange}
+                placeholder="Unesite naziv aviokompanije"
+                required
+              />
+            </div>
+
             <div className="form-group">
               <label htmlFor="avionId">Avion</label>
               <select

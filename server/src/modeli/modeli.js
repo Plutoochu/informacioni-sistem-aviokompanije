@@ -105,6 +105,10 @@ const LetSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    aviokompanija: { 
+      type: String, 
+      required: true 
+    },
     schedule: {
       type: String,
       required: true,

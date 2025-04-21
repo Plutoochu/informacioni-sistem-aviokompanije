@@ -16,10 +16,7 @@ const Letovi = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Extend filter state to include new filters:
-  // - polaziste (origin), odrediste (destination)
-  // - datumOd, datumDo (date range for flight availability)
-  // - aviokompanija (airline name), departureFrom/to, arrivalFrom/to (time ranges)
+  // Postavljamo filtere i dodajemo i polje za aviokompaniju
   const [filters, setFilters] = useState({
     polaziste: "",
     odrediste: "",
@@ -56,11 +53,11 @@ const Letovi = () => {
       setLoading(true);
       setError(null);
 
-      // Build query parameters by reading from filters.
+      // Build query parameters based on filters
       const params = {};
       if (filters.polaziste) params.polaziste = filters.polaziste;
       if (filters.odrediste) params.odrediste = filters.odrediste;
-      if (filters.datumOd) params.datumOd = filters.datumOd; // Expected ISO format ("YYYY-MM-DD")
+      if (filters.datumOd) params.datumOd = filters.datumOd;
       if (filters.datumDo) params.datumDo = filters.datumDo;
       if (filters.aviokompanija) params.aviokompanija = filters.aviokompanija;
       if (filters.departureFrom) params.departureFrom = filters.departureFrom;
@@ -79,6 +76,7 @@ const Letovi = () => {
         throw new Error("Neočekivani format podataka sa servera");
       }
 
+      // Formatiramo letove i dodajemo polje aviokompanija
       const formattedLetovi = response.data.map((let_) => ({
         _id: let_._id || "",
         origin: let_.origin || "",
@@ -94,6 +92,7 @@ const Letovi = () => {
               model: let_.avionId.model || "",
             }
           : null,
+        aviokompanija: let_.aviokompanija || "",
       }));
 
       console.log("Formatirani letovi:", formattedLetovi);
@@ -142,7 +141,7 @@ const Letovi = () => {
     <div className="letovi-container">
       <h2>Pretraga Letova</h2>
       <form onSubmit={handleSearch} className="pretraga-forma">
-        {/* Existing filters for origin/destination and date range */}
+        {/* Filter za polazište */}
         <div className="form-group">
           <label>Od:</label>
           <select
@@ -159,6 +158,7 @@ const Letovi = () => {
             ))}
           </select>
         </div>
+        {/* Filter za odredište */}
         <div className="form-group">
           <label>Do:</label>
           <select
@@ -175,6 +175,7 @@ const Letovi = () => {
             ))}
           </select>
         </div>
+        {/* Filter za datum */}
         <div className="form-group">
           <label>Datum od:</label>
           <input
@@ -197,8 +198,7 @@ const Letovi = () => {
             required
           />
         </div>
-
-        {/* New filter for Airline */}
+        {/* Filter za aviokompaniju */}
         <div className="form-group">
           <label>Aviokompanija:</label>
           <input
@@ -210,8 +210,7 @@ const Letovi = () => {
             className="input-field"
           />
         </div>
-
-        {/* New filters for Departure Time Range */}
+        {/* Filter za vrijeme polaska */}
         <div className="form-group">
           <label>Vrijeme polaska od:</label>
           <input
@@ -232,8 +231,7 @@ const Letovi = () => {
             className="input-field"
           />
         </div>
-
-        {/* New filters for Arrival Time Range */}
+        {/* Filter za vrijeme dolaska */}
         <div className="form-group">
           <label>Vrijeme dolaska od:</label>
           <input
@@ -254,7 +252,6 @@ const Letovi = () => {
             className="input-field"
           />
         </div>
-
         <button type="submit" className="pretrazi-dugme" disabled={loading}>
           Pretraži
         </button>
@@ -280,6 +277,9 @@ const Letovi = () => {
                     {let_.dolazakSljedeciDan ? "(dolazak sljedeći dan)" : ""}
                   </p>
                   <p>Cijena: {let_.cijena} €</p>
+                  {let_.aviokompanija && (
+                    <p>Aviokompanija: {let_.aviokompanija}</p>
+                  )}
                   {let_.avionId && (
                     <p className="avion-info">
                       Avion: {let_.avionId.naziv} ({let_.avionId.model})

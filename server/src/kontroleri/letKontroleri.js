@@ -27,10 +27,9 @@ export const dohvatiLetove = async (req, res) => {
       query.validityTo = { $gte: startDate };
     }
 
-    // Filter by airline based on avionId.naziv (if populated)
-    if (aviokompanija) {
-      query["avionId.naziv"] = { $regex: new RegExp(aviokompanija, "i") };
-    }
+if (aviokompanija) {
+  query.aviokompanija = { $regex: new RegExp(aviokompanija, "i") };
+}
 
     // Filter by departure time range (departureTime is stored as string "HH:MM")
     if (departureFrom && departureTo) {
