@@ -218,6 +218,57 @@ const NotifikacijaSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const BookingSchema = new mongoose.Schema(
+  {
+    bookingNumber: {
+      type: String,
+      required: true,
+    },
+    flight: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Let",
+      required: true,
+    },
+    classType: {
+      type: String,
+      required: true,
+    },
+    ticketType: {
+      type: String,
+      required: true,
+    },
+    adultsCount: {
+      type: Number,
+      required: true,
+    },
+    childrenCount: {
+      type: Number,
+      required: true,
+    },
+    infantsCount: {
+      type: Number,
+      required: true,
+    },
+    passengers: {
+      type: Array,
+      required: true,
+    },
+    paymentMethod: {
+      type: String,
+      required: true,
+    },
+    cardDetails: {
+      cardNumber: { type: String },
+      cardExpiry: { type: String },
+      cardCVC: { type: String },
+    },
+    seatSelection: {
+      type: Array, // npr. niz stringova koji predstavljaju brojeve sjedala
+    },
+  },
+  { timestamps: true }
+);
+
 const Notifikacija = mongoose.model("Notifikacija", NotifikacijaSchema);
 
 const OtkazaniLet = mongoose.model("OtkazaniLet", OtkazaniLetSchema);
@@ -226,6 +277,7 @@ const Destinacija = mongoose.model("Destinacija", DestinacijaSchema);
 const Avion = mongoose.model("Avion", AvionSchema);
 const ResetToken = mongoose.model("ResetToken", ResetTokenSchema);
 const Let = mongoose.model("Let", LetSchema);
+const Booking = mongoose.model("Booking", BookingSchema);
 
 export {
   Korisnik,
@@ -235,4 +287,5 @@ export {
   Let,
   OtkazaniLet,
   Notifikacija,
+  Booking,
 };

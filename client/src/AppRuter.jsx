@@ -92,6 +92,7 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/avioni" element={<AvioniForma />} />
               <Route path="/rezervacija/:id" element={<Rezervacija />} />
+              
             </Routes>
           </main>
         </div>

@@ -10,6 +10,7 @@ import adminRute from "./src/rute/adminRute.js";
 import avionRute from "./src/rute/avionRute.js";
 import letRute from "./src/rute/letRute.js";
 import resetPasswordRoute from "./src/rute/resetPasswordRoute.js";
+import rezervacijaRute from "./src/rute/rezervacijaRute.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/admin", adminRute);
 app.use("/api/avioni", avionRute);
 app.use("/api/letovi", letRute);
 app.use("/api/", resetPasswordRoute);
+app.use("/api/rezervacije", rezervacijaRute);
 
 app.listen(config.port, () =>
   console.log(`Server pokrenut na portu: ${config.port}`)

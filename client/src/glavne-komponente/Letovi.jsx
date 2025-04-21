@@ -5,10 +5,9 @@ import "../stilovi/App.css";
 import { dohvatiDestinacije } from "../pomocne-funkcije/fetch-funkcije";
 
 const getBaseUrl = () => {
-  if (window.location.hostname === "localhost") {
-    return "http://localhost:5000";
-  }
-  return "https://informacioni-sistem-za-aviokompanije.onrender.com";
+  return window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : "https://informacioni-sistem-za-aviokompanije.onrender.com";
 };
 
 const Letovi = () => {
@@ -16,25 +15,30 @@ const Letovi = () => {
   const [destinacije, setDestinacije] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Extend filter state to include new filters:
+  // - polaziste (origin), odrediste (destination)
+  // - datumOd, datumDo (date range for flight availability)
+  // - aviokompanija (airline name), departureFrom/to, arrivalFrom/to (time ranges)
   const [filters, setFilters] = useState({
+    polaziste: "",
     odrediste: "",
-    dan: "",
-    mjesec: "",
-    godina: "",
+    datumOd: "",
+    datumDo: "",
+    aviokompanija: "",
+    departureFrom: "",
+    departureTo: "",
+    arrivalFrom: "",
+    arrivalTo: "",
   });
 
-  // Inicijalizacija navigacije iz React Router-a
   const navigate = useNavigate();
 
   const fetchDestinacije = async () => {
     try {
-      const response = await axios.get(
-        `${getBaseUrl()}/api/letovi/destinacije`
-      );
+      const response = await axios.get(`${getBaseUrl()}/api/letovi/destinacije`);
       const data = response.data;
-
       if (!Array.isArray(data)) throw new Error("Nepodržan format");
-
       setDestinacije(data);
     } catch (err) {
       console.error("Greška pri dohvatanju destinacija:", err);
@@ -52,25 +56,25 @@ const Letovi = () => {
       setLoading(true);
       setError(null);
 
+      // Build query parameters by reading from filters.
       const params = {};
+      if (filters.polaziste) params.polaziste = filters.polaziste;
       if (filters.odrediste) params.odrediste = filters.odrediste;
-
-      if (filters.dan && filters.mjesec && filters.godina) {
-        const dan = filters.dan.padStart(2, "0");
-        const mjesec = filters.mjesec.padStart(2, "0");
-        params.datumPolaska = `${dan}/${mjesec}/${filters.godina}`;
-      }
+      if (filters.datumOd) params.datumOd = filters.datumOd; // Expected ISO format ("YYYY-MM-DD")
+      if (filters.datumDo) params.datumDo = filters.datumDo;
+      if (filters.aviokompanija) params.aviokompanija = filters.aviokompanija;
+      if (filters.departureFrom) params.departureFrom = filters.departureFrom;
+      if (filters.departureTo) params.departureTo = filters.departureTo;
+      if (filters.arrivalFrom) params.arrivalFrom = filters.arrivalFrom;
+      if (filters.arrivalTo) params.arrivalTo = filters.arrivalTo;
 
       console.log("Pozivam API sa parametrima:", params);
-      const response = await axios.get(`${getBaseUrl()}/api/letovi`, {
-        params,
-      });
+      const response = await axios.get(`${getBaseUrl()}/api/letovi`, { params });
       console.log("API odgovor:", response.data);
 
       if (!response.data) {
         throw new Error("Nema podataka o letovima");
       }
-
       if (!Array.isArray(response.data)) {
         throw new Error("Neočekivani format podataka sa servera");
       }
@@ -96,41 +100,15 @@ const Letovi = () => {
       setLetovi(formattedLetovi);
     } catch (err) {
       console.error("Greška pri dohvatanju letova:", err);
-      setError(
-        "Došlo je do greške pri učitavanju letova. Molimo pokušajte ponovo."
-      );
+      setError("Došlo je do greške pri učitavanju letova. Molimo pokušajte ponovo.");
       setLetovi([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchDestinacije();
-    fetchLetovi();
-  }, []);
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "dan") {
-      const dan = parseInt(value);
-      if (value && (dan < 1 || dan > 31)) return;
-      if (value && value.length > 2) return;
-    }
-    if (name === "mjesec") {
-      const mjesec = parseInt(value);
-      if (value && (mjesec < 1 || mjesec > 12)) return;
-      if (value && value.length > 2) return;
-    }
-    if (name === "godina") {
-      if (value && value.length > 4) return;
-    }
-
-    if (["dan", "mjesec", "godina"].includes(name) && value !== "") {
-      if (!/^\d+$/.test(value)) return;
-    }
-
     setFilters((prev) => ({
       ...prev,
       [name]: value,
@@ -142,14 +120,18 @@ const Letovi = () => {
     fetchLetovi();
   };
 
+  useEffect(() => {
+    fetchDestinacije();
+    fetchLetovi();
+  }, []);
+
   if (letovi.length === 0) {
     return (
       <div className="letovi-container">
         <div className="letovi-card">
           <h2>Trenutno nema dostupnih letova</h2>
           <p>
-            Molimo vas da pokušate kasnije ili kontaktirajte administratora za
-            više informacija.
+            Molimo vas da pokušate kasnije ili kontaktirajte administratora za više informacija.
           </p>
         </div>
       </div>
@@ -159,25 +141,120 @@ const Letovi = () => {
   return (
     <div className="letovi-container">
       <h2>Pretraga Letova</h2>
-
       <form onSubmit={handleSearch} className="pretraga-forma">
+        {/* Existing filters for origin/destination and date range */}
         <div className="form-group">
+          <label>Od:</label>
+          <select
+            name="polaziste"
+            value={filters.polaziste}
+            onChange={handleFilterChange}
+            className="input-field select-field"
+          >
+            <option value="">Sva polazista</option>
+            {destinacije.map((dest) => (
+              <option key={`polaziste-${dest._id}`} value={dest.grad}>
+                {dest.grad} - {dest.nazivAerodroma}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Do:</label>
           <select
             name="odrediste"
             value={filters.odrediste}
             onChange={handleFilterChange}
             className="input-field select-field"
           >
-            <option key="default" value="">
-              Sve destinacije
-            </option>
+            <option value="">Sve destinacije</option>
             {destinacije.map((dest) => (
-              <option key={dest._id} value={dest.grad}>
+              <option key={`odrediste-${dest._id}`} value={dest.grad}>
                 {dest.grad} - {dest.nazivAerodroma}
               </option>
             ))}
           </select>
         </div>
+        <div className="form-group">
+          <label>Datum od:</label>
+          <input
+            type="date"
+            name="datumOd"
+            value={filters.datumOd}
+            onChange={handleFilterChange}
+            className="input-field date-input"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Datum do:</label>
+          <input
+            type="date"
+            name="datumDo"
+            value={filters.datumDo}
+            onChange={handleFilterChange}
+            className="input-field date-input"
+            required
+          />
+        </div>
+
+        {/* New filter for Airline */}
+        <div className="form-group">
+          <label>Aviokompanija:</label>
+          <input
+            type="text"
+            name="aviokompanija"
+            value={filters.aviokompanija}
+            onChange={handleFilterChange}
+            placeholder="Unesite naziv aviokompanije"
+            className="input-field"
+          />
+        </div>
+
+        {/* New filters for Departure Time Range */}
+        <div className="form-group">
+          <label>Vrijeme polaska od:</label>
+          <input
+            type="time"
+            name="departureFrom"
+            value={filters.departureFrom}
+            onChange={handleFilterChange}
+            className="input-field"
+          />
+        </div>
+        <div className="form-group">
+          <label>Vrijeme polaska do:</label>
+          <input
+            type="time"
+            name="departureTo"
+            value={filters.departureTo}
+            onChange={handleFilterChange}
+            className="input-field"
+          />
+        </div>
+
+        {/* New filters for Arrival Time Range */}
+        <div className="form-group">
+          <label>Vrijeme dolaska od:</label>
+          <input
+            type="time"
+            name="arrivalFrom"
+            value={filters.arrivalFrom}
+            onChange={handleFilterChange}
+            className="input-field"
+          />
+        </div>
+        <div className="form-group">
+          <label>Vrijeme dolaska do:</label>
+          <input
+            type="time"
+            name="arrivalTo"
+            value={filters.arrivalTo}
+            onChange={handleFilterChange}
+            className="input-field"
+          />
+        </div>
+
         <button type="submit" className="pretrazi-dugme" disabled={loading}>
           Pretraži
         </button>
@@ -209,7 +286,6 @@ const Letovi = () => {
                     </p>
                   )}
                 </div>
-
                 <button
                   className="rezervisi-dugme"
                   onClick={() =>
