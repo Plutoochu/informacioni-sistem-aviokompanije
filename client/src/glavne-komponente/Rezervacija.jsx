@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "../stilovi/Rezervacija.css"; // Uvozimo stilove
 
 const getBaseUrl = () => {
@@ -11,9 +11,14 @@ const getBaseUrl = () => {
 };
 
 const Rezervacija = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
   const passedFlight = location.state?.flight;
+
+  // Stanja za mapu sjedista
+  const [showSeatMap, setShowSeatMap] = useState(false);
+  const [reservationData, setReservationData] = useState(null);
 
   // Osnovni podaci o letu
   const [letInfo, setLetInfo] = useState(passedFlight || null);
@@ -21,7 +26,7 @@ const Rezervacija = () => {
   const [greska, setGreska] = useState(null);
   const [cijena, setCijena] = useState(passedFlight ? passedFlight.cijena : 0);
   const [bookingNumber, setBookingNumber] = useState("");
-
+ 
   // Opcije rezervacije
   const [classType, setClassType] = useState("Ekonomska");
   const [ticketType, setTicketType] = useState("Jednosmjerna"); // "Jednosmjerna" ili "Povratna"
@@ -166,19 +171,18 @@ const Rezervacija = () => {
     };
   
     console.log("Podaci rezervacije:", bookingData);
+    setReservationData(bookingData);
+    setShowSeatMap(true);
     
-    try {
-      const response = await axios.post(`${getBaseUrl()}/api/rezervacije`, bookingData, {
-        headers: { "Content-Type": "application/json" },
-      });
-      alert("Rezervacija uspješna!");
-      console.log("Odgovor servera:", response.data);
-      // Preusmjerite korisnika prema potrebi
-    } catch (error) {
-      console.error("Greška pri kreiranju rezervacije:", error);
-      alert("Došlo je do greške prilikom rezervacije. Provjerite konzolu za detalje.");
-    }
-  };  
+    setReservationData(bookingData);
+    
+    navigate('/mapa-sjedista', { 
+      state: { 
+        reservation: bookingData, 
+        flight: letInfo 
+      } 
+    });
+  }; 
 
   if (loading) return <div>Učitavanje...</div>;
   if (greska) return <div>{greska}</div>;
@@ -452,9 +456,10 @@ const yearOptions = Array.from({ length: 11 }, (_, i) => {
     </div>
   </div>
 )}
-        <button type="submit" className="rezervisi-dugme">
-          Potvrdi rezervaciju
-        </button>
+        
+          <button type="submit" className="rezervisi-dugme">
+            Dalje na odabir sjedišta
+          </button>
       </form>
     </div>
   );
