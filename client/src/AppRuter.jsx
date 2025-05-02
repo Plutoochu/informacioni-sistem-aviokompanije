@@ -1,27 +1,28 @@
 import React from "react";
 import {
+  Navigate,
+  Route,
   BrowserRouter as Router,
   Routes,
-  Route,
-  Navigate,
 } from "react-router-dom";
-import { AuthProvider, useAuth } from "./kontekst/AuthContext";
+import AdminDashboard from "./glavne-komponente/AdminDashboard";
+import AvioniForma from "./glavne-komponente/AvioniForma";
+import ForgotPassword from "./glavne-komponente/ForgotPassword";
+import Letovi from "./glavne-komponente/Letovi";
+import MapaSjedista from "./glavne-komponente/MapaSjedista";
 import Navigacija from "./glavne-komponente/Navigacija";
 import Pocetna from "./glavne-komponente/Pocetna";
 import Prijava from "./glavne-komponente/Prijava";
-import Registracija from "./glavne-komponente/Registracija";
 import Profil from "./glavne-komponente/Profil";
-import Letovi from "./glavne-komponente/Letovi";
-import ForgotPassword from "./glavne-komponente/ForgotPassword";
+import RasporedLetovaForma from "./glavne-komponente/RasporedLetovaForma";
+import Registracija from "./glavne-komponente/Registracija";
 import ResetPassword from "./glavne-komponente/ResetPassword";
-import AvioniForma from "./glavne-komponente/AvioniForma";
-import "./stilovi/App.css";
-import AdminDashboard from "./glavne-komponente/AdminDashboard";
-import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
+import Rezervacija from "./glavne-komponente/Rezervacija";
 import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
 import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
-import RasporedLetovaForma from "./glavne-komponente/RasporedLetovaForma";
-import Rezervacija from "./glavne-komponente/Rezervacija";
+import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
+import { AuthProvider, useAuth } from "./kontekst/AuthContext";
+import "./stilovi/App.css";
 
 // Komponenta za zaštićene admin rute
 const ProtectedAdminRoute = ({ children }) => {
@@ -92,6 +93,7 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/avioni" element={<AvioniForma />} />
               <Route path="/rezervacija/:id" element={<Rezervacija />} />
+              <Route path="/mapa-sjedista" element={<MapaSjedista />} />
               
             </Routes>
           </main>
