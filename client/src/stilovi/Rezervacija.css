@@ -1,13 +1,13 @@
 body {
   background-color: #e9f5ff;
   margin: 0;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 .booking-container {
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   padding: 30px;
   margin: 40px auto;
   max-width: 700px;

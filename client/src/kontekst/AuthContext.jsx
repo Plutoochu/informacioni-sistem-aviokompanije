@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const getBaseUrl = () => {
-    if (window.location.hostname === 'localhost') {
+    if (window.location.hostname === "localhost") {
       return "http://localhost:5000";
     }
     return "https://informacioni-sistem-za-aviokompanije.onrender.com";
@@ -52,18 +52,18 @@ export const AuthProvider = ({ children }) => {
 
   const resetujLozinku = async (email) => {
     const adresaRute = `${getBaseUrl()}/api/korisnici/reset-lozinke`;
-    
+
     try {
-      const odgovor = await axios.post(adresaRute, { email });
+      const Odgovor = await axios.post(adresaRute, { email });
       return {
         uspjesno: true,
-        poruka: "Zahtjev za resetovanje lozinke je poslan na vaš email"
+        poruka: "Zahtjev za resetovanje lozinke je poslan na vaš email",
       };
     } catch (error) {
       console.error("Greška pri resetovanju lozinke:", error);
       return {
         uspjesno: false,
-        poruka: error.response?.data?.message || "Došlo je do greške prilikom resetovanja lozinke"
+        poruka: error.response?.data?.message || "Došlo je do greške prilikom resetovanja lozinke",
       };
     }
   };
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     korisnik,
     prijaviKorisnika,
     odjaviKorisnika,
-    resetujLozinku
+    resetujLozinku,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

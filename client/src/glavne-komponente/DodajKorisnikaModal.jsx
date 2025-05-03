@@ -48,38 +48,11 @@ const DodajKorisnikaModal = ({ otvoren, onZatvori, onDodajKorisnika }) => {
         <h2>Dodaj korisnika</h2>
         {greska && <p className="error-message">{greska}</p>}
         <form onSubmit={handleSubmit}>
-          <input
-            name="ime"
-            placeholder="Ime *"
-            value={forma.ime}
-            onChange={handleChange}
-          />
-          <input
-            name="prezime"
-            placeholder="Prezime *"
-            value={forma.prezime}
-            onChange={handleChange}
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email *"
-            value={forma.email}
-            onChange={handleChange}
-          />
-          <input
-            name="lozinka"
-            type="password"
-            placeholder="Lozinka *"
-            value={forma.lozinka}
-            onChange={handleChange}
-          />
-          <input
-            name="telefon"
-            placeholder="Telefon"
-            value={forma.telefon}
-            onChange={handleChange}
-          />
+          <input name="ime" placeholder="Ime *" value={forma.ime} onChange={handleChange} />
+          <input name="prezime" placeholder="Prezime *" value={forma.prezime} onChange={handleChange} />
+          <input name="email" type="email" placeholder="Email *" value={forma.email} onChange={handleChange} />
+          <input name="lozinka" type="password" placeholder="Lozinka *" value={forma.lozinka} onChange={handleChange} />
+          <input name="telefon" placeholder="Telefon" value={forma.telefon} onChange={handleChange} />
           <select name="role" value={forma.role} onChange={handleChange}>
             <option value="kupac">Kupac</option>
             <option value="admin">Admin</option>

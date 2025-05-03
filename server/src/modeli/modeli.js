@@ -105,9 +105,9 @@ const LetSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    aviokompanija: { 
-      type: String, 
-      required: true 
+    aviokompanija: {
+      type: String,
+      required: true,
     },
     schedule: {
       type: String,
@@ -139,8 +139,7 @@ const LetSchema = new mongoose.Schema(
 
           return arrivalMinutes > departureMinutes;
         },
-        message:
-          "Vrijeme dolaska mora biti nakon vremena polaska (osim ako nije sljedeći dan).",
+        message: "Vrijeme dolaska mora biti nakon vremena polaska (osim ako nije sljedeći dan).",
       },
     },
     dolazakSljedeciDan: {
@@ -283,13 +282,4 @@ const ResetToken = mongoose.model("ResetToken", ResetTokenSchema);
 const Let = mongoose.model("Let", LetSchema);
 const Booking = mongoose.model("Booking", BookingSchema);
 
-export {
-  Korisnik,
-  Destinacija,
-  Avion,
-  ResetToken,
-  Let,
-  OtkazaniLet,
-  Notifikacija,
-  Booking,
-};
+export { Korisnik, Destinacija, Avion, ResetToken, Let, OtkazaniLet, Notifikacija, Booking };

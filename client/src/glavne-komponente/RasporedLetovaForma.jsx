@@ -41,9 +41,7 @@ const RasporedLetovaForma = ({ flightData }) => {
 
   const handleDayCheckboxChange = (e) => {
     const value = e.target.value;
-    setCancelDays((prev) =>
-      prev.includes(value) ? prev.filter((d) => d !== value) : [...prev, value]
-    );
+    setCancelDays((prev) => (prev.includes(value) ? prev.filter((d) => d !== value) : [...prev, value]));
   };
 
   const handleCancelSubmit = async (e) => {
@@ -64,9 +62,7 @@ const RasporedLetovaForma = ({ flightData }) => {
 
       const otkazaniRes = await dohvatiOtkazaneLetove();
 
-      const updatedLet = letovi.map((let_) =>
-        let_._id === let_._id ? { ...let_, status: "Aktivan" } : let_
-      );
+      const updatedLet = letovi.map((let_) => (let_._id === let_._id ? { ...let_, status: "Aktivan" } : let_));
       setLetovi(updatedLet);
       setOtkazaniLetovi(otkazaniRes);
     } catch (err) {
@@ -92,9 +88,7 @@ const RasporedLetovaForma = ({ flightData }) => {
 
       const otkazaniRes = await dohvatiOtkazaneLetove();
 
-      const updatedLet = letovi.map((let_) =>
-        let_._id === let_._id ? { ...let_, status: "Aktivan" } : let_
-      );
+      const updatedLet = letovi.map((let_) => (let_._id === let_._id ? { ...let_, status: "Aktivan" } : let_));
       setLetovi(updatedLet);
       setOtkazaniLetovi(otkazaniRes);
     } catch (err) {
@@ -150,9 +144,7 @@ const RasporedLetovaForma = ({ flightData }) => {
       const to = new Date(otkazan.to);
       const hasOverlap = from <= validityEnd && to >= validityStart;
 
-      const hasDayMatch = otkazan.days.some((day) =>
-        daysInSchedule.includes(day)
-      );
+      const hasDayMatch = otkazan.days.some((day) => daysInSchedule.includes(day));
 
       return otkazan.flightId === letId && hasOverlap && hasDayMatch;
     });
@@ -201,7 +193,7 @@ const RasporedLetovaForma = ({ flightData }) => {
     validityTo: "",
     avionId: "",
     dolazakSljedeciDan: false,
-    aviokompanija: ""
+    aviokompanija: "",
   });
 
   const handleEdit = (let_) => {
@@ -217,7 +209,7 @@ const RasporedLetovaForma = ({ flightData }) => {
       validityTo: let_.validityTo?.slice(0, 10),
       avionId: let_.avionId?._id || let_.avionId,
       dolazakSljedeciDan: false,
-      aviokompanija: let_.aviokompanija || ""
+      aviokompanija: let_.aviokompanija || "",
     });
     setIsEditing(true);
     setSelectedFlightId(let_._id);
@@ -246,16 +238,8 @@ const RasporedLetovaForma = ({ flightData }) => {
       return nextDay ? true : endMin > startMin;
     };
 
-    if (
-      !isTimeValid(
-        formData.departureTime,
-        formData.arrivalTime,
-        formData.dolazakSljedeciDan
-      )
-    ) {
-      setErrorMessage(
-        "Vrijeme dolaska mora biti nakon polaska (ili označi dolazak sljedeći dan)."
-      );
+    if (!isTimeValid(formData.departureTime, formData.arrivalTime, formData.dolazakSljedeciDan)) {
+      setErrorMessage("Vrijeme dolaska mora biti nakon polaska (ili označi dolazak sljedeći dan).");
       return;
     }
 
@@ -290,16 +274,13 @@ const RasporedLetovaForma = ({ flightData }) => {
         validityFrom: "",
         validityTo: "",
         avionId: "",
-        aviokompanija: ""
+        aviokompanija: "",
       });
       setErrorMessage(""); // Očisti eventualnu staru poruku
     } catch (error) {
       console.error("Greška:", error);
 
-      const backendMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Greška pri dodavanju.";
+      const backendMessage = error.response?.data?.message || error.message || "Greška pri dodavanju.";
 
       setErrorMessage(backendMessage);
     }
@@ -351,15 +332,8 @@ const RasporedLetovaForma = ({ flightData }) => {
             </div>
             {["origin", "destination"].map((field) => (
               <div className="form-group" key={field}>
-                <label htmlFor={field}>
-                  {field === "origin" ? "Polazište" : "Odredište"}
-                </label>
-                <select
-                  id={field}
-                  name={field}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  required>
+                <label htmlFor={field}>{field === "origin" ? "Polazište" : "Odredište"}</label>
+                <select id={field} name={field} value={formData[field]} onChange={handleChange} required>
                   <option value="">-- Odaberi --</option>
                   {destinacije.map((dest) => (
                     <option key={dest._id} value={dest.grad}>
@@ -370,7 +344,7 @@ const RasporedLetovaForma = ({ flightData }) => {
               </div>
             ))}
 
-              {/* NOVO polje za unos naziv aviokompanije */}
+            {/* NOVO polje za unos naziv aviokompanije */}
             <div className="form-group">
               <label htmlFor="aviokompanija">Aviokompanija</label>
               <input
@@ -386,12 +360,7 @@ const RasporedLetovaForma = ({ flightData }) => {
 
             <div className="form-group">
               <label htmlFor="avionId">Avion</label>
-              <select
-                id="avionId"
-                name="avionId"
-                value={formData.avionId}
-                onChange={handleChange}
-                required>
+              <select id="avionId" name="avionId" value={formData.avionId} onChange={handleChange} required>
                 <option value="">-- Odaberi avion --</option>
                 {avioni.map((avion) => (
                   <option key={avion._id} value={avion._id}>
@@ -424,28 +393,13 @@ const RasporedLetovaForma = ({ flightData }) => {
             </div>
             <div className="form-group">
               <label>Važi od - do</label>
-              <input
-                type="date"
-                name="validityFrom"
-                value={formData.validityFrom}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="date"
-                name="validityTo"
-                value={formData.validityTo}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" name="validityFrom" value={formData.validityFrom} onChange={handleChange} required />
+              <input type="date" name="validityTo" value={formData.validityTo} onChange={handleChange} required />
             </div>
             <button className="btn-submit" type="submit">
               {isEditing ? "Ažuriraj" : "Spremi"}
             </button>
-            <button
-              type="button"
-              className="btn-cancel"
-              onClick={() => setShowForm(false)}>
+            <button type="button" className="btn-cancel" onClick={() => setShowForm(false)}>
               Otkaži
             </button>
           </form>
@@ -474,7 +428,8 @@ const RasporedLetovaForma = ({ flightData }) => {
             setSelectedFlightId(null);
             setErrorMessage("");
             setShowForm(true);
-          }}>
+          }}
+        >
           Dodaj let
         </button>
         <h2>Rasporedi letova</h2>
@@ -502,45 +457,28 @@ const RasporedLetovaForma = ({ flightData }) => {
                     {let_.origin} → {let_.destination}
                   </td>
                   <td>
-                    {let_.departureTime && let_.arrivalTime
-                      ? `${let_.departureTime} - ${let_.arrivalTime}`
-                      : "N/A"}
+                    {let_.departureTime && let_.arrivalTime ? `${let_.departureTime} - ${let_.arrivalTime}` : "N/A"}
                   </td>
                   <td>{let_.avionId?.naziv || "N/A"}</td>
+                  <td>{let_.schedule ? opisRasporeda(let_.schedule) : "Nema rasporeda"}</td>
                   <td>
-                    {let_.schedule
-                      ? opisRasporeda(let_.schedule)
-                      : "Nema rasporeda"}
+                    {let_.validityFrom ? let_.validityFrom.slice(0, 10) : "N/A"} –{" "}
+                    {let_.validityTo ? let_.validityTo.slice(0, 10) : "N/A"}
                   </td>
-                  <td>
-                    {let_.validityFrom ? let_.validityFrom.slice(0, 10) : "N/A"}{" "}
-                    – {let_.validityTo ? let_.validityTo.slice(0, 10) : "N/A"}
-                  </td>
-                  <td
-                    className={
-                      isFlightCanceled(let_)
-                        ? "flight-canceled"
-                        : "flight-active"
-                    }>
+                  <td className={isFlightCanceled(let_) ? "flight-canceled" : "flight-active"}>
                     {isFlightCanceled(let_) ? "Otkazan" : "Aktivan"}
                   </td>
                   <td>
                     {isFlightCanceled(let_) ? (
-                      <button
-                        className="btn-add"
-                        onClick={() => handleReactivateFlight(let_)}>
+                      <button className="btn-add" onClick={() => handleReactivateFlight(let_)}>
                         Aktiviraj
                       </button>
                     ) : (
                       <>
-                        <button
-                          className="btn-edit"
-                          onClick={() => handleEdit(let_)}>
+                        <button className="btn-edit" onClick={() => handleEdit(let_)}>
                           Uredi
                         </button>
-                        <button
-                          onClick={() => handleCancelClick(let_)}
-                          className="btn-cancel">
+                        <button onClick={() => handleCancelClick(let_)} className="btn-cancel">
                           Otkazi
                         </button>
                       </>
@@ -562,8 +500,7 @@ const RasporedLetovaForma = ({ flightData }) => {
                 <strong>{selectedFlightForCancel?.origin}</strong> →{" "}
                 <strong>{selectedFlightForCancel?.destination}</strong>
                 <br />
-                Vrijeme: {selectedFlightForCancel?.departureTime} –{" "}
-                {selectedFlightForCancel?.arrivalTime}
+                Vrijeme: {selectedFlightForCancel?.departureTime} – {selectedFlightForCancel?.arrivalTime}
               </p>
 
               <div className="form-group">
@@ -577,12 +514,7 @@ const RasporedLetovaForma = ({ flightData }) => {
               </div>
               <div className="form-group">
                 <label>Do datuma:</label>
-                <input
-                  type="date"
-                  value={cancelToDate}
-                  onChange={(e) => setCancelToDate(e.target.value)}
-                  required
-                />
+                <input type="date" value={cancelToDate} onChange={(e) => setCancelToDate(e.target.value)} required />
               </div>
               <div className="form-group">
                 <label>Dani letenja za otkaz:</label>
@@ -602,10 +534,7 @@ const RasporedLetovaForma = ({ flightData }) => {
                 <button type="submit" className="btn-submit">
                   Potvrdi otkazivanje
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setShowCancelModal(false)}
-                  className="btn-cancel">
+                <button type="button" onClick={() => setShowCancelModal(false)} className="btn-cancel">
                   Zatvori
                 </button>
               </div>

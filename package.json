@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.10.1"
-  }
-}

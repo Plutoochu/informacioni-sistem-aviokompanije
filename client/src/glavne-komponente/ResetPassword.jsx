@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import '../stilovi/App.css';
+import "../stilovi/App.css";
 
 const getBaseUrl = () => {
-  if (window.location.hostname === 'localhost') {
+  if (window.location.hostname === "localhost") {
     return "http://localhost:5000";
   }
   return "https://informacioni-sistem-za-aviokompanije.onrender.com";
@@ -20,7 +20,7 @@ export default function ResetPassword() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const tokenParam = searchParams.get('token');
+    const tokenParam = searchParams.get("token");
     if (!tokenParam) {
       setError("Nevažeći link za resetovanje lozinke");
       return;
@@ -41,9 +41,9 @@ export default function ResetPassword() {
     try {
       const response = await axios.post(`${getBaseUrl()}/api/korisnici/reset-password`, {
         token,
-        novaLozinka
+        novaLozinka,
       });
-      
+
       if (response.data.message) {
         setMessage(response.data.message);
         setTimeout(() => {
@@ -61,7 +61,7 @@ export default function ResetPassword() {
         <div className="reset-password-form">
           <h2>Greška</h2>
           <p className="error">{error}</p>
-          <button onClick={() => navigate('/prijava')} className="auth-button">
+          <button onClick={() => navigate("/prijava")} className="auth-button">
             Vrati se na prijavu
           </button>
         </div>
@@ -73,7 +73,7 @@ export default function ResetPassword() {
     <div className="reset-password-container">
       <div className="reset-password-form">
         <h2>Resetujte lozinku</h2>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="novaLozinka">Nova lozinka:</label>

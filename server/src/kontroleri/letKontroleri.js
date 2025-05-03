@@ -1,15 +1,19 @@
-import {
-  Let,
-  Destinacija,
-  OtkazaniLet,
-  Notifikacija,
-  Korisnik,
-} from "../modeli/modeli.js";
+import { Let, Destinacija, OtkazaniLet, Notifikacija, Korisnik } from "../modeli/modeli.js";
 
 export const dohvatiLetove = async (req, res) => {
   try {
-    const { odrediste, datumOd, datumDo, aviokompanija, departureFrom, departureTo, arrivalFrom, arrivalTo } = req.query;
-    console.log("Server primio zahtjev sa parametrima:", { odrediste, datumOd, datumDo, aviokompanija, departureFrom, departureTo, arrivalFrom, arrivalTo });
+    const { odrediste, datumOd, datumDo, aviokompanija, departureFrom, departureTo, arrivalFrom, arrivalTo } =
+      req.query;
+    console.log("Server primio zahtjev sa parametrima:", {
+      odrediste,
+      datumOd,
+      datumDo,
+      aviokompanija,
+      departureFrom,
+      departureTo,
+      arrivalFrom,
+      arrivalTo,
+    });
 
     let query = {};
 
@@ -27,9 +31,9 @@ export const dohvatiLetove = async (req, res) => {
       query.validityTo = { $gte: startDate };
     }
 
-if (aviokompanija) {
-  query.aviokompanija = { $regex: new RegExp(aviokompanija, "i") };
-}
+    if (aviokompanija) {
+      query.aviokompanija = { $regex: new RegExp(aviokompanija, "i") };
+    }
 
     // Filter by departure time range (departureTime is stored as string "HH:MM")
     if (departureFrom && departureTo) {
@@ -75,9 +79,7 @@ export const dodajLet = async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
-    res
-      .status(500)
-      .json({ message: "Greška pri dodavanju leta.", details: error.message });
+    res.status(500).json({ message: "Greška pri dodavanju leta.", details: error.message });
   }
 };
 

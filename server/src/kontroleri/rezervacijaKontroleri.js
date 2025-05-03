@@ -30,9 +30,7 @@ const sendConfirmationEmail = async (to, booking) => {
     }
     <p><strong>Putnici:</strong></p>
     <ul>
-      ${booking.passengers
-        .map((p) => `<li>${p.ime} ${p.prezime} - ${p.email}</li>`)
-        .join("")}
+      ${booking.passengers.map((p) => `<li>${p.ime} ${p.prezime} - ${p.email}</li>`).join("")}
     </ul>
     <p>Hvala na kupovini!</p>
   `;
@@ -79,12 +77,7 @@ export const createBooking = async (req, res) => {
 
     // Ako se plaća karticom, validiraj podatke o kartici
     if (paymentMethod === "Kartica") {
-      if (
-        !cardDetails ||
-        !cardDetails.cardNumber ||
-        !cardDetails.cardExpiry ||
-        !cardDetails.cardCVC
-      ) {
+      if (!cardDetails || !cardDetails.cardNumber || !cardDetails.cardExpiry || !cardDetails.cardCVC) {
         return res.status(400).json({ message: "Nedostaju podaci o kartici." });
       }
       if (!/^\d{16}$/.test(cardDetails.cardNumber)) {

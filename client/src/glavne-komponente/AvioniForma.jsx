@@ -4,7 +4,7 @@ import "../stilovi/AvioniForma.css";
 import "../stilovi/App.css";
 
 const getBaseUrl = () => {
-  if (window.location.hostname === 'localhost') {
+  if (window.location.hostname === "localhost") {
     return "http://localhost:5000";
   }
   return "https://informacioni-sistem-za-aviokompanije.onrender.com";
@@ -90,35 +90,17 @@ const AvioniForma = () => {
       <form onSubmit={handleSubmit} className="avioni-forma">
         <div className="form-group">
           <label>Naziv:</label>
-          <input
-            type="text"
-            name="naziv"
-            value={formData.naziv}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="naziv" value={formData.naziv} onChange={handleChange} required />
         </div>
 
         <div className="form-group">
           <label>Model:</label>
-          <input
-            type="text"
-            name="model"
-            value={formData.model}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="model" value={formData.model} onChange={handleChange} required />
         </div>
 
         <div className="form-group">
           <label>Tip:</label>
-          <input
-            type="text"
-            name="tip"
-            value={formData.tip}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="tip" value={formData.tip} onChange={handleChange} required />
         </div>
 
         <div className="form-group">
@@ -145,22 +127,12 @@ const AvioniForma = () => {
 
         <div className="form-group">
           <label>Broj sjedista:</label>
-          <input
-            type="number"
-            name="brojSjedista"
-            value={formData.brojSjedista}
-            onChange={handleChange}
-            required
-          />
+          <input type="number" name="brojSjedista" value={formData.brojSjedista} onChange={handleChange} required />
         </div>
 
         <div className="form-group">
           <label>Status:</label>
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            required>
+          <select name="status" value={formData.status} onChange={handleChange} required>
             <option value="aktivan">Aktivan</option>
             <option value="neaktivan">Neaktivan</option>
             <option value="u održavanju">U održavanju</option>
@@ -171,30 +143,15 @@ const AvioniForma = () => {
           <h3>Broj sjedala po klasi:</h3>
           <div className="form-group">
             <label>First Class (F):</label>
-            <input
-              type="number"
-              name="F"
-              value={formData.sjedalaPoRedu.F}
-              onChange={handleSjedalaChange}
-            />
+            <input type="number" name="F" value={formData.sjedalaPoRedu.F} onChange={handleSjedalaChange} />
           </div>
           <div className="form-group">
             <label>Business Class (C):</label>
-            <input
-              type="number"
-              name="C"
-              value={formData.sjedalaPoRedu.C}
-              onChange={handleSjedalaChange}
-            />
+            <input type="number" name="C" value={formData.sjedalaPoRedu.C} onChange={handleSjedalaChange} />
           </div>
           <div className="form-group">
             <label>Economy Class (Y):</label>
-            <input
-              type="number"
-              name="Y"
-              value={formData.sjedalaPoRedu.Y}
-              onChange={handleSjedalaChange}
-            />
+            <input type="number" name="Y" value={formData.sjedalaPoRedu.Y} onChange={handleSjedalaChange} />
           </div>
         </div>
 

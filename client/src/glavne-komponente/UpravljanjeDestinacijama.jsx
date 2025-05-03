@@ -51,9 +51,7 @@ const UpravljanjeDestinacijama = () => {
     try {
       if (editId) {
         const azurirano = await azurirajDestinaciju(editId, novaDestinacija);
-        setDestinacije((prev) =>
-          prev.map((d) => (d._id === editId ? azurirano : d))
-        );
+        setDestinacije((prev) => prev.map((d) => (d._id === editId ? azurirano : d)));
       } else {
         const dodana = await dodajDestinaciju(novaDestinacija);
         setDestinacije([...destinacije, dodana]);
@@ -87,18 +85,8 @@ const UpravljanjeDestinacijama = () => {
       <h2>Upravljanje destinacijama</h2>
 
       <div className="form-container">
-        <input
-          type="text"
-          placeholder="Grad"
-          value={grad}
-          onChange={(e) => setGrad(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Naziv aerodroma"
-          value={naziv}
-          onChange={(e) => setNaziv(e.target.value)}
-        />
+        <input type="text" placeholder="Grad" value={grad} onChange={(e) => setGrad(e.target.value)} />
+        <input type="text" placeholder="Naziv aerodroma" value={naziv} onChange={(e) => setNaziv(e.target.value)} />
         <input
           type="text"
           placeholder="IATA kod (npr. SJJ)"
@@ -111,9 +99,7 @@ const UpravljanjeDestinacijama = () => {
           value={icao}
           onChange={(e) => setICAO(e.target.value.toUpperCase())}
         />
-        <button onClick={handleDodajIliAzuriraj}>
-          {editId ? "Ažuriraj" : "Dodaj"} destinaciju
-        </button>
+        <button onClick={handleDodajIliAzuriraj}>{editId ? "Ažuriraj" : "Dodaj"} destinaciju</button>
       </div>
 
       <h3>Postojeće destinacije</h3>

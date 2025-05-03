@@ -129,9 +129,7 @@ const Letovi = () => {
       <div className="letovi-container">
         <div className="letovi-card">
           <h2>Trenutno nema dostupnih letova</h2>
-          <p>
-            Molimo vas da pokušate kasnije ili kontaktirajte administratora za više informacija.
-          </p>
+          <p>Molimo vas da pokušate kasnije ili kontaktirajte administratora za više informacija.</p>
         </div>
       </div>
     );
@@ -263,10 +261,7 @@ const Letovi = () => {
       <div className="letovi-grid">
         {letovi.length > 0
           ? letovi.map((let_) => (
-              <div
-                key={let_._id || `let-${let_.origin}-${let_.destination}`}
-                className="let-kartica"
-              >
+              <div key={let_._id || `let-${let_.origin}-${let_.destination}`} className="let-kartica">
                 <div className="let-info">
                   <h3>Let {let_.flightNumber}</h3>
                   <p>
@@ -277,9 +272,7 @@ const Letovi = () => {
                     {let_.dolazakSljedeciDan ? "(dolazak sljedeći dan)" : ""}
                   </p>
                   <p>Cijena: {let_.cijena} €</p>
-                  {let_.aviokompanija && (
-                    <p>Aviokompanija: {let_.aviokompanija}</p>
-                  )}
+                  {let_.aviokompanija && <p>Aviokompanija: {let_.aviokompanija}</p>}
                   {let_.avionId && (
                     <p className="avion-info">
                       Avion: {let_.avionId.naziv} ({let_.avionId.model})
@@ -288,20 +281,13 @@ const Letovi = () => {
                 </div>
                 <button
                   className="rezervisi-dugme"
-                  onClick={() =>
-                    navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })
-                  }
+                  onClick={() => navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })}
                 >
                   Rezerviši
                 </button>
               </div>
             ))
-          : !loading &&
-            !error && (
-              <div className="no-results">
-                Nema dostupnih letova za odabrane kriterije.
-              </div>
-            )}
+          : !loading && !error && <div className="no-results">Nema dostupnih letova za odabrane kriterije.</div>}
       </div>
     </div>
   );

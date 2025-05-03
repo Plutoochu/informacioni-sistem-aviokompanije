@@ -52,11 +52,7 @@ const UpravljanjeKorisnicima = () => {
     try {
       setActionInProgress(true);
       await promovisiNaAdmina(userId);
-      setUsers(
-        users.map((user) =>
-          user._id === userId ? { ...user, role: "admin" } : user
-        )
-      );
+      setUsers(users.map((user) => (user._id === userId ? { ...user, role: "admin" } : user)));
     } catch (err) {
       setError("Failed to promote user.");
       console.error("Error promoting user:", err);
@@ -70,11 +66,7 @@ const UpravljanjeKorisnicima = () => {
     try {
       setActionInProgress(true);
       await demovisiToKorisnika(userId);
-      setUsers(
-        users.map((user) =>
-          user._id === userId ? { ...user, role: "kupac" } : user
-        )
-      );
+      setUsers(users.map((user) => (user._id === userId ? { ...user, role: "kupac" } : user)));
     } catch (err) {
       setError("Failed to demote user.");
       console.error("Error demoting admin:", err);
@@ -124,9 +116,7 @@ const UpravljanjeKorisnicima = () => {
 
       {error && <div className="error-message">{error}</div>}
 
-      <button
-        onClick={() => setModalOtvoren(true)}
-        className="promote-btn add-user-btn">
+      <button onClick={() => setModalOtvoren(true)} className="promote-btn add-user-btn">
         Dodaj korisnika
       </button>
 
@@ -155,7 +145,8 @@ const UpravljanjeKorisnicima = () => {
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
-            strokeLinejoin="round">
+            strokeLinejoin="round"
+          >
             <path d="M21 2v6h-6"></path>
             <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
             <path d="M3 22v-6h6"></path>
@@ -185,17 +176,13 @@ const UpravljanjeKorisnicima = () => {
                   <td>{user.name || "N/A"}</td>
                   <td>{user.email}</td>
                   <td>
-                    <span className={`role-badge ${user.role}`}>
-                      {user.role}
-                    </span>
+                    <span className={`role-badge ${user.role}`}>{user.role}</span>
                   </td>
                   <td className="hide-mobile">{user.phoneNumber || "N/A"}</td>
                   <td className="hide-mobile">{user.loyaltyPoints || 0}</td>
                   <td className="hide-mobile">
                     {user.bookingHistory?.length > 0 ? (
-                      <span className="booking-badge">
-                        {user.bookingHistory.length} bookings
-                      </span>
+                      <span className="booking-badge">{user.bookingHistory.length} bookings</span>
                     ) : (
                       "None"
                     )}
@@ -205,14 +192,16 @@ const UpravljanjeKorisnicima = () => {
                       <button
                         onClick={() => upravljajPromocijomKorisnika(user._id)}
                         disabled={actionInProgress}
-                        className="promote-btn">
+                        className="promote-btn"
+                      >
                         Promote
                       </button>
                     ) : user.role === "admin" ? (
                       <button
                         onClick={() => upravljajDemocijomKorisnika(user._id)}
                         disabled={actionInProgress}
-                        className="demote-btn">
+                        className="demote-btn"
+                      >
                         Demote
                       </button>
                     ) : (
@@ -223,7 +212,8 @@ const UpravljanjeKorisnicima = () => {
                     <button
                       onClick={() => upravaljajBrisanjemKorisnika(user._id)}
                       disabled={actionInProgress}
-                      className="demote-btn delete-btn">
+                      className="demote-btn delete-btn"
+                    >
                       Delete
                     </button>
                   </td>

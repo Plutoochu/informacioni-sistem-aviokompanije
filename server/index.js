@@ -18,13 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(compress());
-app.use(
-  cors({
-    credentials: true,
-  })
-);
+app.use(cors({ credentials: true }));
 
-// Rute
 app.use("/api/korisnici", userRute);
 app.use("/api/admin", adminRute);
 app.use("/api/avioni", avionRute);
@@ -32,9 +27,7 @@ app.use("/api/letovi", letRute);
 app.use("/api/", resetPasswordRoute);
 app.use("/api/rezervacije", rezervacijaRute);
 
-app.listen(config.port, () =>
-  console.log(`Server pokrenut na portu: ${config.port}`)
-);
+app.listen(config.port, () => console.log(`Server pokrenut na portu: ${config.port}`));
 
 mongoose
   .connect(config.mongo)

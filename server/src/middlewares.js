@@ -22,9 +22,7 @@ export const autentifikacija = (req, res, next) => {
 
 export const adminOnly = (req, res, next) => {
   if (req.korisnik?.role !== "admin") {
-    return res
-      .status(403)
-      .json({ message: "Nemate dopuštenje za ovu radnju!" });
+    return res.status(403).json({ message: "Nemate dopuštenje za ovu radnju!" });
   }
   next();
 };

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import '../stilovi/App.css';
+import "../stilovi/App.css";
 
 const getBaseUrl = () => {
-  if (window.location.hostname === 'localhost') {
+  if (window.location.hostname === "localhost") {
     return "http://localhost:5000";
   }
   return "https://informacioni-sistem-za-aviokompanije.onrender.com";

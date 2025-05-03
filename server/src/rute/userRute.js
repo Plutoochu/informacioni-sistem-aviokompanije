@@ -91,16 +91,8 @@ router.get("/dobavi-korisnike", async (req, res) => {
   }
 });
 
-router.get(
-  "/moje-notifikacije",
-  autentifikacija,
-  dohvatiNotifikacijeZaKorisnika
-);
+router.get("/moje-notifikacije", autentifikacija, dohvatiNotifikacijeZaKorisnika);
 
-router.put(
-  "/notifikacije/:notificationId",
-  autentifikacija,
-  oznaciKaoProcitano
-);
+router.put("/notifikacije/:notificationId", autentifikacija, oznaciKaoProcitano);
 
 export default router;

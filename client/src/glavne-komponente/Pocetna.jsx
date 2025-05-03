@@ -1,10 +1,7 @@
 import { Link, Navigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../kontekst/AuthContext";
-import {
-  dohvatiNotifikacije,
-  oznaciKaoProcitano,
-} from "../pomocne-funkcije/fetch-funkcije";
+import { dohvatiNotifikacije, oznaciKaoProcitano } from "../pomocne-funkcije/fetch-funkcije";
 
 const Pocetna = () => {
   const { korisnik } = useAuth();
@@ -32,9 +29,7 @@ const Pocetna = () => {
       console.log("🎯 Notifikacija označena kao pročitana:", response);
 
       // Remove the notification from the UI by updating the state
-      setNotifikacije((prevNotifikacije) =>
-        prevNotifikacije.filter((n) => n._id !== notificationId)
-      );
+      setNotifikacije((prevNotifikacije) => prevNotifikacije.filter((n) => n._id !== notificationId));
     } catch (err) {
       console.error("Greška pri označavanju notifikacije kao pročitane:", err);
     }
@@ -56,9 +51,7 @@ const Pocetna = () => {
                 <li key={n._id}>
                   {n.poruka}
                   {!n.procitano && (
-                    <button
-                      onClick={() => handleMarkAsRead(n._id)}
-                      className="mark-as-read-button">
+                    <button onClick={() => handleMarkAsRead(n._id)} className="mark-as-read-button">
                       Oznaci kao pročitan
                     </button>
                   )}

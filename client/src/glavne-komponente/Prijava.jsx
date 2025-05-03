@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../kontekst/AuthContext';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../kontekst/AuthContext";
 
 const Prijava = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    lozinka: ''
+    email: "",
+    lozinka: "",
   });
-  const [greska, setGreska] = useState('');
+  const [greska, setGreska] = useState("");
   const { prijaviKorisnika } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setGreska('');
+    setGreska("");
 
     if (!formData.email || !formData.lozinka) {
-      setGreska('Molimo popunite sva polja');
+      setGreska("Molimo popunite sva polja");
       return;
     }
 
     const rezultat = await prijaviKorisnika(formData.email, formData.lozinka);
     if (!rezultat.uspjesno) {
-      setGreska(rezultat.poruka || 'Došlo je do greške prilikom prijave');
+      setGreska(rezultat.poruka || "Došlo je do greške prilikom prijave");
     }
   };
 
@@ -57,7 +57,7 @@ const Prijava = () => {
           </button>
           <div className="link-container">
             <span>Zaboravili ste lozinku? </span>
-            <span className="link" onClick={() => navigate('/forgot-password')}>
+            <span className="link" onClick={() => navigate("/forgot-password")}>
               Resetujte je
             </span>
           </div>
@@ -67,4 +67,4 @@ const Prijava = () => {
   );
 };
 
-export default Prijava; 
+export default Prijava;

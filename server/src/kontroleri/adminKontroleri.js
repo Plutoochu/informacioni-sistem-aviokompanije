@@ -68,9 +68,7 @@ const demovirajUKorisnika = async (req, res) => {
     }
 
     if (korisnik.role === "kupac") {
-      return res
-        .status(400)
-        .json({ poruka: "Korisnik je već obični korisnik" });
+      return res.status(400).json({ poruka: "Korisnik je već obični korisnik" });
     }
 
     korisnik.role = "kupac";
@@ -107,9 +105,7 @@ const dodajNovogKorisnika = async (req, res) => {
     // Provjeravamo da li korisnik već postoji
     const postojeciKorisnik = await Korisnik.findOne({ email });
     if (postojeciKorisnik) {
-      return res
-        .status(400)
-        .json({ poruka: "Korisnik s ovim emailom već postoji" });
+      return res.status(400).json({ poruka: "Korisnik s ovim emailom već postoji" });
     }
 
     // Kreiramo novog korisnika
@@ -134,9 +130,7 @@ const dodajNovogKorisnika = async (req, res) => {
       role: kreiraniKorisnik.role,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ poruka: "Greška pri dodavanju korisnika", error: error.message });
+    res.status(500).json({ poruka: "Greška pri dodavanju korisnika", error: error.message });
   }
 };
 

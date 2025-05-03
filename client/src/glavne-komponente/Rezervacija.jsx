@@ -26,7 +26,7 @@ const Rezervacija = () => {
   const [greska, setGreska] = useState(null);
   const [cijena, setCijena] = useState(passedFlight ? passedFlight.cijena : 0);
   const [bookingNumber, setBookingNumber] = useState("");
- 
+
   // Opcije rezervacije
   const [classType, setClassType] = useState("Ekonomska");
   const [ticketType, setTicketType] = useState("Jednosmjerna"); // "Jednosmjerna" ili "Povratna"
@@ -73,19 +73,17 @@ const Rezervacija = () => {
 
   // Ažuriramo listu putnika kad se promijeni broj odabranih putnika
   useEffect(() => {
-    const totalPassengers =
-      parseInt(adultsCount) + parseInt(childrenCount) + parseInt(infantsCount);
+    const totalPassengers = parseInt(adultsCount) + parseInt(childrenCount) + parseInt(infantsCount);
     const updatedPassengers = [];
     for (let i = 0; i < totalPassengers; i++) {
-      updatedPassengers[i] =
-        passengers[i] || {
-          ime: "",
-          prezime: "",
-          idNumber: "",
-          datumRodjenja: "",
-          email: "",
-          telefon: "",
-        };
+      updatedPassengers[i] = passengers[i] || {
+        ime: "",
+        prezime: "",
+        idNumber: "",
+        datumRodjenja: "",
+        email: "",
+        telefon: "",
+      };
     }
     setPassengers(updatedPassengers);
   }, [adultsCount, childrenCount, infantsCount]);
@@ -136,16 +134,16 @@ const Rezervacija = () => {
     }
     return true;
   };
-    
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (paymentMethod === "Kartica") {
       if (!validateCardDetails()) {
         return;
       }
     }
-  
+
     const cardDetails =
       paymentMethod === "Kartica"
         ? {
@@ -155,7 +153,7 @@ const Rezervacija = () => {
             cardCVC,
           }
         : null;
-  
+
     const bookingData = {
       bookingNumber,
       flightId: letInfo._id,
@@ -169,46 +167,46 @@ const Rezervacija = () => {
       cardDetails: paymentMethod === "Kartica" ? cardDetails : undefined,
       // seatSelection opcionalno, ako postoji
     };
-  
+
     console.log("Podaci rezervacije:", bookingData);
     setReservationData(bookingData);
     setShowSeatMap(true);
-    
+
     setReservationData(bookingData);
-    
-    navigate('/mapa-sjedista', { 
-      state: { 
-        reservation: bookingData, 
-        flight: letInfo 
-      } 
+
+    navigate("/mapa-sjedista", {
+      state: {
+        reservation: bookingData,
+        flight: letInfo,
+      },
     });
-  }; 
+  };
 
   if (loading) return <div>Učitavanje...</div>;
   if (greska) return <div>{greska}</div>;
   if (!letInfo) return <div>Nema informacija o letu.</div>;
 
   // Generisanje opcija za mjesec (01 do 12)
-// Opcije za mjesec – od "01" do "12"
-const monthOptions = Array.from({ length: 12 }, (_, i) => {
-  const month = (i + 1).toString().padStart(2, "0");
-  return (
-    <option key={month} value={month}>
-      {month}
-    </option>
-  );
-});
+  // Opcije za mjesec – od "01" do "12"
+  const monthOptions = Array.from({ length: 12 }, (_, i) => {
+    const month = (i + 1).toString().padStart(2, "0");
+    return (
+      <option key={month} value={month}>
+        {month}
+      </option>
+    );
+  });
 
-// Opcije za godinu – puni brojevi, od trenutne godine do trenutne + 10
-const currentYear = new Date().getFullYear();
-const yearOptions = Array.from({ length: 11 }, (_, i) => {
-  const yearFull = currentYear + i;
-  return (
-    <option key={yearFull} value={yearFull}>
-      {yearFull}
-    </option>
-  );
-});
+  // Opcije za godinu – puni brojevi, od trenutne godine do trenutne + 10
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 11 }, (_, i) => {
+    const yearFull = currentYear + i;
+    return (
+      <option key={yearFull} value={yearFull}>
+        {yearFull}
+      </option>
+    );
+  });
 
   return (
     <div className="booking-container">
@@ -281,38 +279,21 @@ const yearOptions = Array.from({ length: 11 }, (_, i) => {
           <div className="passengers-count">
             <div>
               <label>Odrasli:</label>
-              <input
-                type="number"
-                min="1"
-                value={adultsCount}
-                onChange={(e) => setAdultsCount(e.target.value)}
-              />
+              <input type="number" min="1" value={adultsCount} onChange={(e) => setAdultsCount(e.target.value)} />
             </div>
             <div>
               <label>Djeca:</label>
-              <input
-                type="number"
-                min="0"
-                value={childrenCount}
-                onChange={(e) => setChildrenCount(e.target.value)}
-              />
+              <input type="number" min="0" value={childrenCount} onChange={(e) => setChildrenCount(e.target.value)} />
             </div>
             <div>
               <label>Bebe:</label>
-              <input
-                type="number"
-                min="0"
-                value={infantsCount}
-                onChange={(e) => setInfantsCount(e.target.value)}
-              />
+              <input type="number" min="0" value={infantsCount} onChange={(e) => setInfantsCount(e.target.value)} />
             </div>
           </div>
         </div>
 
         {/* Unos podataka putnika */}
-        {(parseInt(adultsCount) +
-          parseInt(childrenCount) +
-          parseInt(infantsCount)) > 0 && (
+        {parseInt(adultsCount) + parseInt(childrenCount) + parseInt(infantsCount) > 0 && (
           <div className="passengers-details">
             <h4>Unesite podatke putnika</h4>
             {passengers.map((passenger, index) => (
@@ -408,58 +389,58 @@ const yearOptions = Array.from({ length: 11 }, (_, i) => {
 
         {/* Dodatna polja za kreditnu karticu – prikazuju se samo ako je izabran način plaćanja "Kartica" */}
         {paymentMethod === "Kartica" && (
-  <div className="credit-card-details">
-    <div className="form-group">
-      <label>Broj kartice:</label>
-      <input
-        type="text"
-        name="cardNumber"
-        placeholder="1234456787654321"
-        value={cardNumber}
-        onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, ""))}
-        maxLength={16}
-        required
-      />
-    </div>
-    <div className="form-group">
-      <label>Datum isteka:</label>
-      <select
-        name="cardExpiryMonth"
-        value={cardExpiryMonth}
-        onChange={(e) => setCardExpiryMonth(e.target.value)}
-        required
-      >
-        <option value="">Mjesec</option>
-        {monthOptions}
-      </select>
-      <select
-        name="cardExpiryYear"
-        value={cardExpiryYear}
-        onChange={(e) => setCardExpiryYear(e.target.value)}
-        required
-      >
-        <option value="">Godina</option>
-        {yearOptions}
-      </select>
-    </div>
-    <div className="form-group">
-      <label>CVC:</label>
-      <input
-        type="text"
-        name="cardCVC"
-        placeholder="xxx"
-        value={cardCVC}
-        onChange={(e) => setCardCVC(e.target.value.replace(/\D/g, ""))}
-        maxLength={3}
-        required
-      />
-    </div>
-  </div>
-)}
-        
-          <button type="submit" className="rezervisi-dugme">
-            Dalje na odabir sjedišta
-          </button>
+          <div className="credit-card-details">
+            <div className="form-group">
+              <label>Broj kartice:</label>
+              <input
+                type="text"
+                name="cardNumber"
+                placeholder="1234456787654321"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, ""))}
+                maxLength={16}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Datum isteka:</label>
+              <select
+                name="cardExpiryMonth"
+                value={cardExpiryMonth}
+                onChange={(e) => setCardExpiryMonth(e.target.value)}
+                required
+              >
+                <option value="">Mjesec</option>
+                {monthOptions}
+              </select>
+              <select
+                name="cardExpiryYear"
+                value={cardExpiryYear}
+                onChange={(e) => setCardExpiryYear(e.target.value)}
+                required
+              >
+                <option value="">Godina</option>
+                {yearOptions}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>CVC:</label>
+              <input
+                type="text"
+                name="cardCVC"
+                placeholder="xxx"
+                value={cardCVC}
+                onChange={(e) => setCardCVC(e.target.value.replace(/\D/g, ""))}
+                maxLength={3}
+                required
+              />
+            </div>
+          </div>
+        )}
+
+        <button type="submit" className="rezervisi-dugme">
+          Dalje na odabir sjedišta
+        </button>
       </form>
     </div>
   );

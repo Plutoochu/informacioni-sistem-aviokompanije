@@ -1,11 +1,5 @@
 import { Router } from "express";
-import {
-  dohvatiLetove,
-  dodajLet,
-  dohvatiLet,
-  dohvatiDestinacije,
-  azurirajLet,
-} from "../kontroleri/letKontroleri.js";
+import { dohvatiLetove, dodajLet, dohvatiLet, dohvatiDestinacije, azurirajLet } from "../kontroleri/letKontroleri.js";
 
 const router = Router();
 

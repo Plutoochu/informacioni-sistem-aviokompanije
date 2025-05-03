@@ -25,8 +25,7 @@ const dohvatiDestinacije = async (req, res) => {
 const dohvatiDestinacijuPoId = async (req, res) => {
   try {
     const destinacija = await Destinacija.findById(req.params.id);
-    if (!destinacija)
-      return res.status(404).json({ poruka: "Destinacija nije pronađena." });
+    if (!destinacija) return res.status(404).json({ poruka: "Destinacija nije pronađena." });
     res.json(destinacija);
   } catch (greska) {
     res.status(500).json({ poruka: greska.message });
@@ -36,13 +35,8 @@ const dohvatiDestinacijuPoId = async (req, res) => {
 // Ažuriranje destinacije
 const azurirajDestinaciju = async (req, res) => {
   try {
-    const azuriranaDestinacija = await Destinacija.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!azuriranaDestinacija)
-      return res.status(404).json({ poruka: "Destinacija nije pronađena." });
+    const azuriranaDestinacija = await Destinacija.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!azuriranaDestinacija) return res.status(404).json({ poruka: "Destinacija nije pronađena." });
     res.json(azuriranaDestinacija);
   } catch (greska) {
     res.status(400).json({ poruka: greska.message });
@@ -52,11 +46,8 @@ const azurirajDestinaciju = async (req, res) => {
 // Brisanje destinacije
 const obrisiDestinaciju = async (req, res) => {
   try {
-    const obrisanaDestinacija = await Destinacija.findByIdAndDelete(
-      req.params.id
-    );
-    if (!obrisanaDestinacija)
-      return res.status(404).json({ poruka: "Destinacija nije pronađena." });
+    const obrisanaDestinacija = await Destinacija.findByIdAndDelete(req.params.id);
+    if (!obrisanaDestinacija) return res.status(404).json({ poruka: "Destinacija nije pronađena." });
     res.json({ poruka: "Destinacija uspješno obrisana." });
   } catch (greska) {
     res.status(500).json({ poruka: greska.message });
