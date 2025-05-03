@@ -55,6 +55,7 @@ const Rezervacija = () => {
         try {
           const response = await axios.get(`${getBaseUrl()}/api/letovi/${id}`);
           const flightData = response.data;
+          console.log("Dohvaćen let:", flightData);  // provjera
           setLetInfo(flightData);
           setCijena(flightData.cijena || 0);
           setBookingNumber(generisiBookingBroj());
@@ -70,6 +71,7 @@ const Rezervacija = () => {
       setBookingNumber(generisiBookingBroj());
     }
   }, [id, passedFlight]);
+  
 
   // Ažuriramo listu putnika kad se promijeni broj odabranih putnika
   useEffect(() => {

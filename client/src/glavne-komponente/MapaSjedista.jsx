@@ -10,10 +10,23 @@ const getBaseUrl = () => {
   return "https://informacioni-sistem-za-aviokompanije.onrender.com";
 };
 
-// TODO (Backend): Potrebna su dva endpointa:
-// 1. GET /api/letovi/:id/sjedista - vraća zauzeta sjedišta
-// 2. POST /api/rezervacije - potvrđuje rezervaciju sa sjedištima
-// Detalji ispod u komentarima.
+function parseSeatConfiguration(configStr) {
+  const regex = /[Ff](\d+)[Cc](\d+)[Yy](\d+)/;
+  const match = configStr.match(regex);
+  if (!match) {
+    throw new Error("Neispravna konfiguracija sjedala.");
+  }
+  return {
+    first: { totalSeats: parseInt(match[1], 10) },
+    business: { totalSeats: parseInt(match[2], 10) },
+    economy: { totalSeats: parseInt(match[3], 10) },
+  };
+}
+
+
+function seatLetterToIndex(letter) {
+  return letter.charCodeAt(0) - "A".charCodeAt(0);
+}
 
 const MapaSjedista = () => {
   const location = useLocation();
@@ -27,62 +40,97 @@ const MapaSjedista = () => {
       (parseInt(reservation.infantsCount) || 0)
     : 0;
 
-  // Trenutno hardkodirano za testiranje.
-  // TODO (Backend): Dinamički dohvatiti konfiguraciju aviona za let.
-  const [airplaneConfig] = useState({
-    firstClass: {
-      rows: 3,
-      seatsPerRow: 4,
-      startRow: 1,
-      price: 300,
-    },
-    businessClass: {
-      rows: 5,
-      seatsPerRow: 4,
-      startRow: 1,
-      price: 200,
-    },
-    economyClass: {
-      rows: 20,
-      seatsPerRow: 6,
-      startRow: 6,
-      price: 100,
-    },
-  });
-
+  // State za let iz statea ponekad se mora "osvježiti" sa backenda
+  const [flightData, setFlightData] = useState(flight);
+  // State za kompletan Avion dokument
+  const [avion, setAvion] = useState(null);
+  // State za dinamičku konfiguraciju sjedala
+  const [dynamicAirplaneConfig, setDynamicAirplaneConfig] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [bookedSeats, setBookedSeats] = useState([]);
 
-  // TODO (Backend): OVDJE SU PRIVREMENI PODACI (mock) - treba ih zamijeniti pravim API pozivom
+  // Re-fetch kompletnog leta
   useEffect(() => {
-    // Simulacija dohvatanja zauzetih sjedista
-    const fetchBookedSeats = async () => {
+    const fetchCompleteFlight = async () => {
       try {
-        const mockBookedSeats = [
-          { class: "first", seat: "A1" },
-          { class: "first", seat: "B2" },
-          { class: "business", seat: "A4" },
-          { class: "business", seat: "B5" },
-          { class: "economy", seat: "A9" },
-          { class: "economy", seat: "B10" },
-          { class: "economy", seat: "C11" },
-        ];
-        setBookedSeats(mockBookedSeats);
-      } catch (error) {
-        console.error("Greška pri učitavanju sjedišta:", error);
+        const response = await axios.get(`${getBaseUrl()}/api/letovi/${flight._id}`);
+        console.log("Osvježeni let s populate:", response.data);
+        setFlightData(response.data);
+      } catch (err) {
+        console.error("Greška pri dohvatanju kompletnog leta:", err);
       }
     };
+    if (flight && flight._id && (!flight.avionId || !flight.avionId._id)) {
+      fetchCompleteFlight();
+    }
+  }, [flight]);
 
+  useEffect(() => {
+    if (flightData && flightData.avionId) {
+      setAvion(flightData.avionId);
+    }
+  }, [flightData]);
+
+// Dohvatamo zauzeta mjesta za dati let iz backenda
+useEffect(() => {
+  const fetchBookedSeats = async () => {
+    try {
+      const response = await axios.get(`${getBaseUrl()}/api/sjedista/${flightData._id}/sjedista`);
+      console.log("Dohvaćena zauzeta sjedala:", response.data.bookedSeats);
+      setBookedSeats(response.data.bookedSeats);
+    } catch (error) {
+      console.error("Greška pri dohvaćanju zauzetih sjedala:", error);
+    }
+  };
+  if (flightData && flightData._id) {
     fetchBookedSeats();
-  }, []);
+  }
+}, [flightData]);
+
+
+  useEffect(() => {
+    if (flightData && avion && flightData.seatConfiguration && avion.sjedalaPoRedu && avion.brojSjedista) {
+      try {
+        const config = parseSeatConfiguration(flightData.seatConfiguration);
+        const firstRows = Math.ceil(config.first.totalSeats / avion.sjedalaPoRedu.F);
+        const businessRows = Math.ceil(config.business.totalSeats / avion.sjedalaPoRedu.C);
+        const economyRows = Math.ceil(config.economy.totalSeats / avion.sjedalaPoRedu.Y);
+  
+        const dynamicConfig = {
+          firstClass: {
+            rows: firstRows,
+            seatsPerRow: avion.sjedalaPoRedu.F,
+            startRow: 1,
+            price: 300,
+          },
+          businessClass: {
+            rows: businessRows,
+            seatsPerRow: avion.sjedalaPoRedu.C,
+            startRow: firstRows + 1,
+            price: 200,
+          },
+          economyClass: {
+            rows: economyRows,
+            seatsPerRow: avion.sjedalaPoRedu.Y,
+            startRow: firstRows + businessRows + 1,
+            price: 100,
+          },
+        };
+        setDynamicAirplaneConfig(dynamicConfig);
+        console.log("Dynamic config:", dynamicConfig);
+      } catch (err) {
+        console.error("Greška pri postavljanju konfiguracije sjedala:", err);
+      }
+    }
+  }, [flightData, avion]);
+  
 
   const handleSeatClick = (seat) => {
-    if (bookedSeats.some((booked) => booked.seat === seat.id)) return;
-
-    // Provjera da li je sjedište u odgovarajućoj klasi
+    if (bookedSeats.some((booked) => booked === seat.id)) return;
+  
     const selectedClass = reservation.classType;
     const seatClass = seat.class;
-
+  
     if (
       (selectedClass === "Ekonomska" && seatClass !== "economy") ||
       (selectedClass === "Biznis" && seatClass !== "business") ||
@@ -91,10 +139,8 @@ const MapaSjedista = () => {
       alert(`Možete odabrati samo sjedišta u ${selectedClass.toLowerCase()} klasi`);
       return;
     }
-
-    // Provjera odabranih sjedišta po broju putnika
+  
     const isSelected = selectedSeats.some((s) => s.id === seat.id);
-
     if (isSelected) {
       setSelectedSeats(selectedSeats.filter((s) => s.id !== seat.id));
     } else {
@@ -105,15 +151,20 @@ const MapaSjedista = () => {
       }
     }
   };
-
-  const isSeatBooked = (seatId) => bookedSeats.some((seat) => seat.seat === seatId);
-  const isSeatSelected = (seatId) => selectedSeats.some((seat) => seat.id === seatId);
-
+  
+  const isSeatBooked = (seatId) =>
+    bookedSeats.some((bookedSeat) => bookedSeat === seatId);
+  const isSeatSelected = (seatId) =>
+    selectedSeats.some((seat) => seat.id === seatId);
+  
   const renderSeatMap = () => {
+    if (!dynamicAirplaneConfig) {
+      return <div>Učitavam konfiguraciju sjedala...</div>;
+    }
     const seats = [];
-    const { firstClass, businessClass, economyClass } = airplaneConfig;
-
-    // Prva klasa
+    const { firstClass, businessClass, economyClass } = dynamicAirplaneConfig;
+  
+    // Renderiranje Prve klase
     seats.push(
       <div key="first-label" className="class-label">
         Prva klasa
@@ -126,13 +177,15 @@ const MapaSjedista = () => {
         const seatId = `${seatLetter}${row}`;
         const isBooked = isSeatBooked(seatId);
         const isSelected = isSeatSelected(seatId);
-
         rowSeats.push(
           <div
             key={seatId}
-            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} first 
-              ${reservation.classType !== "Prva klasa" ? "disabled" : ""}`}
-            onClick={() => !isBooked && handleSeatClick({ id: seatId, class: "first" })}
+            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} first ${
+              reservation.classType !== "Prva klasa" ? "disabled" : ""
+            }`}
+            onClick={() =>
+              !isBooked && handleSeatClick({ id: seatId, class: "first" })
+            }
           >
             {seatId}
           </div>
@@ -144,8 +197,8 @@ const MapaSjedista = () => {
         </div>
       );
     }
-
-    // Biznis klasa
+  
+    // Renderiranje Biznis klase
     seats.push(
       <div key="business-label" className="class-label">
         Biznis klasa
@@ -158,13 +211,15 @@ const MapaSjedista = () => {
         const seatId = `${seatLetter}${row}`;
         const isBooked = isSeatBooked(seatId);
         const isSelected = isSeatSelected(seatId);
-
         rowSeats.push(
           <div
             key={seatId}
-            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} business 
-              ${reservation.classType !== "Biznis" ? "disabled" : ""}`}
-            onClick={() => !isBooked && handleSeatClick({ id: seatId, class: "business" })}
+            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} business ${
+              reservation.classType !== "Biznis" ? "disabled" : ""
+            }`}
+            onClick={() =>
+              !isBooked && handleSeatClick({ id: seatId, class: "business" })
+            }
           >
             {seatId}
           </div>
@@ -176,8 +231,8 @@ const MapaSjedista = () => {
         </div>
       );
     }
-
-    // Ekonomska klasa
+  
+    // Renderiranje Ekonomske klase
     seats.push(
       <div key="economy-label" className="class-label">
         Ekonomska klasa
@@ -190,13 +245,15 @@ const MapaSjedista = () => {
         const seatId = `${seatLetter}${row}`;
         const isBooked = isSeatBooked(seatId);
         const isSelected = isSeatSelected(seatId);
-
         rowSeats.push(
           <div
             key={seatId}
-            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} economy 
-              ${reservation.classType !== "Ekonomska" ? "disabled" : ""}`}
-            onClick={() => !isBooked && handleSeatClick({ id: seatId, class: "economy" })}
+            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} economy ${
+              reservation.classType !== "Ekonomska" ? "disabled" : ""
+            }`}
+            onClick={() =>
+              !isBooked && handleSeatClick({ id: seatId, class: "economy" })
+            }
           >
             {seatId}
           </div>
@@ -208,28 +265,27 @@ const MapaSjedista = () => {
         </div>
       );
     }
-
+  
     return seats;
   };
-
-  // TODO (Backend): KRITIČNO - Potrebna je serverska validacija zauzetosti sjedišta
-  // Trenutna frontend validacija (preko bookedSeats) nije dovoljna jer se može desiti
-  // da dva korisnika rezervišu isto sjedište ako rade istovremeno
-  // Rješenje:
-  // - Endpoint /api/rezervacije MORA u transakciji provjeriti da li su sva sjedišta još uvijek slobodna prije čuvanja
-  // - Vratiti grešku (409 Conflict) ako bilo koje sjedište više nije dostupno
+  
   const handleConfirmSeats = async () => {
     if (selectedSeats.length !== totalPassengers) {
       alert(`Morate odabrati tačno ${totalPassengers} sjedišta za ${totalPassengers} putnika`);
       return;
     }
-
+  
     try {
       const response = await axios.post(`${getBaseUrl()}/api/rezervacije`, {
         ...reservation,
-        seats: selectedSeats,
+        seatSelection: selectedSeats.map((seat) => seat.id),
       });
-
+  
+      // Nakon uspješne rezervacije, ponovo dohvatimo booked seats
+      const seatsResponse = await axios.get(`${getBaseUrl()}/api/sjedista/${flightData._id}/sjedista`);
+      console.log("Ažurirana zauzeta sjedala:", seatsResponse.data.bookedSeats);
+      setBookedSeats(seatsResponse.data.bookedSeats);
+  
       alert("Rezervacija uspješno završena!");
       navigate("/");
     } catch (error) {
@@ -237,7 +293,8 @@ const MapaSjedista = () => {
       alert("Došlo je do greške pri potvrdi rezervacije");
     }
   };
-
+  
+  
   if (!reservation || !flight) {
     return (
       <div className="seat-map-container">
@@ -248,14 +305,14 @@ const MapaSjedista = () => {
       </div>
     );
   }
-
+  
   return (
     <div className="seat-map-container">
       <h2>Odabir sjedišta za let {flight.flightNumber}</h2>
       <p>
         <strong>Putnika:</strong> {totalPassengers} |<strong>Klasa:</strong> {reservation.classType}
       </p>
-
+  
       <div className="seat-map-legend">
         <div className="legend-item">
           <div className="seat-sample available"></div>
@@ -270,9 +327,9 @@ const MapaSjedista = () => {
           <span>Zauzeto</span>
         </div>
       </div>
-
+  
       <div className="seat-map">{renderSeatMap()}</div>
-
+  
       <div className="selected-seats-info">
         <h3>Odabrana sjedišta:</h3>
         {selectedSeats.length > 0 ? (
@@ -285,7 +342,7 @@ const MapaSjedista = () => {
           <p>Niste odabrali nijedno sjedište.</p>
         )}
       </div>
-
+  
       <div className="action-buttons">
         <button onClick={() => navigate(-1)} className="back-button">
           Nazad
@@ -301,5 +358,5 @@ const MapaSjedista = () => {
     </div>
   );
 };
-
+  
 export default MapaSjedista;
