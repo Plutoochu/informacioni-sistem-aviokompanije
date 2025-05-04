@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { dohvatiLetove, dodajLet, dohvatiLet, dohvatiDestinacije, azurirajLet } from "../kontroleri/letKontroleri.js";
+import { getBookedSeats } from "../kontroleri/sjedistaKontroleri.js";
 
 const router = Router();
 
@@ -17,5 +18,7 @@ router.get("/:id", dohvatiLet);
 
 // PUT /api/letovi/:id - Ažuriraj let
 router.put("/:id", azurirajLet);
+
+router.get("/:id/sjedista", getBookedSeats);
 
 export default router;

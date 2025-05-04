@@ -85,15 +85,20 @@ export const dodajLet = async (req, res) => {
 
 export const dohvatiLet = async (req, res) => {
   try {
-    const let_ = await Let.findById(req.params.id);
-    if (!let_) {
-      return res.status(404).json({ message: "Let nije pronađen" });
+    // populate bez selecta = vraća sav Avion dokument, uključujući _id
+    const letDoc = await Let.findById(req.params.id)
+      .populate("avionId");
+
+    if (!letDoc) {
+      return res.status(404).json({ message: "Let nije pronađen." });
     }
-    res.status(200).json(let_);
+    res.json(letDoc);
   } catch (error) {
-    res.status(500).json({ message: "Greška pri dohvatanju leta" });
+    res.status(500).json({ message: error.message });
   }
 };
+
+
 
 export const dohvatiDestinacije = async (req, res) => {
   try {
