@@ -45,6 +45,26 @@ const sendConfirmationEmail = async (to, booking) => {
   await transporter.sendMail(mailOptions);
 };
 
+export const sendCancellationEmail = async (to, korisnikIme, booking, letInfo, otkazaniPeriod) => {
+  const htmlContent = `
+    <h1>Otkazivanje leta</h1>
+    <p>Poštovani/a ${korisnikIme},</p>
+    <p>Obavještavamo Vas da je let <strong>${letInfo.flightNumber}</strong> na koji ste izvršili rezervaciju <strong>${booking.bookingNumber}</strong> otkazan u periodu od <strong>${otkazaniPeriod.from}</strong> do <strong>${otkazaniPeriod.to}</strong>.</p>
+    <p>Molimo Vas da kontaktirate podršku radi daljih koraka (promjena ili povrat novca).</p>
+    <p>Hvala na razumijevanju,</p>
+  `;
+
+  const mailOptions = {
+    from: `"Aviokompanija" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: `Otkazivanje leta - ${letInfo.flightNumber}`,
+    html: htmlContent,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+
 export const createBooking = async (req, res) => {
   try {
     const {
