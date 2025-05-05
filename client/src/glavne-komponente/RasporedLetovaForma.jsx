@@ -23,26 +23,15 @@ const RasporedLetovaForma = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelFromDate, setCancelFromDate] = useState("");
   const [cancelToDate, setCancelToDate] = useState("");
-  const [cancelDays, setCancelDays] = useState([]);
   const [selectedFlightForCancel, setSelectedFlightForCancel] = useState(null);
   const [otkazaniLetovi, setOtkazaniLetovi] = useState([]);
   const [dodajSkupLetova, setDodajSkupLetova] = useState(false);
 
   const handleCancelClick = (let_) => {
-    if (let_.rasporedLetova) {
-      setSelectedFlightForCancel(let_);
-      setCancelFromDate(let_.datumPolaska?.slice(0, 10));
-      setCancelToDate(let_.datumDolaska?.slice(0, 10));
-      setCancelDays(let_.rasporedLetova.split(""));
-      setShowCancelModal(true);
-    } else {
-      console.error("Raspored nije definiran za ovaj let.");
-    }
-  };
-
-  const handleDayCheckboxChange = (e) => {
-    const value = e.target.value;
-    setCancelDays((prev) => (prev.includes(value) ? prev.filter((d) => d !== value) : [...prev, value]));
+    setSelectedFlightForCancel(let_);
+    setCancelFromDate(let_.datumPolaska?.slice(0, 10));
+    setCancelToDate(let_.datumDolaska?.slice(0, 10));
+    setShowCancelModal(true);
   };
 
   const handleCancelSubmit = async (e) => {
@@ -52,12 +41,10 @@ const RasporedLetovaForma = () => {
         flightId: selectedFlightForCancel._id,
         from: cancelFromDate,
         to: cancelToDate,
-        days: cancelDays,
       });
 
       alert("Let uspješno otkazan.");
       setShowCancelModal(false);
-      setCancelDays([]);
       setCancelFromDate("");
       setCancelToDate("");
 
@@ -127,36 +114,17 @@ const RasporedLetovaForma = () => {
   }, []);
 
   const isFlightCanceled = (let_) => {
-    // Ensure rasporedLetova exists before using it
-    if (!let_.rasporedLetova) {
-      return false; // Return false or any other fallback value you prefer
-    }
-
     const letId = let_._id;
     const validityStart = new Date(let_.datumPolaska);
     const validityEnd = new Date(let_.datumDolaska);
-    const daysInSchedule = let_.rasporedLetova.split(""); // Now it's safe to call split
 
     return otkazaniLetovi.some((otkazan) => {
       const from = new Date(otkazan.from);
       const to = new Date(otkazan.to);
       const hasOverlap = from <= validityEnd && to >= validityStart;
 
-      const hasDayMatch = otkazan.days.some((day) => daysInSchedule.includes(day));
-
-      return otkazan.flightId === letId && hasOverlap && hasDayMatch;
+      return otkazan.flightId === letId && hasOverlap;
     });
-  };
-
-  const daniSedmice = {
-    1: "Pon",
-    2: "Uto",
-    3: "Sri",
-    4: "Čet",
-    5: "Pet",
-    6: "Sub",
-    7: "Ned",
-    x: "Ad-hoc",
   };
 
   const [formData, setFormData] = useState({
@@ -479,20 +447,6 @@ const RasporedLetovaForma = () => {
               <div className="form-group">
                 <label>Do datuma:</label>
                 <input type="date" value={cancelToDate} onChange={(e) => setCancelToDate(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <label>Dani letenja za otkaz:</label>
-                {["1", "2", "3", "4", "5", "6", "7"].map((d) => (
-                  <label key={d} style={{ marginRight: "10px" }}>
-                    <input
-                      type="checkbox"
-                      value={d}
-                      checked={cancelDays.includes(d)}
-                      onChange={handleDayCheckboxChange}
-                    />{" "}
-                    {daniSedmice[d]}
-                  </label>
-                ))}
               </div>
               <div className="modal-buttons">
                 <button type="submit" className="btn-submit">

@@ -4,11 +4,11 @@ import nodemailer from "nodemailer";
 
 // Konfiguracija transporter-a pomoću NodeMailer-a
 const transporter = nodemailer.createTransport({
-  service: "gmail", // ili drugi SMTP servis po potrebi
-  auth: {
-    user: process.env.EMAIL_USER, // npr. "moja.adresa@gmail.com"
-    pass: process.env.EMAIL_PASS, // lozinka ili API ključ (po mogućnosti app password)
-  },
+  host: "smtp.sendgrid.net",
+  port: 587,
+  secure: false,
+  auth: { user: "apikey", pass: process.env.SENDGRID_API_KEY },
+  tls: { rejectUnauthorized: false },
 });
 
 // Funkcija za slanje potvrde emaila
@@ -36,7 +36,7 @@ const sendConfirmationEmail = async (to, booking) => {
   `;
 
   const mailOptions = {
-    from: `"Aviokompanija" <${process.env.EMAIL_USER}>`,
+    from: `"NRS Aviokompanija" <${process.env.SENDER_EMAIL}>`,
     to, // primatelj – email adresa kupca
     subject: `Potvrda rezervacije - ${booking.bookingNumber}`,
     html: htmlContent,
@@ -55,7 +55,7 @@ export const sendCancellationEmail = async (to, korisnikIme, booking, letInfo, o
   `;
 
   const mailOptions = {
-    from: `"Aviokompanija" <${process.env.EMAIL_USER}>`,
+    from: `"NRS Aviokompanija" <${process.env.SENDER_EMAIL}>`,
     to,
     subject: `Otkazivanje leta - ${letInfo.brojLeta}`,
     html: htmlContent,

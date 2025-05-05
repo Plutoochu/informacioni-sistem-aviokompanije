@@ -233,9 +233,9 @@ export const azurirajLet = async (req, res) => {
 };
 
 export const otkaziLet = async (req, res) => {
-  const { flightId, from, to, days } = req.body;
+  const { flightId, from, to } = req.body;
 
-  if (!flightId || !from || !to || !days?.length) {
+  if (!flightId || !from || !to) {
     return res.status(400).json({ poruka: "Nedostaju podaci." });
   }
 
@@ -244,7 +244,6 @@ export const otkaziLet = async (req, res) => {
       flightId,
       from: new Date(from),
       to: new Date(to),
-      days,
     });
 
     await noviOtkaz.save();
@@ -307,16 +306,15 @@ export const dohvatiOtkazaneLetove = async (req, res) => {
 
 export const obrisiOtkazaniLet = async (req, res) => {
   try {
-    const { flightId, from, to, days } = req.body;
+    const { flightId, from, to } = req.body;
 
     console.log("➡️ Stigao DELETE zahtjev za aktivaciju leta sa podacima:", {
       flightId,
       from,
       to,
-      days,
     });
 
-    if (!flightId || !from || !to || !days || !Array.isArray(days)) {
+    if (!flightId || !from || !to) {
       return res.status(400).json({ message: "Nedostaju podaci za brisanje." });
     }
 
@@ -324,14 +322,12 @@ export const obrisiOtkazaniLet = async (req, res) => {
       flightId,
       from: { $lte: new Date(from) },
       to: { $gte: new Date(to) },
-      days: { $in: days },
     });
 
     console.log("➡️ Tipovi:", {
       flightId: typeof flightId,
       from: typeof from,
       to: typeof to,
-      days: Array.isArray(days),
     });
 
     res.status(200).json({ message: "Let ponovo aktiviran." });
