@@ -1,4 +1,5 @@
-import { Let, Destinacija, OtkazaniLet, Notifikacija, Korisnik } from "../modeli/modeli.js";
+import { Let, Destinacija, OtkazaniLet, Notifikacija, Korisnik, Booking } from "../modeli/modeli.js";
+import { sendCancellationEmail } from "./rezervacijaKontroleri.js";
 
 export const dohvatiLetove = async (req, res) => {
   try {
@@ -122,6 +123,7 @@ export const azurirajLet = async (req, res) => {
     res.status(500).json({ message: "Greška pri ažuriranju leta" });
   }
 };
+
 export const otkaziLet = async (req, res) => {
   const { flightId, from, to, days } = req.body;
 
@@ -130,7 +132,6 @@ export const otkaziLet = async (req, res) => {
   }
 
   try {
-    // Snimi otkaz u kolekciju
     const noviOtkaz = new OtkazaniLet({
       flightId,
       from: new Date(from),
@@ -140,13 +141,11 @@ export const otkaziLet = async (req, res) => {
 
     await noviOtkaz.save();
 
-    // Fetch the flight details to get the flight number
     const flight = await Let.findById(flightId);
     if (!flight) {
       return res.status(404).json({ poruka: "Let nije pronađen." });
     }
 
-    // Kreiraj notifikacije za sve kupce
     const sviKorisnici = await Korisnik.find({ role: "kupac" });
 
     const notifikacije = sviKorisnici.map((korisnik) => ({
@@ -156,12 +155,41 @@ export const otkaziLet = async (req, res) => {
 
     await Notifikacija.insertMany(notifikacije);
 
-    res.status(201).json({ poruka: "Let otkazan i notifikacije poslane." });
+    // ✅ Slanje emailova putnicima
+    try {
+      const rezervacije = await Booking.find({ flight: flightId }).populate("flight");
+
+      for (const rezervacija of rezervacije) {
+        for (const putnik of rezervacija.passengers) {
+          if (putnik.email) {
+            try {
+              await sendCancellationEmail(
+                putnik.email,
+                putnik.ime,
+                rezervacija,
+                rezervacija.flight,
+                {
+                  from: new Date(from).toLocaleDateString(),
+                  to: new Date(to).toLocaleDateString(),
+                }
+              );
+            } catch (e) {
+              console.error(`⚠️ Greška prilikom slanja maila za ${putnik.email}:`, e);
+            }
+          }
+        }
+      }
+    } catch (greskaEmail) {
+      console.error("⚠️ Greška prilikom dohvatanja rezervacija ili slanja emailova:", greskaEmail);
+    }
+
+    res.status(201).json({ poruka: "Let otkazan i notifikacije + emailovi su poslani." });
   } catch (err) {
     console.error("❌ Greška pri otkazivanju i slanju notifikacija:", err);
     res.status(500).json({ poruka: "Greška na serveru." });
   }
 };
+
 
 export const dohvatiOtkazaneLetove = async (req, res) => {
   try {
