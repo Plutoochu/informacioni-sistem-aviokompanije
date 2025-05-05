@@ -64,22 +64,21 @@ function validateSeat(seatId, config, selectedClass, seatsPerRow) {
 }
 
 export const getBookedSeats = async (req, res) => {
-    try {
-      const flightId = req.params.id;
-      const bookings = await Booking.find({ flight: flightId });
-      const bookedSeats = bookings.reduce((acc, booking) => {
-        if (booking.seatSelection && Array.isArray(booking.seatSelection)) {
-          return acc.concat(booking.seatSelection);
-        }
-        return acc;
-      }, []);
-      res.json({ bookedSeats });
-    } catch (error) {
-      console.error("Greška pri dohvatu sjedala:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  };
-  
+  try {
+    const flightId = req.params.id;
+    const bookings = await Booking.find({ flight: flightId });
+    const bookedSeats = bookings.reduce((acc, booking) => {
+      if (booking.seatSelection && Array.isArray(booking.seatSelection)) {
+        return acc.concat(booking.seatSelection);
+      }
+      return acc;
+    }, []);
+    res.json({ bookedSeats });
+  } catch (error) {
+    console.error("Greška pri dohvatu sjedala:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
 export const confirmSeatReservation = async (req, res) => {
   const session = await mongoose.startSession();
@@ -120,7 +119,7 @@ export const confirmSeatReservation = async (req, res) => {
     }
 
     // Parsiranje konfiguracije sjedala (npr. "F10C20Y120") iz letDoc
-    const parsedConfig = parseSeatConfiguration(letDoc.seatConfiguration);
+    const parsedConfig = parseSeatConfiguration(letDoc.konfiguracijaSjedista);
     // Broj sjedala po redu iz Aviona (npr. Avion.sjedalaPoRedu daje { F: 4, C: 4, Y: 6 })
     const seatsPerRow = {
       first: avion.sjedalaPoRedu.F,

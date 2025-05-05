@@ -2,65 +2,100 @@ import mongoose from "mongoose";
 import { Let, Destinacija, OtkazaniLet, Notifikacija, Korisnik, Booking } from "../modeli/modeli.js";
 import { sendCancellationEmail } from "./rezervacijaKontroleri.js";
 
+const dolazakSljedeciDan = (vrijemePolaska, vrijemeDolaska) => {
+  const [h1, m1] = vrijemePolaska.split(":").map(Number);
+  const [h2, m2] = vrijemeDolaska.split(":").map(Number);
+  const polazak = h1 * 60 + m1;
+  const dolazak = h2 * 60 + m2;
+  return polazak >= dolazak;
+};
+
+const ispravanRasporedLetova = (rasporedLetova) => {
+  if (!/^[1234567x]+$/.test(rasporedLetova)) return false;
+
+  const jedinstveniSkup = new Set(rasporedLetova);
+  return (
+    jedinstveniSkup.size === rasporedLetova.length &&
+    (rasporedLetova.includes("x") ? rasporedLetova.startsWith("x") : true)
+  );
+};
+
+const dajDatumDolaska = (datumPolaska, dolaziSljedeciDan) => {
+  let datumDolaska = new Date(datumPolaska);
+  if (dolaziSljedeciDan) {
+    datumDolaska.setDate(datumDolaska.getDate() + 1);
+  }
+  return datumDolaska;
+};
+
+const ispravniDatumiRaspona = (datumPolaska, datumDo) => {
+  return datumPolaska <= datumDo;
+};
+
 export const dohvatiLetove = async (req, res) => {
   try {
-    const { odrediste, datumOd, datumDo, aviokompanija, departureFrom, departureTo, arrivalFrom, arrivalTo } =
-      req.query;
+    const {
+      odrediste,
+      datumOd,
+      datumDo,
+      aviokompanija,
+      vrijemePolaskaOd,
+      vrijemePolaskaDo,
+      vrijemeDolaskaOd,
+      vrijemeDolaskaDo,
+    } = req.query;
     console.log("Server primio zahtjev sa parametrima:", {
       odrediste,
       datumOd,
       datumDo,
       aviokompanija,
-      departureFrom,
-      departureTo,
-      arrivalFrom,
-      arrivalTo,
+      vrijemePolaskaOd,
+      vrijemePolaskaDo,
+      vrijemeDolaskaOd,
+      vrijemeDolaskaDo,
     });
 
     let query = {};
 
-    // Filter by destination (using your field; adjust if necessary)
+    // Filter by odrediste (using your field; adjust if necessary)
     if (odrediste) {
-      query.destination = { $regex: new RegExp(odrediste, "i") };
+      query.odrediste = { $regex: new RegExp(odrediste, "i") };
     }
 
-    // Filter by date range (using validityFrom/validityTo in your DB)
+    // Filter by date range (using datumPolaska/datumDolaska in your DB)
     if (datumOd && datumDo) {
       const startDate = new Date(datumOd);
       const endDate = new Date(datumDo);
       endDate.setHours(23, 59, 59, 999);
-      query.validityFrom = { $lte: endDate };
-      query.validityTo = { $gte: startDate };
+      query.datumPolaska = { $lte: endDate };
+      query.datumDolaska = { $gte: startDate };
     }
 
     if (aviokompanija) {
       query.aviokompanija = { $regex: new RegExp(aviokompanija, "i") };
     }
 
-    // Filter by departure time range (departureTime is stored as string "HH:MM")
-    if (departureFrom && departureTo) {
-      query.departureTime = { $gte: departureFrom, $lte: departureTo };
-    } else if (departureFrom) {
-      query.departureTime = { $gte: departureFrom };
-    } else if (departureTo) {
-      query.departureTime = { $lte: departureTo };
+    // Filter by departure time range (vrijemePolaska is stored as string "HH:MM")
+    if (vrijemePolaskaOd && vrijemePolaskaDo) {
+      query.vrijemePolaska = { $gte: vrijemePolaskaOd, $lte: vrijemePolaskaDo };
+    } else if (vrijemePolaskaOd) {
+      query.vrijemePolaska = { $gte: vrijemePolaskaOd };
+    } else if (vrijemePolaskaDo) {
+      query.vrijemePolaska = { $lte: vrijemePolaskaDo };
     }
 
-    // Filter by arrival time range (arrivalTime stored as string)
-    if (arrivalFrom && arrivalTo) {
-      query.arrivalTime = { $gte: arrivalFrom, $lte: arrivalTo };
-    } else if (arrivalFrom) {
-      query.arrivalTime = { $gte: arrivalFrom };
-    } else if (arrivalTo) {
-      query.arrivalTime = { $lte: arrivalTo };
+    // Filter by arrival time range (vrijemeDolaska stored as string)
+    if (vrijemeDolaskaOd && vrijemeDolaskaDo) {
+      query.vrijemeDolaska = { $gte: vrijemeDolaskaOd, $lte: vrijemeDolaskaDo };
+    } else if (vrijemeDolaskaOd) {
+      query.vrijemeDolaska = { $gte: vrijemeDolaskaOd };
+    } else if (vrijemeDolaskaDo) {
+      query.vrijemeDolaska = { $lte: vrijemeDolaskaDo };
     }
 
     console.log("MongoDB query:", query);
 
-    const letovi = await Let.find(query)
-      .sort({ flightNumber: 1 })
-      .populate("avionId", "naziv model brojSjedista")
-      .lean();
+    const letovi = await Let.find(query).sort({ brojLeta: 1 }).populate("avionId", "naziv model brojSjedista").lean();
 
     console.log("Pronađeni letovi:", letovi);
     res.status(200).json(letovi);
@@ -82,26 +117,26 @@ export const pretraziLetove = async (req, res) => {
     }
 
     // Filtriranje po polazištu i odredištu
-    if (polaziste) query.origin = polaziste;
-    if (odrediste) query.destination = odrediste;
+    if (polaziste) query.polaziste = polaziste;
+    if (odrediste) query.odrediste = odrediste;
 
     // Filtriranje po datumu
     if (datumOd || datumDo) {
-      query.validityFrom = {};
-      if (datumOd) query.validityFrom.$gte = new Date(datumOd);
-      if (datumDo) query.validityFrom.$lte = new Date(datumDo);
+      query.datumPolaska = {};
+      if (datumOd) query.datumPolaska.$gte = new Date(datumOd);
+      if (datumDo) query.datumPolaska.$lte = new Date(datumDo);
     }
 
     const letovi = await Let.find(query)
       .populate({
-        path: 'aviokompanija',
-        select: 'naziv kod'
+        path: "aviokompanija",
+        select: "naziv kod",
       })
       .populate({
-        path: 'avionId',
-        select: 'naziv model'
+        path: "avionId",
+        select: "naziv model",
       })
-      .sort({ departureTime: 1 });
+      .sort({ vrijemePolaska: 1 });
 
     res.status(200).json(letovi);
   } catch (error) {
@@ -111,14 +146,50 @@ export const pretraziLetove = async (req, res) => {
 
 export const dodajLet = async (req, res) => {
   try {
-    const noviLet = new Let(req.body);
-    await noviLet.save();
-    res.status(201).json(noviLet);
+    const { rasporedLetova, datumDo, ...jedanLet } = req.body;
+
+    let datumPolaska = new Date(jedanLet.datumPolaska);
+    const datumDoString = datumDo;
+    const datumDoDate = new Date(datumDoString);
+    const dolaziSljedeciDan = dolazakSljedeciDan(jedanLet.vrijemePolaska, jedanLet.vrijemeDolaska);
+
+    if (
+      !rasporedLetova ||
+      !datumDoString ||
+      !ispravanRasporedLetova(rasporedLetova) ||
+      !ispravniDatumiRaspona(datumPolaska, datumDoDate)
+    ) {
+      const noviLet = new Let({ ...jedanLet, datumDolaska: dajDatumDolaska(datumPolaska, dolaziSljedeciDan) });
+      await noviLet.save();
+      return res.status(201).json({ poruka: "Uspjesno dodan let" });
+    } else {
+      const letovi = [];
+
+      let brojLeta = jedanLet.brojLeta;
+
+      while (datumPolaska <= datumDoDate) {
+        if (
+          (rasporedLetova.includes("x") && !rasporedLetova.includes(datumPolaska.getDay())) ||
+          rasporedLetova.includes(datumPolaska.getDay()) ||
+          (datumPolaska.getDay() === 0 && rasporedLetova.includes(datumPolaska.getDay() + 1))
+        ) {
+          letovi.push({
+            ...jedanLet,
+            brojLeta: brojLeta++,
+            datumPolaska: new Date(datumPolaska),
+            datumDolaska: dajDatumDolaska(datumPolaska, dolaziSljedeciDan),
+          });
+        }
+        datumPolaska.setDate(datumPolaska.getDate() + 1);
+      }
+      await Let.insertMany(letovi);
+      return res.status(201).json({ poruka: "Uspjesno dodani letovi" });
+    }
   } catch (error) {
     // Ovo šalje TAČNU poruku validacije npr. "Arrival time must be after departure time"
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
+    // if (error.name === "ValidationError") {
+    //   return res.status(400).json({ message: error.message });
+    // }
 
     res.status(500).json({ message: "Greška pri dodavanju leta.", details: error.message });
   }
@@ -127,9 +198,7 @@ export const dodajLet = async (req, res) => {
 export const dohvatiLet = async (req, res) => {
   try {
     // populate bez selecta = vraća sav Avion dokument, uključujući _id
-    const letDoc = await Let.findById(req.params.id)
-      .populate('aviokompanija', 'naziv kod')
-      .populate("avionId");
+    const letDoc = await Let.findById(req.params.id).populate("aviokompanija", "naziv kod").populate("avionId");
 
     if (!letDoc) {
       return res.status(404).json({ message: "Let nije pronađen." });
@@ -140,12 +209,10 @@ export const dohvatiLet = async (req, res) => {
   }
 };
 
-
-
 export const dohvatiDestinacije = async (req, res) => {
   try {
     const destinacije = await Destinacija.find();
-    res.json(destinacije);
+    res.status(200).json(destinacije);
   } catch (greska) {
     res.status(500).json({ poruka: greska.message });
   }
@@ -191,7 +258,7 @@ export const otkaziLet = async (req, res) => {
 
     const notifikacije = sviKorisnici.map((korisnik) => ({
       korisnik: korisnik._id,
-      poruka: `Let ${flight.flightNumber} je otkazan.`,
+      poruka: `Let ${flight.brojLeta} je otkazan.`,
     }));
 
     await Notifikacija.insertMany(notifikacije);
@@ -204,16 +271,10 @@ export const otkaziLet = async (req, res) => {
         for (const putnik of rezervacija.passengers) {
           if (putnik.email) {
             try {
-              await sendCancellationEmail(
-                putnik.email,
-                putnik.ime,
-                rezervacija,
-                rezervacija.flight,
-                {
-                  from: new Date(from).toLocaleDateString(),
-                  to: new Date(to).toLocaleDateString(),
-                }
-              );
+              await sendCancellationEmail(putnik.email, putnik.ime, rezervacija, rezervacija.flight, {
+                from: new Date(from).toLocaleDateString(),
+                to: new Date(to).toLocaleDateString(),
+              });
             } catch (e) {
               console.error(`⚠️ Greška prilikom slanja maila za ${putnik.email}:`, e);
             }
@@ -230,7 +291,6 @@ export const otkaziLet = async (req, res) => {
     res.status(500).json({ poruka: "Greška na serveru." });
   }
 };
-
 
 export const dohvatiOtkazaneLetove = async (req, res) => {
   try {

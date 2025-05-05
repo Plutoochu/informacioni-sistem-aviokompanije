@@ -81,7 +81,7 @@ const UpravljanjeDestinacijama = () => {
   };
 
   return (
-    <div className="destination-container">
+    <div className="odrediste-container">
       <h2>Upravljanje destinacijama</h2>
 
       <div className="form-container">
@@ -103,10 +103,10 @@ const UpravljanjeDestinacijama = () => {
       </div>
 
       <h3>Postojeće destinacije</h3>
-      <div className="destination-list">
+      <div className="odrediste-list">
         {destinacije.map((d) => (
-          <div key={d._id} className="destination-card">
-            <div className="destination-info">
+          <div key={d._id} className="odrediste-card">
+            <div className="odrediste-info">
               <p>
                 <strong>{d.grad}</strong>
               </p>
@@ -115,7 +115,7 @@ const UpravljanjeDestinacijama = () => {
                 {d.IATA} / {d.ICAO}
               </p>
             </div>
-            <div className="destination-actions">
+            <div className="odrediste-actions">
               <button className="edit" onClick={() => handleEdit(d)}>
                 Uredi
               </button>
