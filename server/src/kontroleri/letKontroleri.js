@@ -1,4 +1,5 @@
 import { Let, Destinacija, OtkazaniLet, Notifikacija, Korisnik } from "../modeli/modeli.js";
+import mongoose from "mongoose";
 
 export const dohvatiLetove = async (req, res) => {
   try {
@@ -68,6 +69,45 @@ export const dohvatiLetove = async (req, res) => {
   }
 };
 
+// Novi kontroler za napredno pretraživanje
+export const pretraziLetove = async (req, res) => {
+  try {
+    const { aviokompanija, polaziste, odrediste, datumOd, datumDo } = req.query;
+    const query = {};
+
+    // Filtriranje po aviokompaniji (ID)
+    if (aviokompanija) {
+      query.aviokompanija = new mongoose.Types.ObjectId(aviokompanija);
+    }
+
+    // Filtriranje po polazištu i odredištu
+    if (polaziste) query.origin = polaziste;
+    if (odrediste) query.destination = odrediste;
+
+    // Filtriranje po datumu
+    if (datumOd || datumDo) {
+      query.validityFrom = {};
+      if (datumOd) query.validityFrom.$gte = new Date(datumOd);
+      if (datumDo) query.validityFrom.$lte = new Date(datumDo);
+    }
+
+    const letovi = await Let.find(query)
+      .populate({
+        path: 'aviokompanija',
+        select: 'naziv kod'
+      })
+      .populate({
+        path: 'avionId',
+        select: 'naziv model'
+      })
+      .sort({ departureTime: 1 });
+
+    res.status(200).json(letovi);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const dodajLet = async (req, res) => {
   try {
     const noviLet = new Let(req.body);
@@ -87,6 +127,7 @@ export const dohvatiLet = async (req, res) => {
   try {
     // populate bez selecta = vraća sav Avion dokument, uključujući _id
     const letDoc = await Let.findById(req.params.id)
+      .populate('aviokompanija', 'naziv kod')
       .populate("avionId");
 
     if (!letDoc) {

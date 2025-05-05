@@ -13,6 +13,7 @@ import RasporedLetovaForma from "./glavne-komponente/RasporedLetovaForma";
 import Registracija from "./glavne-komponente/Registracija";
 import ResetPassword from "./glavne-komponente/ResetPassword";
 import Rezervacija from "./glavne-komponente/Rezervacija";
+import UpravljanjeAviokompanijama from "./glavne-komponente/UpravljanjeAviokompanijama";
 import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
 import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
 import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
@@ -104,6 +105,7 @@ function App() {
               <Route path="/avioni" element={<AvioniForma />} />
               <Route path="/rezervacija/:id" element={<Rezervacija />} />
               <Route path="/mapa-sjedista" element={<MapaSjedista />} />
+              <Route path="/aviokompanije" element={<UpravljanjeAviokompanijama />} />
             </Routes>
           </main>
         </div>

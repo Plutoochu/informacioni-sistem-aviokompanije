@@ -41,6 +41,14 @@ const AdminDashboard = () => {
               <p>Dodavanje i uređivanje letova</p>
             </div>
           </div>
+
+          {/* Dodana nova opcija za aviokompanije */}
+          <div className="pocetna-opcija" onClick={() => navigate("/aviokompanije")} style={{ cursor: "pointer" }}>
+            <div className="pocetna-opcija-kartica">
+              <h3>Aviokompanije</h3>
+              <p>Upravljanje aviokompanijama</p>
+            </div>
+          </div>
         </div>
       </div>
 
