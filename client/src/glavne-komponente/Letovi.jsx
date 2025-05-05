@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../stilovi/App.css";
-import { dohvatiDestinacije } from "../pomocne-funkcije/fetch-funkcije";
 
 const getBaseUrl = () => {
   return window.location.hostname === "localhost"
@@ -24,10 +23,10 @@ const Letovi = () => {
     datumOd: "",
     datumDo: "",
     aviokompanija: "",
-    departureFrom: "",
-    departureTo: "",
-    arrivalFrom: "",
-    arrivalTo: "",
+    vrijemePolaskaOd: "",
+    vrijemePolaskaDo: "",
+    vrijemeDolaskaOd: "",
+    vrijemeDolaskaDo: "",
   });
 
   const navigate = useNavigate();
@@ -71,10 +70,10 @@ const Letovi = () => {
       if (filters.datumOd) params.datumOd = filters.datumOd;
       if (filters.datumDo) params.datumDo = filters.datumDo;
       if (filters.aviokompanija) params.aviokompanija = filters.aviokompanija;
-      if (filters.departureFrom) params.departureFrom = filters.departureFrom;
-      if (filters.departureTo) params.departureTo = filters.departureTo;
-      if (filters.arrivalFrom) params.arrivalFrom = filters.arrivalFrom;
-      if (filters.arrivalTo) params.arrivalTo = filters.arrivalTo;
+      if (filters.vrijemePolaskaOd) params.vrijemePolaskaOd = filters.vrijemePolaskaOd;
+      if (filters.vrijemePolaskaDo) params.vrijemePolaskaDo = filters.vrijemePolaskaDo;
+      if (filters.vrijemeDolaskaOd) params.vrijemeDolaskaOd = filters.vrijemeDolaskaOd;
+      if (filters.vrijemeDolaskaDo) params.vrijemeDolaskaDo = filters.vrijemeDolaskaDo;
 
       console.log("Pozivam API sa parametrima:", params);
       const response = await axios.get(`${getBaseUrl()}/api/letovi`, { params });
@@ -90,12 +89,11 @@ const Letovi = () => {
       // Formatiramo letove i dodajemo polje aviokompanija
       const formattedLetovi = response.data.map((let_) => ({
         _id: let_._id || "",
-        origin: let_.origin || "",
-        destination: let_.destination || "",
-        departureTime: let_.departureTime || "",
-        arrivalTime: let_.arrivalTime || "",
-        dolazakSljedeciDan: let_.dolazakSljedeciDan || false,
-        flightNumber: let_.flightNumber || "",
+        polaziste: let_.polaziste || "",
+        odrediste: let_.odrediste || "",
+        vrijemePolaska: let_.vrijemePolaska || "",
+        vrijemeDolaska: let_.vrijemeDolaska || "",
+        brojLeta: let_.brojLeta || "",
         cijena: generisiCijenu(),
         avionId: let_.avionId
           ? {
@@ -103,10 +101,10 @@ const Letovi = () => {
               model: let_.avionId.model || "",
             }
           : null,
-          aviokompanija: {
-            naziv: let_.aviokompanija?.naziv || let_.aviokompanijaNaziv || 'Nepoznata aviokompanija',
-            kod: let_.aviokompanija?.kod || let_.aviokompanijaKod || ''
-          },
+        aviokompanija: {
+          naziv: let_.aviokompanija?.naziv || let_.aviokompanijaNaziv || "Nepoznata aviokompanija",
+          kod: let_.aviokompanija?.kod || let_.aviokompanijaKod || "",
+        },
       }));
 
       console.log("Formatirani letovi:", formattedLetovi);
@@ -137,6 +135,7 @@ const Letovi = () => {
     fetchDestinacije();
     fetchAviokompanije();
     fetchLetovi();
+    // eslint-disable-next-line
   }, []);
 
   if (letovi.length === 0) {
@@ -213,7 +212,7 @@ const Letovi = () => {
         </div>
         {/* Filter za aviokompaniju */}
         <div className="form-group">
-        <label>Aviokompanija:</label>
+          <label>Aviokompanija:</label>
           <select
             name="aviokompanija"
             value={filters.aviokompanija}
@@ -221,10 +220,10 @@ const Letovi = () => {
             className="input-field select-field"
           >
             <option value="">Sve aviokompanije</option>
-              {aviokompanije.map((avio) => (
-               <option key={avio._id} value={avio._id}>
-              {avio.naziv} ({avio.kod})
-            </option>
+            {aviokompanije.map((avio) => (
+              <option key={avio._id} value={avio._id}>
+                {avio.naziv} ({avio.kod})
+              </option>
             ))}
           </select>
         </div>
@@ -233,8 +232,8 @@ const Letovi = () => {
           <label>Vrijeme polaska od:</label>
           <input
             type="time"
-            name="departureFrom"
-            value={filters.departureFrom}
+            name="vrijemePolaskaOd"
+            value={filters.vrijemePolaskaOd}
             onChange={handleFilterChange}
             className="input-field"
           />
@@ -243,8 +242,8 @@ const Letovi = () => {
           <label>Vrijeme polaska do:</label>
           <input
             type="time"
-            name="departureTo"
-            value={filters.departureTo}
+            name="vrijemePolaskaDo"
+            value={filters.vrijemePolaskaDo}
             onChange={handleFilterChange}
             className="input-field"
           />
@@ -254,8 +253,8 @@ const Letovi = () => {
           <label>Vrijeme dolaska od:</label>
           <input
             type="time"
-            name="arrivalFrom"
-            value={filters.arrivalFrom}
+            name="vrijemeDolaskaOd"
+            value={filters.vrijemeDolaskaOd}
             onChange={handleFilterChange}
             className="input-field"
           />
@@ -264,8 +263,8 @@ const Letovi = () => {
           <label>Vrijeme dolaska do:</label>
           <input
             type="time"
-            name="arrivalTo"
-            value={filters.arrivalTo}
+            name="vrijemeDolaskaDo"
+            value={filters.vrijemeDolaskaDo}
             onChange={handleFilterChange}
             className="input-field"
           />
@@ -281,21 +280,20 @@ const Letovi = () => {
       <div className="letovi-grid">
         {letovi.length > 0
           ? letovi.map((let_) => (
-              <div key={let_._id || `let-${let_.origin}-${let_.destination}`} className="let-kartica">
+              <div key={let_._id || `let-${let_.polaziste}-${let_.odrediste}`} className="let-kartica">
                 <div className="let-info">
-                  <h3>Let {let_.flightNumber}</h3>
+                  <h3>Let {let_.brojLeta}</h3>
                   <p>
-                    Ruta: {let_.origin} → {let_.destination}
+                    Ruta: {let_.polaziste} → {let_.odrediste}
                   </p>
                   <p>
-                    Vrijeme: {let_.departureTime} – {let_.arrivalTime}{" "}
-                    {let_.dolazakSljedeciDan ? "(dolazak sljedeći dan)" : ""}
+                    Vrijeme: {let_.vrijemePolaska} – {let_.vrijemeDolaska}
                   </p>
                   <p>Cijena: {let_.cijena} €</p>
                   {let_.aviokompanija && (
                     <p>
-                      Aviokompanija: {let_.aviokompanija.naziv} 
-                    {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
+                      Aviokompanija: {let_.aviokompanija.naziv}
+                      {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
                     </p>
                   )}
                   {let_.avionId && (

@@ -101,7 +101,7 @@ const ResetTokenSchema = new mongoose.Schema({
 
 const LetSchema = new mongoose.Schema(
   {
-    flightNumber: {
+    brojLeta: {
       type: String,
       required: true,
     },
@@ -110,60 +110,31 @@ const LetSchema = new mongoose.Schema(
       ref: "Aviokompanija",
       required: true,
     },
-    schedule: {
-      type: String,
-      required: true,
-      validate: {
-        validator: function (v) {
-          // Validate that the schedule is a valid pattern (e.g., "1234567" or "x56")
-          return /^[1234567x]+$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid schedule format!`,
-      },
-    },
-    departureTime: {
+    vrijemePolaska: {
       type: String,
       required: true,
     },
-    arrivalTime: {
-      type: String,
-      required: true,
-      validate: {
-        validator: function (v) {
-          const [h1, m1] = this.departureTime.split(":").map(Number);
-          const [h2, m2] = v.split(":").map(Number);
-          const departureMinutes = h1 * 60 + m1;
-          const arrivalMinutes = h2 * 60 + m2;
-
-          // Ako je dolazak sljedeći dan, validacija uvijek prolazi
-          if (this.dolazakSljedeciDan) return true;
-
-          return arrivalMinutes > departureMinutes;
-        },
-        message: "Vrijeme dolaska mora biti nakon vremena polaska (osim ako nije sljedeći dan).",
-      },
-    },
-    dolazakSljedeciDan: {
-      type: Boolean,
-      default: false,
-    },
-    origin: {
+    vrijemeDolaska: {
       type: String,
       required: true,
     },
-    destination: {
+    polaziste: {
       type: String,
       required: true,
     },
-    seatConfiguration: {
+    odrediste: {
       type: String,
       required: true,
     },
-    validityFrom: {
+    konfiguracijaSjedista: {
+      type: String,
+      required: true,
+    },
+    datumPolaska: {
       type: Date,
       required: true,
     },
-    validityTo: {
+    datumDolaska: {
       type: Date,
       required: true,
     },
@@ -193,12 +164,6 @@ const OtkazaniLetSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    days: [
-      {
-        type: String, // "1" = ponedjeljak, "2" = utorak...
-        enum: ["1", "2", "3", "4", "5", "6", "7"],
-      },
-    ],
   },
   { timestamps: true }
 );
@@ -273,20 +238,23 @@ const BookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const aviokompanijaSchema = new mongoose.Schema({
-  naziv: {
-    type: String,
-    required: true,
-    unique: true
+const aviokompanijaSchema = new mongoose.Schema(
+  {
+    naziv: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    kod: {
+      type: String,
+      required: true,
+      unique: true,
+      uppercase: true,
+      maxlength: 3,
+    },
   },
-  kod: {
-    type: String,
-    required: true,
-    unique: true,
-    uppercase: true,
-    maxlength: 3
-  }
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 const Notifikacija = mongoose.model("Notifikacija", NotifikacijaSchema);
 const OtkazaniLet = mongoose.model("OtkazaniLet", OtkazaniLetSchema);

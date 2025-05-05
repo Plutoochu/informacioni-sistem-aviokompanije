@@ -69,12 +69,12 @@ const Rezervacija = () => {
 
           const formattedFlight = {
             ...flightData,
-            aviokompanija: flightData.aviokompanija?._id 
-              ? flightData.aviokompanija 
-              : { _id: flightData.aviokompanija, naziv: flightData.aviokompanijaNaziv }
+            aviokompanija: flightData.aviokompanija?._id
+              ? flightData.aviokompanija
+              : { _id: flightData.aviokompanija, naziv: flightData.aviokompanijaNaziv },
           };
 
-          console.log("Dohvaćen let:", flightData);  // provjera
+          console.log("Dohvaćen let:", flightData);
           setLetInfo(flightData);
           setCijena(flightData.cijena || 0);
           setBookingNumber(generisiBookingBroj());
@@ -86,14 +86,13 @@ const Rezervacija = () => {
           setLoading(false);
         }
       };
-      
+
       fetchLet();
     } else {
       setBookingNumber(generisiBookingBroj());
       fetchAviokompanije();
     }
   }, [id, passedFlight]);
-  
 
   // Ažuriramo listu putnika kad se promijeni broj odabranih putnika
   useEffect(() => {
@@ -239,21 +238,20 @@ const Rezervacija = () => {
         <strong>Booking broj:</strong> {bookingNumber}
       </p>
       <p>
-        <strong>Aviokompanija:</strong> 
-          {letInfo.aviokompanija?.naziv || 
-            (aviokompanije.find(a => a._id === letInfo.aviokompanija?._id)?.naziv || 
-              aviokompanije.find(a => a._id === letInfo.aviokompanija)?.naziv || 
-            "Nepoznato")}
-          </p>
-      <p>
-        <strong>Broj leta:</strong> {letInfo.flightNumber}
+        <strong>Aviokompanija:</strong>
+        {letInfo.aviokompanija?.naziv ||
+          aviokompanije.find((a) => a._id === letInfo.aviokompanija?._id)?.naziv ||
+          aviokompanije.find((a) => a._id === letInfo.aviokompanija)?.naziv ||
+          "Nepoznato"}
       </p>
       <p>
-        <strong>Polazak:</strong> {letInfo.origin}, {letInfo.departureTime}
+        <strong>Broj leta:</strong> {letInfo.brojLeta}
       </p>
       <p>
-        <strong>Dolazak:</strong> {letInfo.destination}, {letInfo.arrivalTime}{" "}
-        {letInfo.dolazakSljedeciDan ? "(sljedeći dan)" : ""}
+        <strong>Polazak:</strong> {letInfo.polaziste}, {letInfo.vrijemePolaska}
+      </p>
+      <p>
+        <strong>Dolazak:</strong> {letInfo.odrediste}, {letInfo.vrijemeDolaska}
       </p>
       <p>
         <strong>Prtljag dozvoljen:</strong> 1 ručni + 1 čekirani (23kg)

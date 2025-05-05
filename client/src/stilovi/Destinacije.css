@@ -1,12 +1,12 @@
-.destination-container {
+.odrediste-container {
   padding: 30px 20px;
   max-width: 900px;
   margin: auto;
   font-family: "Segoe UI", sans-serif;
 }
 
-.destination-container h2,
-.destination-container h3 {
+.odrediste-container h2,
+.odrediste-container h3 {
   text-align: center;
   margin-bottom: 20px;
   color: #333;
@@ -42,13 +42,13 @@
   background-color: #4338ca;
 }
 
-.destination-list {
+.odrediste-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-.destination-card {
+.odrediste-card {
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 15px;
@@ -59,16 +59,16 @@
   transition: box-shadow 0.2s ease;
 }
 
-.destination-card:hover {
+.odrediste-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.destination-info p {
+.odrediste-info p {
   margin: 3px 0;
   color: #374151;
 }
 
-.destination-actions button {
+.odrediste-actions button {
   margin-left: 8px;
   padding: 6px 12px;
   border-radius: 6px;
@@ -78,20 +78,20 @@
   transition: background-color 0.2s ease;
 }
 
-.destination-actions .edit {
+.odrediste-actions .edit {
   background-color: #fbbf24;
   color: #1f2937;
 }
 
-.destination-actions .edit:hover {
+.odrediste-actions .edit:hover {
   background-color: #f59e0b;
 }
 
-.destination-actions .delete {
+.odrediste-actions .delete {
   background-color: #ef4444;
   color: white;
 }
 
-.destination-actions .delete:hover {
+.odrediste-actions .delete:hover {
   background-color: #dc2626;
 }

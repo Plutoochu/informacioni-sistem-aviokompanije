@@ -4,11 +4,11 @@ import nodemailer from "nodemailer";
 
 // Konfiguracija transporter-a pomoću NodeMailer-a
 const transporter = nodemailer.createTransport({
-  service: "gmail", // ili drugi SMTP servis po potrebi
-  auth: {
-    user: process.env.EMAIL_USER, // npr. "moja.adresa@gmail.com"
-    pass: process.env.EMAIL_PASS, // lozinka ili API ključ (po mogućnosti app password)
-  },
+  host: "smtp.sendgrid.net",
+  port: 587,
+  secure: false,
+  auth: { user: "apikey", pass: process.env.SENDGRID_API_KEY },
+  tls: { rejectUnauthorized: false },
 });
 
 // Funkcija za slanje potvrde emaila
@@ -19,7 +19,7 @@ const sendConfirmationEmail = async (to, booking) => {
     <p>Poštovani/a,</p>
     <p>Vaša rezervacija <strong>${booking.bookingNumber}</strong> je uspješno kreirana.</p>
     <p>
-      <strong>Let:</strong> ${booking.flight.flightNumber}<br/>
+      <strong>Let:</strong> ${booking.flight.brojLeta}<br/>
       <strong>Klasa:</strong> ${booking.classType}<br/>
       <strong>Tip karte:</strong> ${booking.ticketType}
     </p>
@@ -36,7 +36,7 @@ const sendConfirmationEmail = async (to, booking) => {
   `;
 
   const mailOptions = {
-    from: `"Aviokompanija" <${process.env.EMAIL_USER}>`,
+    from: `"NRS Aviokompanija" <${process.env.SENDER_EMAIL}>`,
     to, // primatelj – email adresa kupca
     subject: `Potvrda rezervacije - ${booking.bookingNumber}`,
     html: htmlContent,
@@ -49,21 +49,20 @@ export const sendCancellationEmail = async (to, korisnikIme, booking, letInfo, o
   const htmlContent = `
     <h1>Otkazivanje leta</h1>
     <p>Poštovani/a ${korisnikIme},</p>
-    <p>Obavještavamo Vas da je let <strong>${letInfo.flightNumber}</strong> na koji ste izvršili rezervaciju <strong>${booking.bookingNumber}</strong> otkazan u periodu od <strong>${otkazaniPeriod.from}</strong> do <strong>${otkazaniPeriod.to}</strong>.</p>
+    <p>Obavještavamo Vas da je let <strong>${letInfo.brojLeta}</strong> na koji ste izvršili rezervaciju <strong>${booking.bookingNumber}</strong> otkazan u periodu od <strong>${otkazaniPeriod.from}</strong> do <strong>${otkazaniPeriod.to}</strong>.</p>
     <p>Molimo Vas da kontaktirate podršku radi daljih koraka (promjena ili povrat novca).</p>
     <p>Hvala na razumijevanju,</p>
   `;
 
   const mailOptions = {
-    from: `"Aviokompanija" <${process.env.EMAIL_USER}>`,
+    from: `"NRS Aviokompanija" <${process.env.SENDER_EMAIL}>`,
     to,
-    subject: `Otkazivanje leta - ${letInfo.flightNumber}`,
+    subject: `Otkazivanje leta - ${letInfo.brojLeta}`,
     html: htmlContent,
   };
 
   await transporter.sendMail(mailOptions);
 };
-
 
 export const createBooking = async (req, res) => {
   try {
