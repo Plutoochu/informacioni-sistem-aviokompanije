@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { dohvatiLetove, dodajLet, dohvatiLet, dohvatiDestinacije, azurirajLet } from "../kontroleri/letKontroleri.js";
+import { dohvatiLetove, dodajLet, dohvatiLet, dohvatiDestinacije, azurirajLet, pretraziLetove } from "../kontroleri/letKontroleri.js";
 import { getBookedSeats } from "../kontroleri/sjedistaKontroleri.js";
 
 const router = Router();
@@ -7,8 +7,8 @@ const router = Router();
 // GET /api/letovi/destinacije - Dohvati sve dostupne destinacije
 router.get("/destinacije", dohvatiDestinacije);
 
-// GET /api/letovi - Dohvati sve letove
-router.get("", dohvatiLetove);
+// GET /api/letovi - Dohvati sve letove (sa mogućnošću filtriranja)
+router.get("", pretraziLetove);
 
 // POST /api/letovi - Dodaj novi let
 router.post("", dodajLet);

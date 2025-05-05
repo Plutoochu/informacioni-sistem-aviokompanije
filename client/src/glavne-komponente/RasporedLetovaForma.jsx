@@ -8,6 +8,7 @@ import {
   dohvatiSveZrakoplove,
   dohvatiDestinacije,
   aktivirajLet,
+  dohvatiAviokompanije
 } from "../pomocne-funkcije/fetch-funkcije";
 import "../stilovi/RasporedLetova.css";
 
@@ -19,6 +20,7 @@ const RasporedLetovaForma = ({ flightData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedFlightId, setSelectedFlightId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [aviokompanije, setAviokompanije] = useState([]);
 
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelFromDate, setCancelFromDate] = useState("");
@@ -103,6 +105,7 @@ const RasporedLetovaForma = ({ flightData }) => {
         const avionRes = await dohvatiSveZrakoplove();
         const letoviRes = await dohvatiSveLetove();
         const otkazaniRes = await dohvatiOtkazaneLetove();
+        const aviokompanijeRes = await dohvatiAviokompanije();
 
         // Filtriranje letova koji imaju važeće podatke
         const validLetovi = letoviRes.filter((let_) => {
@@ -120,6 +123,7 @@ const RasporedLetovaForma = ({ flightData }) => {
         setAvioni(avionRes);
         setLetovi(validLetovi); // Set filtered list
         setOtkazaniLetovi(otkazaniRes);
+        setAviokompanije(aviokompanijeRes);
       } catch (err) {
         console.error("Greška pri učitavanju podataka:", err);
       }
@@ -209,7 +213,7 @@ const RasporedLetovaForma = ({ flightData }) => {
       validityTo: let_.validityTo?.slice(0, 10),
       avionId: let_.avionId?._id || let_.avionId,
       dolazakSljedeciDan: false,
-      aviokompanija: let_.aviokompanija || "",
+      aviokompanija: let_.aviokompanija?._id || let_.aviokompanija,
     });
     setIsEditing(true);
     setSelectedFlightId(let_._id);
@@ -346,17 +350,22 @@ const RasporedLetovaForma = ({ flightData }) => {
 
             {/* NOVO polje za unos naziv aviokompanije */}
             <div className="form-group">
-              <label htmlFor="aviokompanija">Aviokompanija</label>
-              <input
-                type="text"
-                id="aviokompanija"
-                name="aviokompanija"
-                value={formData.aviokompanija}
-                onChange={handleChange}
-                placeholder="Unesite naziv aviokompanije"
-                required
-              />
-            </div>
+  <label htmlFor="aviokompanija">Aviokompanija</label>
+  <select
+    id="aviokompanija"
+    name="aviokompanija"
+    value={formData.aviokompanija} // Ovo će sadržavati _id aviokompanije
+    onChange={handleChange}
+    required
+  >
+    <option value="">-- Odaberi aviokompaniju --</option>
+    {aviokompanije.map((avio) => (
+      <option key={avio._id} value={avio._id}> {/* Ovdje smo promijenili value={avio.naziv} u value={avio._id} */}
+        {avio.naziv} ({avio.kod})
+      </option>
+    ))}
+  </select>
+</div>
 
             <div className="form-group">
               <label htmlFor="avionId">Avion</label>
@@ -443,6 +452,7 @@ const RasporedLetovaForma = ({ flightData }) => {
                 <th>Ruta</th>
                 <th>Vrijeme</th>
                 <th>Avion</th>
+                <th>Aviokompanija</th>
                 <th>Raspored</th>
                 <th>Period</th>
                 <th>Status</th>
@@ -460,6 +470,7 @@ const RasporedLetovaForma = ({ flightData }) => {
                     {let_.departureTime && let_.arrivalTime ? `${let_.departureTime} - ${let_.arrivalTime}` : "N/A"}
                   </td>
                   <td>{let_.avionId?.naziv || "N/A"}</td>
+                  <td>{aviokompanije.find(a => a._id === let_.aviokompanija)?.naziv || "N/A"} </td>
                   <td>{let_.schedule ? opisRasporeda(let_.schedule) : "Nema rasporeda"}</td>
                   <td>
                     {let_.validityFrom ? let_.validityFrom.slice(0, 10) : "N/A"} –{" "}

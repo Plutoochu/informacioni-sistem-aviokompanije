@@ -414,3 +414,63 @@ export const oznaciKaoProcitano = async (notificationId) => {
     throw err;
   }
 };
+
+export const dohvatiAviokompanije = async () => {
+  try {
+    const response = await axios.get(`${backendUrl}/api/aviokompanije`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri dohvaćanju aviokompanija:", error);
+    throw error;
+  }
+};
+
+export const dodajAviokompaniju = async (podaci) => {
+  try {
+    const response = await axios.post(`${backendUrl}/api/aviokompanije`, podaci, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri dodavanju aviokompanije:", error);
+    throw error;
+  }
+};
+
+export const azurirajAviokompaniju = async (id, podaci) => {
+  try {
+    const response = await axios.put(`${backendUrl}/api/aviokompanije/${id}`, podaci, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri ažuriranju aviokompanije:", error);
+    throw error;
+  }
+};
+
+export const obrisiAviokompaniju = async (id) => {
+  try {
+    const response = await axios.delete(`${backendUrl}/api/aviokompanije/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Greška pri brisanju aviokompanije:", error);
+    throw error;
+  }
+};

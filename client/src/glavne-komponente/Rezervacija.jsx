@@ -37,6 +37,17 @@ const Rezervacija = () => {
   // Podaci putnika – dinamički se generišu prema broju putnika
   const [passengers, setPassengers] = useState([]);
 
+  const [aviokompanije, setAviokompanije] = useState([]);
+
+  const fetchAviokompanije = async () => {
+    try {
+      const response = await axios.get(`${getBaseUrl()}/api/aviokompanije`);
+      setAviokompanije(response.data);
+    } catch (err) {
+      console.error("Greška pri dohvatanju aviokompanija:", err);
+    }
+  };
+
   // Način plaćanja
   const [paymentMethod, setPaymentMethod] = useState("Kartica");
   // Kreditna kartica – stariji state je zamijenjen novim dijeljenjem na mjesec i godinu
@@ -55,10 +66,19 @@ const Rezervacija = () => {
         try {
           const response = await axios.get(`${getBaseUrl()}/api/letovi/${id}`);
           const flightData = response.data;
+
+          const formattedFlight = {
+            ...flightData,
+            aviokompanija: flightData.aviokompanija?._id 
+              ? flightData.aviokompanija 
+              : { _id: flightData.aviokompanija, naziv: flightData.aviokompanijaNaziv }
+          };
+
           console.log("Dohvaćen let:", flightData);  // provjera
           setLetInfo(flightData);
           setCijena(flightData.cijena || 0);
           setBookingNumber(generisiBookingBroj());
+          await fetchAviokompanije();
         } catch (err) {
           console.error("Greška pri dohvatanju leta:", err);
           setGreska("Nismo mogli dohvatiti podatke o letu.");
@@ -66,9 +86,11 @@ const Rezervacija = () => {
           setLoading(false);
         }
       };
+      
       fetchLet();
     } else {
       setBookingNumber(generisiBookingBroj());
+      fetchAviokompanije();
     }
   }, [id, passedFlight]);
   
@@ -217,8 +239,12 @@ const Rezervacija = () => {
         <strong>Booking broj:</strong> {bookingNumber}
       </p>
       <p>
-        <strong>Aviokompanija:</strong> {letInfo.avionId?.naziv || "Nepoznato"}
-      </p>
+        <strong>Aviokompanija:</strong> 
+          {letInfo.aviokompanija?.naziv || 
+            (aviokompanije.find(a => a._id === letInfo.aviokompanija?._id)?.naziv || 
+              aviokompanije.find(a => a._id === letInfo.aviokompanija)?.naziv || 
+            "Nepoznato")}
+          </p>
       <p>
         <strong>Broj leta:</strong> {letInfo.flightNumber}
       </p>

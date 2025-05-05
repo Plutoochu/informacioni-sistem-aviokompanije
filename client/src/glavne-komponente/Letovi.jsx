@@ -15,6 +15,7 @@ const Letovi = () => {
   const [destinacije, setDestinacije] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [aviokompanije, setAviokompanije] = useState([]);
 
   // Postavljamo filtere i dodajemo i polje za aviokompaniju
   const [filters, setFilters] = useState({
@@ -41,6 +42,16 @@ const Letovi = () => {
       console.error("Greška pri dohvatanju destinacija:", err);
       setError("Greška pri dohvatanju destinacija.");
       setDestinacije([]);
+    }
+  };
+
+  const fetchAviokompanije = async () => {
+    try {
+      const response = await axios.get(`${getBaseUrl()}/api/aviokompanije`);
+      setAviokompanije(response.data || []);
+    } catch (err) {
+      console.error("Greška pri dohvaćanju aviokompanija:", err);
+      setAviokompanije([]);
     }
   };
 
@@ -92,7 +103,10 @@ const Letovi = () => {
               model: let_.avionId.model || "",
             }
           : null,
-        aviokompanija: let_.aviokompanija || "",
+          aviokompanija: {
+            naziv: let_.aviokompanija?.naziv || let_.aviokompanijaNaziv || 'Nepoznata aviokompanija',
+            kod: let_.aviokompanija?.kod || let_.aviokompanijaKod || ''
+          },
       }));
 
       console.log("Formatirani letovi:", formattedLetovi);
@@ -121,6 +135,7 @@ const Letovi = () => {
 
   useEffect(() => {
     fetchDestinacije();
+    fetchAviokompanije();
     fetchLetovi();
   }, []);
 
@@ -198,15 +213,20 @@ const Letovi = () => {
         </div>
         {/* Filter za aviokompaniju */}
         <div className="form-group">
-          <label>Aviokompanija:</label>
-          <input
-            type="text"
+        <label>Aviokompanija:</label>
+          <select
             name="aviokompanija"
             value={filters.aviokompanija}
             onChange={handleFilterChange}
-            placeholder="Unesite naziv aviokompanije"
-            className="input-field"
-          />
+            className="input-field select-field"
+          >
+            <option value="">Sve aviokompanije</option>
+              {aviokompanije.map((avio) => (
+               <option key={avio._id} value={avio._id}>
+              {avio.naziv} ({avio.kod})
+            </option>
+            ))}
+          </select>
         </div>
         {/* Filter za vrijeme polaska */}
         <div className="form-group">
@@ -272,7 +292,12 @@ const Letovi = () => {
                     {let_.dolazakSljedeciDan ? "(dolazak sljedeći dan)" : ""}
                   </p>
                   <p>Cijena: {let_.cijena} €</p>
-                  {let_.aviokompanija && <p>Aviokompanija: {let_.aviokompanija}</p>}
+                  {let_.aviokompanija && (
+                    <p>
+                      Aviokompanija: {let_.aviokompanija.naziv} 
+                    {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
+                    </p>
+                  )}
                   {let_.avionId && (
                     <p className="avion-info">
                       Avion: {let_.avionId.naziv} ({let_.avionId.model})
