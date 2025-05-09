@@ -469,16 +469,18 @@ const RasporedLetovaForma = () => {
                       </button>
                     ) : (
                       <>
-                        <button
-                          className="btn-edit"
-                          onClick={() => handleEdit(let_)}>
-                          Uredi
-                        </button>
-                        <button
-                          onClick={() => handleCancelClick(let_)}
-                          className="btn-cancel">
-                          Otkazi
-                        </button>
+                        <div className="flight-actions">
+                          <button
+                            className="btn-edit"
+                            onClick={() => handleEdit(let_)}>
+                            Uredi
+                          </button>
+                          <button
+                            className="btn-cancel"
+                            onClick={() => handleCancelClick(let_)}>
+                            Otkaži
+                          </button>
+                        </div>
                       </>
                     )}
                   </td>
