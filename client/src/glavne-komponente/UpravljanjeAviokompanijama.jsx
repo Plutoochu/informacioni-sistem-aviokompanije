@@ -22,7 +22,6 @@ const UpravljanjeAviokompanijama = () => {
         console.error("Greška pri dohvaćanju aviokompanija:", err);
       }
     };
-
     fetchAviokompanije();
   }, []);
 
@@ -37,20 +36,21 @@ const UpravljanjeAviokompanijama = () => {
       return alert("Popuni sva polja!");
     }
 
-    const novaAviokompanija = {
-      naziv,
-      kod: kod.toUpperCase(),
-    };
+    const novaAviokompanija = { naziv, kod: kod.toUpperCase() };
 
     try {
       if (editId) {
-        const azurirano = await azurirajAviokompaniju(editId, novaAviokompanija);
-        setAviokompanije((prev) => prev.map((a) => (a._id === editId ? azurirano : a)));
+        const azurirano = await azurirajAviokompaniju(
+          editId,
+          novaAviokompanija
+        );
+        setAviokompanije((prev) =>
+          prev.map((a) => (a._id === editId ? azurirano : a))
+        );
       } else {
         const dodana = await dodajAviokompaniju(novaAviokompanija);
         setAviokompanije([...aviokompanije, dodana]);
       }
-
       resetForm();
     } catch (err) {
       console.error("Greška pri spremanju aviokompanije:", err);
@@ -77,11 +77,11 @@ const UpravljanjeAviokompanijama = () => {
       <h2>Upravljanje aviokompanijama</h2>
 
       <div className="form-container">
-        <input 
-          type="text" 
-          placeholder="Naziv aviokompanije" 
-          value={naziv} 
-          onChange={(e) => setNaziv(e.target.value)} 
+        <input
+          type="text"
+          placeholder="Naziv aviokompanije"
+          value={naziv}
+          onChange={(e) => setNaziv(e.target.value)}
         />
         <input
           type="text"
@@ -95,27 +95,46 @@ const UpravljanjeAviokompanijama = () => {
         </button>
       </div>
 
-      <h3>Postojeće aviokompanije</h3>
-      <div className="avio-list">
-        {aviokompanije.map((a) => (
-          <div key={a._id} className="avio-card">
-            <div className="avio-info">
-              <p>
-                <strong>{a.naziv}</strong>
-              </p>
-              <p>Kod: {a.kod}</p>
-            </div>
-            <div className="avio-actions">
-              <button className="edit" onClick={() => handleEdit(a)}>
-                Uredi
-              </button>
-              <button className="delete" onClick={() => handleBrisanje(a._id)}>
-                Obriši
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      <h3>Lista Aviokompanija</h3>
+      {aviokompanije.length === 0 ? (
+        <p>Trenutno nema aviokompanija.</p>
+      ) : (
+        <div className="avio-table-wrapper">
+          <table className="avio-table">
+            <thead>
+              <tr>
+                <th>Naziv</th>
+                <th>Kod</th>
+                <th>Akcije</th>
+              </tr>
+            </thead>
+            <tbody>
+              {aviokompanije.map((a) => (
+                <tr key={a._id}>
+                  <td>{a.naziv}</td>
+                  <td>{a.kod}</td>
+                  <td>
+                    <button
+                      className="avio-btn edit"
+                      onClick={() => handleEdit(a)}>
+                      Uredi
+                    </button>
+                    <button
+                      className="avio-btn delete"
+                      onClick={() =>
+                        window.confirm(
+                          "Jeste li sigurni da želite obrisati ovu aviokompaniju?"
+                        ) && handleBrisanje(a._id)
+                      }>
+                      Obriši
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
