@@ -143,6 +143,7 @@ const LetSchema = new mongoose.Schema(
       ref: "Avion",
       required: true,
     },
+   // cijenaKarte: { type: Number, required: true }
   },
   {
     timestamps: true,
@@ -234,6 +235,15 @@ const BookingSchema = new mongoose.Schema(
     seatSelection: {
       type: Array, // npr. niz stringova koji predstavljaju brojeve sjedala
     },
+    user: {                             // Novo polje
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Korisnik",
+      required: true,
+    },
+    status: {
+      type: String,
+      default: "active"
+    }
   },
   { timestamps: true }
 );

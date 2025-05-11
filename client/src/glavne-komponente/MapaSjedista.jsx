@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../kontekst/AuthContext";
 import "../stilovi/MapaSjedista.css";
 
 const getBaseUrl = () => {
@@ -30,16 +31,29 @@ function seatLetterToIndex(letter) {
 const MapaSjedista = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { korisnik } = useAuth();
+  // Dohvaćamo podatke iz statea – očekujemo da su proslijeđeni iz rezervacijske funkcije
   const { reservation, flight } = location.state || {};
 
-  // Računanje broja putnika
-  const totalPassengers = reservation
-    ? (parseInt(reservation.adultsCount) || 0) +
-      (parseInt(reservation.childrenCount) || 0) +
-      (parseInt(reservation.infantsCount) || 0)
-    : 0;
+  // Ako nema reservation ili flight, prikazujemo fallback
+  if (!reservation || !flight) {
+    return (
+      <div className="seat-map-container">
+        <h2>Nema podataka o rezervaciji</h2>
+        <button onClick={() => navigate("/")} className="confirm-button">
+          Vrati se na početnu
+        </button>
+      </div>
+    );
+  }
 
-  // State za let iz statea ponekad se mora "osvježiti" sa backenda
+  // Računanje ukupnog broja putnika
+  const totalPassengers =
+    (parseInt(reservation.adultsCount) || 0) +
+    (parseInt(reservation.childrenCount) || 0) +
+    (parseInt(reservation.infantsCount) || 0);
+
+  // State za let – ako postoji u state, postavljamo ga; inače ćemo kasnije učitati kompletan let s backenda
   const [flightData, setFlightData] = useState(flight);
   // State za kompletan Avion dokument
   const [avion, setAvion] = useState(null);
@@ -47,8 +61,31 @@ const MapaSjedista = () => {
   const [dynamicAirplaneConfig, setDynamicAirplaneConfig] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [bookedSeats, setBookedSeats] = useState([]);
+  // Novi state koji označava da je rezervacija već završena
+  const [reservationComplete, setReservationComplete] = useState(false);
 
-  // Re-fetch kompletnog leta
+  useEffect(() => {
+    if (flightData && flightData._id) {
+      const key = `reservation_${reservation.userId}_${flightData._id}`;
+      // Pretpostavimo da imate endpoint /api/rezervacije/count koji broji rezervacije za let
+      axios.get(`${getBaseUrl()}/api/rezervacije/count`, {
+        params: { userId: reservation.userId, flightId: flightData._id }
+      }).then((res) => {
+        // Ako nema rezervacija, ukloni ključ
+        if (res.data.count === 0) {
+          localStorage.removeItem(key);
+          setReservationComplete(false);
+        } else {
+          localStorage.setItem(key, "true");
+          setReservationComplete(true);
+        }
+      }).catch(err => console.error(err));
+    }
+  }, [flightData, reservation.userId]);
+  
+
+
+  // Ako letData nije kompletan (npr. nedostaje avionId), osvežavamo ga s backenda
   useEffect(() => {
     const fetchCompleteFlight = async () => {
       try {
@@ -70,24 +107,34 @@ const MapaSjedista = () => {
     }
   }, [flightData]);
 
-  // Dohvatamo zauzeta mjesta za dati let iz backenda
+  // Izdvojena funkcija za dohvat zauzetih sjedala
+  const fetchBookedSeats = async () => {
+    if (!flightData || !flightData._id) return;
+    try {
+      const response = await axios.get(`${getBaseUrl()}/api/sjedista/${flightData._id}/sjedista`);
+      console.log("Dohvaćena zauzeta sjedala:", response.data.bookedSeats);
+      setBookedSeats(response.data.bookedSeats);
+    } catch (error) {
+      console.error("Greška pri dohvaćanju zauzetih sjedala:", error);
+    }
+  };
+
+  // Dohvat zauzetih sjedala - korištenje izdvojene funkcije
   useEffect(() => {
-    const fetchBookedSeats = async () => {
-      try {
-        const response = await axios.get(`${getBaseUrl()}/api/sjedista/${flightData._id}/sjedista`);
-        console.log("Dohvaćena zauzeta sjedala:", response.data.bookedSeats);
-        setBookedSeats(response.data.bookedSeats);
-      } catch (error) {
-        console.error("Greška pri dohvaćanju zauzetih sjedala:", error);
-      }
-    };
     if (flightData && flightData._id) {
       fetchBookedSeats();
     }
   }, [flightData]);
 
+  // Postavljanje dinamičke konfiguracije sjedala (ako su dostupni svi potrebni podaci)
   useEffect(() => {
-    if (flightData && avion && flightData.konfiguracijaSjedista && avion.sjedalaPoRedu && avion.brojSjedista) {
+    if (
+      flightData &&
+      avion &&
+      flightData.konfiguracijaSjedista &&
+      avion.sjedalaPoRedu &&
+      avion.brojSjedista
+    ) {
       try {
         const config = parseSeatConfiguration(flightData.konfiguracijaSjedista);
         const firstRows = Math.ceil(config.first.totalSeats / avion.sjedalaPoRedu.F);
@@ -122,7 +169,12 @@ const MapaSjedista = () => {
     }
   }, [flightData, avion]);
 
+  // Handler za klik na sjedište; ako je već rezervirano, ne dozvoljava ponovnu interakciju
   const handleSeatClick = (seat) => {
+    if (reservationComplete) {
+      alert("Već ste rezervirali sjediste za ovaj let.");
+      return;
+    }
     if (bookedSeats.some((booked) => booked === seat.id)) return;
 
     const selectedClass = reservation.classType;
@@ -263,42 +315,43 @@ const MapaSjedista = () => {
       alert(`Morate odabrati tačno ${totalPassengers} sjedišta za ${totalPassengers} putnika`);
       return;
     }
+    
+    const payload = {
+      ...reservation,
+      userId: reservation.userId || (korisnik && korisnik.id), // dodaj userId ako nedostaje
+      seatSelection: selectedSeats.map((seat) => seat.id),
+    };
+
+    console.log("Payload za rezervaciju:", payload);
 
     try {
-      const response = await axios.post(`${getBaseUrl()}/api/rezervacije`, {
-        ...reservation,
-        seatSelection: selectedSeats.map((seat) => seat.id),
-      });
+      const response = await axios.post(`${getBaseUrl()}/api/rezervacije`, payload);
 
-      // Nakon uspješne rezervacije, ponovo dohvatimo booked seats
-      const seatsResponse = await axios.get(`${getBaseUrl()}/api/sjedista/${flightData._id}/sjedista`);
+      // Nakon uspješne rezervacije dohvatimo ažurirana zauzeta sjedala, itd.
+      const seatsResponse = await axios.get(`${getBaseUrl()}/api/sjedista/${flight._id}/sjedista`);
       console.log("Ažurirana zauzeta sjedala:", seatsResponse.data.bookedSeats);
       setBookedSeats(seatsResponse.data.bookedSeats);
 
       alert("Rezervacija uspješno završena!");
-      navigate("/");
+      setReservationComplete(true);
+
+      const key = `reservation_${payload.userId}_${flightData._id}`;
+      localStorage.setItem(key, "true");
+      window.location.reload();
+
     } catch (error) {
       console.error("Greška pri potvrdi rezervacije:", error);
       alert("Došlo je do greške pri potvrdi rezervacije");
     }
   };
-
-  if (!reservation || !flight) {
-    return (
-      <div className="seat-map-container">
-        <h2>Nema podataka o rezervaciji</h2>
-        <button onClick={() => navigate("/")} className="confirm-button">
-          Vrati se na početnu
-        </button>
-      </div>
-    );
-  }
+  
 
   return (
     <div className="seat-map-container">
       <h2>Odabir sjedišta za let {flight.brojLeta}</h2>
       <p>
-        <strong>Putnika:</strong> {totalPassengers} |<strong>Klasa:</strong> {reservation.classType}
+        <strong>Putnika:</strong> {totalPassengers} | <strong>Klasa:</strong>{" "}
+        {reservation.classType}
       </p>
 
       <div className="seat-map-legend">
@@ -338,7 +391,7 @@ const MapaSjedista = () => {
         <button
           className="confirm-button"
           onClick={handleConfirmSeats}
-          disabled={selectedSeats.length !== totalPassengers}
+          disabled={selectedSeats.length !== totalPassengers || reservationComplete}
         >
           Potvrdi rezervaciju
         </button>
