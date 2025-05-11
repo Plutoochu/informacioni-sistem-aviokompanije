@@ -19,7 +19,7 @@ import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacija
 import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
 import AzurirajRezervacije from "./glavne-komponente/AzurirajRezervacije";
 import { AuthProvider, useAuth } from "./kontekst/AuthContext";
-import "./stilovi/App.css";
+import CjenovnikLetova from "./glavne-komponente/CjenovnikLetova";
 
 // Komponenta za zaštićene admin rute
 const ProtectedAdminRoute = ({ children }) => {
@@ -54,49 +54,13 @@ function App() {
               <Route path="/" element={<Navigate to="/prijava" replace />} />
               <Route path="/pocetna" element={<AdminRedirect />} />
 
-              {/* Zaštićene admin rute */}
-              <Route
-                path="/admin-dashboard"
-                element={
-                  <ProtectedAdminRoute>
-                    <AdminDashboard />
-                  </ProtectedAdminRoute>
-                }
-              />
-              <Route
-                path="/raspored-letova"
-                element={
-                  <ProtectedAdminRoute>
-                    <RasporedLetovaForma />
-                  </ProtectedAdminRoute>
-                }
-              />
-              <Route
-                path="/korisnici"
-                element={
-                  <ProtectedAdminRoute>
-                    <UpravljanjeKorisnicima />
-                  </ProtectedAdminRoute>
-                }
-              />
-              <Route
-                path="/upravljanje-avionima"
-                element={
-                  <ProtectedAdminRoute>
-                    <UpravljanjeAvionima />
-                  </ProtectedAdminRoute>
-                }
-              />
-              <Route
-                path="/destinacije"
-                element={
-                  <ProtectedAdminRoute>
-                    <UpravljanjeDestinacijama />
-                  </ProtectedAdminRoute>
-                }
-              />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/raspored-letova" element={<RasporedLetovaForma />} />
+              <Route path="/korisnici" element={<UpravljanjeKorisnicima />} />
+              <Route path="/upravljanje-avionima" element={<UpravljanjeAvionima />} />
+              <Route path="/destinacije" element={<UpravljanjeDestinacijama />} />
+              <Route path="/cjenovnik" element={<CjenovnikLetova />} />
 
-              {/* Ostale rute */}
               <Route path="/prijava" element={<Prijava />} />
               <Route path="/registracija" element={<Registracija />} />
               <Route path="/profil" element={<Profil />} />

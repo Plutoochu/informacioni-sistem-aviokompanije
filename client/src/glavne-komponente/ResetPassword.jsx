@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import "../stilovi/App.css";
 
 const getBaseUrl = () => {
   if (window.location.hostname === "localhost") {

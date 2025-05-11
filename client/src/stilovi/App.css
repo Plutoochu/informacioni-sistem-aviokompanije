@@ -1,6 +1,6 @@
+@import "tailwindcss";
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
@@ -617,7 +617,6 @@ form {
   width: 100%;
 }
 
-
 /* Button Row - centriran */
 .btn-row {
   display: flex;
@@ -637,7 +636,7 @@ form {
   border-radius: 4px;
   font-size: 1rem;
   width: 100%;
-  background: white;   /* Osiguravamo bijelu pozadinu */
+  background: white; /* Osiguravamo bijelu pozadinu */
   color: #333;
 }
 
@@ -673,7 +672,6 @@ input[type="time"] {
   transform: translateY(-1px);
 }
 
-
 /* Letovi rezultati – centrirani i jednaki širine kao forma */
 .letovi-grid {
   width: 100%;
@@ -688,10 +686,10 @@ input[type="time"] {
 .let-kartica {
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;  /* Kartica centrirana; razmak između kartica osigurat ćemo gapom u .letovi-grid */
+  margin: 0 auto; /* Kartica centrirana; razmak između kartica osigurat ćemo gapom u .letovi-grid */
   background: white;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
 }
 
@@ -762,7 +760,6 @@ input[type="time"] {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
 
 /* Pretraga letova
 .pretraga-forma {

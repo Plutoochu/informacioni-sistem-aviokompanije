@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../stilovi/App.css";
 
 const getBaseUrl = () => {
   return window.location.hostname === "localhost"
@@ -61,8 +60,8 @@ const Letovi = () => {
   // Pomoćna funkcija za format vremena (npr. osigurava format "HH:MM")
   const formatTime = (timeStr) => {
     if (!timeStr) return timeStr;
-    let [hours, minutes] = timeStr.split(':');
-    hours = hours.padStart(2, '0');
+    let [hours, minutes] = timeStr.split(":");
+    hours = hours.padStart(2, "0");
     return `${hours}:${minutes}`;
   };
 
@@ -117,14 +116,8 @@ const Letovi = () => {
             }
           : null,
         aviokompanija: {
-          naziv:
-            let_.aviokompanija?.naziv ||
-            let_.aviokompanijaNaziv ||
-            "Nepoznata aviokompanija",
-          kod:
-            let_.aviokompanija?.kod ||
-            let_.aviokompanijaKod ||
-            "",
+          naziv: let_.aviokompanija?.naziv || let_.aviokompanijaNaziv || "Nepoznata aviokompanija",
+          kod: let_.aviokompanija?.kod || let_.aviokompanijaKod || "",
         },
       }));
 
@@ -292,60 +285,48 @@ const Letovi = () => {
 
       {loading && <div className="loading">Učitavanje...</div>}
       {error && <div className="error">{error}</div>}
-      
-{/* Prikaz letova tek nakon pretrage */}
-{hasSearched && (
-  <div className="letovi-grid">
-    {letovi.length > 0 ? (
-      letovi.map((let_) => (
-        <div
-          key={let_._id || `let-${let_.polaziste}-${let_.odrediste}`}
-          className="let-kartica"
-        >
-          <div className="let-info">
-            <h3>Let {let_.brojLeta}</h3>
-            <p>
-              Ruta: {let_.polaziste} → {let_.odrediste}
-            </p>
-            <p>
-              Datum: {let_.datumPolaska} – {let_.datumDolaska}
-            </p>
-            <p>
-              Vrijeme: {let_.vrijemePolaska} – {let_.vrijemeDolaska}
-            </p>
-            <p>Cijena: {let_.cijena} €</p>
-            {let_.aviokompanija && (
-              <p>
-                Aviokompanija: {let_.aviokompanija.naziv}
-                {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
-              </p>
-            )}
-            {let_.avionId && (
-              <p className="avion-info">
-                Avion: {let_.avionId.naziv} ({let_.avionId.model})
-              </p>
-            )}
-          </div>
-          <button
-            className="rezervisi-dugme"
-            onClick={() =>
-              navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })
-            }
-          >
-            Rezerviši
-          </button>
+
+      {/* Prikaz letova tek nakon pretrage */}
+      {hasSearched && (
+        <div className="letovi-grid">
+          {letovi.length > 0
+            ? letovi.map((let_) => (
+                <div key={let_._id || `let-${let_.polaziste}-${let_.odrediste}`} className="let-kartica">
+                  <div className="let-info">
+                    <h3>Let {let_.brojLeta}</h3>
+                    <p>
+                      Ruta: {let_.polaziste} → {let_.odrediste}
+                    </p>
+                    <p>
+                      Datum: {let_.datumPolaska} – {let_.datumDolaska}
+                    </p>
+                    <p>
+                      Vrijeme: {let_.vrijemePolaska} – {let_.vrijemeDolaska}
+                    </p>
+                    <p>Cijena: {let_.cijena} €</p>
+                    {let_.aviokompanija && (
+                      <p>
+                        Aviokompanija: {let_.aviokompanija.naziv}
+                        {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
+                      </p>
+                    )}
+                    {let_.avionId && (
+                      <p className="avion-info">
+                        Avion: {let_.avionId.naziv} ({let_.avionId.model})
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    className="rezervisi-dugme"
+                    onClick={() => navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })}
+                  >
+                    Rezerviši
+                  </button>
+                </div>
+              ))
+            : !loading && !error && <div className="no-results">Nema dostupnih letova za odabrane kriterije.</div>}
         </div>
-      ))
-    ) : (
-      !loading &&
-      !error && (
-        <div className="no-results">
-          Nema dostupnih letova za odabrane kriterije.
-        </div>
-      )
-    )}
-  </div>
-)}
+      )}
     </div>
   );
 };
