@@ -823,7 +823,6 @@ form {
   padding: 0 0.1rem;
 }
 
-/* Uklanjamo nepotrebne stilove */
 .date-inputs:focus-within {
   border-color: transparent;
   box-shadow: none;

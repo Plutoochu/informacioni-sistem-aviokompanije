@@ -125,6 +125,14 @@
   overflow-x: auto;
 }
 
+.flight-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+
 .flight-list h2 {
   margin-bottom: 1rem;
 }
