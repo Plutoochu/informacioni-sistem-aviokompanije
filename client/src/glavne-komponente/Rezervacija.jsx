@@ -344,16 +344,18 @@ const Rezervacija = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <input
-                    type="text"
-                    placeholder="Broj pasoša ili ID (XXXXXXXX)"
-                    maxLength="8"
-                    pattern="[A-Za-z0-9]{1,8}"
-                    value={passenger.idNumber}
-                    onChange={(e) => handlePassengerChange(index, "idNumber", e.target.value)}
-                    required
-                  />
-                </div>
+                <input
+                  type="text"
+                  placeholder="Broj pasoša ili ID (XXXXXXXX)"
+                  maxLength="8"
+                  pattern="[A-Z0-9]{1,8}"
+                  value={passenger.idNumber}
+                  onChange={(e) =>
+                    handlePassengerChange(index, "idNumber", e.target.value.toUpperCase())
+                  }
+                  required
+                />
+              </div>
                 <div className="form-group">
                   <input
                     type="date"
@@ -373,14 +375,18 @@ const Rezervacija = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <input
-                    type="tel"
-                    placeholder="Telefon"
-                    value={passenger.telefon}
-                    onChange={(e) => handlePassengerChange(index, "telefon", e.target.value)}
-                    required
-                  />
-                </div>
+                <input
+                  type="tel"
+                  placeholder="Telefon"
+                  maxLength="9"
+                  pattern="[0-9]{9}"
+                  value={passenger.telefon}
+                  onChange={(e) =>
+                    handlePassengerChange(index, "telefon", e.target.value.replace(/\D/g, ""))
+                  }
+                  required
+                />
+              </div>
               </div>
             ))}
           </div>

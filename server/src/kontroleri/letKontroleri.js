@@ -44,6 +44,7 @@ export const dohvatiLetove = async (req, res) => {
       vrijemeDolaskaOd,
       vrijemeDolaskaDo,
     } = req.query;
+    
     console.log("Server primio zahtjev sa parametrima:", {
       odrediste,
       datumOd,
@@ -54,15 +55,15 @@ export const dohvatiLetove = async (req, res) => {
       vrijemeDolaskaOd,
       vrijemeDolaskaDo,
     });
-
+    
     let query = {};
 
-    // Filter by odrediste (using your field; adjust if necessary)
+    // Filter by odrediste
     if (odrediste) {
       query.odrediste = { $regex: new RegExp(odrediste, "i") };
     }
 
-    // Filter by date range (using datumPolaska/datumDolaska in your DB)
+    // Filter by date range (assumes the fields in DB are datumPolaska and datumDolaska)
     if (datumOd && datumDo) {
       const startDate = new Date(datumOd);
       const endDate = new Date(datumDo);
@@ -75,7 +76,7 @@ export const dohvatiLetove = async (req, res) => {
       query.aviokompanija = { $regex: new RegExp(aviokompanija, "i") };
     }
 
-    // Filter by departure time range (vrijemePolaska is stored as string "HH:MM")
+    // Filter by departure time range (stored as string "HH:MM")
     if (vrijemePolaskaOd && vrijemePolaskaDo) {
       query.vrijemePolaska = { $gte: vrijemePolaskaOd, $lte: vrijemePolaskaDo };
     } else if (vrijemePolaskaOd) {
@@ -84,7 +85,7 @@ export const dohvatiLetove = async (req, res) => {
       query.vrijemePolaska = { $lte: vrijemePolaskaDo };
     }
 
-    // Filter by arrival time range (vrijemeDolaska stored as string)
+    // Filter by arrival time range (stored as string "HH:MM")
     if (vrijemeDolaskaOd && vrijemeDolaskaDo) {
       query.vrijemeDolaska = { $gte: vrijemeDolaskaOd, $lte: vrijemeDolaskaDo };
     } else if (vrijemeDolaskaOd) {
@@ -95,7 +96,10 @@ export const dohvatiLetove = async (req, res) => {
 
     console.log("MongoDB query:", query);
 
-    const letovi = await Let.find(query).sort({ brojLeta: 1 }).populate("avionId", "naziv model brojSjedista").lean();
+    const letovi = await Let.find(query)
+      .sort({ brojLeta: 1 })
+      .populate("avionId", "naziv model brojSjedista")
+      .lean();
 
     console.log("Pronađeni letovi:", letovi);
     res.status(200).json(letovi);
@@ -105,14 +109,25 @@ export const dohvatiLetove = async (req, res) => {
   }
 };
 
-// Novi kontroler za napredno pretraživanje
+
 export const pretraziLetove = async (req, res) => {
   try {
-    const { aviokompanija, polaziste, odrediste, datumOd, datumDo } = req.query;
+    const {
+      aviokompanija,
+      polaziste,
+      odrediste,
+      datumOd,
+      datumDo,
+      vrijemePolaskaOd,
+      vrijemePolaskaDo,
+      vrijemeDolaskaOd,
+      vrijemeDolaskaDo,
+    } = req.query;
     const query = {};
 
     // Filtriranje po aviokompaniji (ID)
     if (aviokompanija) {
+      // Ako je aviokompanija predmet pretrage (ID) – pretvorite ga u ObjectId
       query.aviokompanija = new mongoose.Types.ObjectId(aviokompanija);
     }
 
@@ -120,12 +135,32 @@ export const pretraziLetove = async (req, res) => {
     if (polaziste) query.polaziste = polaziste;
     if (odrediste) query.odrediste = odrediste;
 
-    // Filtriranje po datumu
+    // Filtriranje po datumu (datumPolaska)
     if (datumOd || datumDo) {
       query.datumPolaska = {};
       if (datumOd) query.datumPolaska.$gte = new Date(datumOd);
       if (datumDo) query.datumPolaska.$lte = new Date(datumDo);
     }
+
+    // Filtriranje po vremenu polaska (stored as string "HH:MM")
+    if (vrijemePolaskaOd && vrijemePolaskaDo) {
+      query.vrijemePolaska = { $gte: vrijemePolaskaOd, $lte: vrijemePolaskaDo };
+    } else if (vrijemePolaskaOd) {
+      query.vrijemePolaska = { $gte: vrijemePolaskaOd };
+    } else if (vrijemePolaskaDo) {
+      query.vrijemePolaska = { $lte: vrijemePolaskaDo };
+    }
+
+    // Filtriranje po vremenu dolaska (stored as string "HH:MM")
+    if (vrijemeDolaskaOd && vrijemeDolaskaDo) {
+      query.vrijemeDolaska = { $gte: vrijemeDolaskaOd, $lte: vrijemeDolaskaDo };
+    } else if (vrijemeDolaskaOd) {
+      query.vrijemeDolaska = { $gte: vrijemeDolaskaOd };
+    } else if (vrijemeDolaskaDo) {
+      query.vrijemeDolaska = { $lte: vrijemeDolaskaDo };
+    }
+
+    console.log("PretraziLetove MongoDB query:", query);
 
     const letovi = await Let.find(query)
       .populate({
@@ -143,6 +178,7 @@ export const pretraziLetove = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 export const dodajLet = async (req, res) => {
   try {

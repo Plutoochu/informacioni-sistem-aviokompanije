@@ -16,7 +16,7 @@ const Letovi = () => {
   const [error, setError] = useState(null);
   const [aviokompanije, setAviokompanije] = useState([]);
 
-  // Postavljamo filtere i dodajemo i polje za aviokompaniju
+  // Filteri
   const [filters, setFilters] = useState({
     polaziste: "",
     odrediste: "",
@@ -58,22 +58,34 @@ const Letovi = () => {
     return Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
   };
 
+  // Pomoćna funkcija za format vremena (npr. osigurava format "HH:MM")
+  const formatTime = (timeStr) => {
+    if (!timeStr) return timeStr;
+    let [hours, minutes] = timeStr.split(':');
+    hours = hours.padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  // Prikaz letova tek nakon pretrage => state za pretragu
+  const [hasSearched, setHasSearched] = useState(false);
+
+  // Dohvat letova – sada će se pozvati samo nakon pretrage
   const fetchLetovi = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Build query parameters based on filters
+      // Građenje query parametara
       const params = {};
       if (filters.polaziste) params.polaziste = filters.polaziste;
       if (filters.odrediste) params.odrediste = filters.odrediste;
       if (filters.datumOd) params.datumOd = filters.datumOd;
       if (filters.datumDo) params.datumDo = filters.datumDo;
       if (filters.aviokompanija) params.aviokompanija = filters.aviokompanija;
-      if (filters.vrijemePolaskaOd) params.vrijemePolaskaOd = filters.vrijemePolaskaOd;
-      if (filters.vrijemePolaskaDo) params.vrijemePolaskaDo = filters.vrijemePolaskaDo;
-      if (filters.vrijemeDolaskaOd) params.vrijemeDolaskaOd = filters.vrijemeDolaskaOd;
-      if (filters.vrijemeDolaskaDo) params.vrijemeDolaskaDo = filters.vrijemeDolaskaDo;
+      if (filters.vrijemePolaskaOd) params.vrijemePolaskaOd = formatTime(filters.vrijemePolaskaOd);
+      if (filters.vrijemePolaskaDo) params.vrijemePolaskaDo = formatTime(filters.vrijemePolaskaDo);
+      if (filters.vrijemeDolaskaOd) params.vrijemeDolaskaOd = formatTime(filters.vrijemeDolaskaOd);
+      if (filters.vrijemeDolaskaDo) params.vrijemeDolaskaDo = formatTime(filters.vrijemeDolaskaDo);
 
       console.log("Pozivam API sa parametrima:", params);
       const response = await axios.get(`${getBaseUrl()}/api/letovi`, { params });
@@ -86,11 +98,14 @@ const Letovi = () => {
         throw new Error("Neočekivani format podataka sa servera");
       }
 
-      // Formatiramo letove i dodajemo polje aviokompanija
+      // Uključujemo i datum polaska i datum dolaska u formatiranje (pretpostavljamo da ih API vraća)
       const formattedLetovi = response.data.map((let_) => ({
         _id: let_._id || "",
         polaziste: let_.polaziste || "",
         odrediste: let_.odrediste || "",
+        // Formatiramo datum koristeći toLocaleDateString() – prilagodite prema željenom formatu
+        datumPolaska: let_.datumPolaska ? new Date(let_.datumPolaska).toLocaleDateString() : "",
+        datumDolaska: let_.datumDolaska ? new Date(let_.datumDolaska).toLocaleDateString() : "",
         vrijemePolaska: let_.vrijemePolaska || "",
         vrijemeDolaska: let_.vrijemeDolaska || "",
         brojLeta: let_.brojLeta || "",
@@ -102,8 +117,14 @@ const Letovi = () => {
             }
           : null,
         aviokompanija: {
-          naziv: let_.aviokompanija?.naziv || let_.aviokompanijaNaziv || "Nepoznata aviokompanija",
-          kod: let_.aviokompanija?.kod || let_.aviokompanijaKod || "",
+          naziv:
+            let_.aviokompanija?.naziv ||
+            let_.aviokompanijaNaziv ||
+            "Nepoznata aviokompanija",
+          kod:
+            let_.aviokompanija?.kod ||
+            let_.aviokompanijaKod ||
+            "",
         },
       }));
 
@@ -128,190 +149,203 @@ const Letovi = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setHasSearched(true);
     fetchLetovi();
   };
 
   useEffect(() => {
     fetchDestinacije();
     fetchAviokompanije();
-    fetchLetovi();
+    // Ne učitavamo letove automatski – prikazujemo ih tek nakon pretrage
     // eslint-disable-next-line
   }, []);
-
-  if (letovi.length === 0) {
-    return (
-      <div className="letovi-container">
-        <div className="letovi-card">
-          <h2>Trenutno nema dostupnih letova</h2>
-          <p>Molimo vas da pokušate kasnije ili kontaktirajte administratora za više informacija.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="letovi-container">
       <h2>Pretraga Letova</h2>
       <form onSubmit={handleSearch} className="pretraga-forma">
-        {/* Filter za polazište */}
-        <div className="form-group">
-          <label>Od:</label>
-          <select
-            name="polaziste"
-            value={filters.polaziste}
-            onChange={handleFilterChange}
-            className="input-field select-field"
-          >
-            <option value="">Sva polazista</option>
-            {destinacije.map((dest) => (
-              <option key={`polaziste-${dest._id}`} value={dest.grad}>
-                {dest.grad} - {dest.nazivAerodroma}
-              </option>
-            ))}
-          </select>
+        {/* Prvi red: Od, Do, Datum od, Datum do */}
+        <div className="first-row">
+          <div className="form-group">
+            <label>Od:</label>
+            <select
+              name="polaziste"
+              value={filters.polaziste}
+              onChange={handleFilterChange}
+              className="input-field select-field"
+            >
+              <option value="">Sva polazista</option>
+              {destinacije.map((dest) => (
+                <option key={`polaziste-${dest._id}`} value={dest.grad}>
+                  {dest.grad} - {dest.nazivAerodroma}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Do:</label>
+            <select
+              name="odrediste"
+              value={filters.odrediste}
+              onChange={handleFilterChange}
+              className="input-field select-field"
+            >
+              <option value="">Sve destinacije</option>
+              {destinacije.map((dest) => (
+                <option key={`odrediste-${dest._id}`} value={dest.grad}>
+                  {dest.grad} - {dest.nazivAerodroma}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Datum od:</label>
+            <input
+              type="date"
+              name="datumOd"
+              value={filters.datumOd}
+              onChange={handleFilterChange}
+              className="input-field date-input"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Datum do:</label>
+            <input
+              type="date"
+              name="datumDo"
+              value={filters.datumDo}
+              onChange={handleFilterChange}
+              className="input-field date-input"
+              required
+            />
+          </div>
         </div>
-        {/* Filter za odredište */}
-        <div className="form-group">
-          <label>Do:</label>
-          <select
-            name="odrediste"
-            value={filters.odrediste}
-            onChange={handleFilterChange}
-            className="input-field select-field"
-          >
-            <option value="">Sve destinacije</option>
-            {destinacije.map((dest) => (
-              <option key={`odrediste-${dest._id}`} value={dest.grad}>
-                {dest.grad} - {dest.nazivAerodroma}
-              </option>
-            ))}
-          </select>
+        {/* Drugi red: Aviokompanija, Vrijeme polaska od, Vrijeme polaska do */}
+        <div className="second-row">
+          <div className="form-group">
+            <label>Aviokompanija:</label>
+            <select
+              name="aviokompanija"
+              value={filters.aviokompanija}
+              onChange={handleFilterChange}
+              className="input-field select-field"
+            >
+              <option value="">Sve aviokompanije</option>
+              {aviokompanije.map((avio) => (
+                <option key={avio._id} value={avio._id}>
+                  {avio.naziv} ({avio.kod})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Vrijeme polaska od:</label>
+            <input
+              type="time"
+              name="vrijemePolaskaOd"
+              value={filters.vrijemePolaskaOd}
+              onChange={handleFilterChange}
+              className="input-field"
+            />
+          </div>
+          <div className="form-group">
+            <label>Vrijeme polaska do:</label>
+            <input
+              type="time"
+              name="vrijemePolaskaDo"
+              value={filters.vrijemePolaskaDo}
+              onChange={handleFilterChange}
+              className="input-field"
+            />
+          </div>
         </div>
-        {/* Filter za datum */}
-        <div className="form-group">
-          <label>Datum od:</label>
-          <input
-            type="date"
-            name="datumOd"
-            value={filters.datumOd}
-            onChange={handleFilterChange}
-            className="input-field date-input"
-            required
-          />
+        {/* Treći red: Vrijeme dolaska od, Vrijeme dolaska do, Dugme Pretraži */}
+        <div className="third-row">
+          <div className="form-group">
+            <label>Vrijeme dolaska od:</label>
+            <input
+              type="time"
+              name="vrijemeDolaskaOd"
+              value={filters.vrijemeDolaskaOd}
+              onChange={handleFilterChange}
+              className="input-field"
+            />
+          </div>
+          <div className="form-group">
+            <label>Vrijeme dolaska do:</label>
+            <input
+              type="time"
+              name="vrijemeDolaskaDo"
+              value={filters.vrijemeDolaskaDo}
+              onChange={handleFilterChange}
+              className="input-field"
+            />
+          </div>
+          <div className="form-group btn-row">
+            <button type="submit" className="pretrazi-dugme" disabled={loading}>
+              Pretraži
+            </button>
+          </div>
         </div>
-        <div className="form-group">
-          <label>Datum do:</label>
-          <input
-            type="date"
-            name="datumDo"
-            value={filters.datumDo}
-            onChange={handleFilterChange}
-            className="input-field date-input"
-            required
-          />
-        </div>
-        {/* Filter za aviokompaniju */}
-        <div className="form-group">
-          <label>Aviokompanija:</label>
-          <select
-            name="aviokompanija"
-            value={filters.aviokompanija}
-            onChange={handleFilterChange}
-            className="input-field select-field"
-          >
-            <option value="">Sve aviokompanije</option>
-            {aviokompanije.map((avio) => (
-              <option key={avio._id} value={avio._id}>
-                {avio.naziv} ({avio.kod})
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* Filter za vrijeme polaska */}
-        <div className="form-group">
-          <label>Vrijeme polaska od:</label>
-          <input
-            type="time"
-            name="vrijemePolaskaOd"
-            value={filters.vrijemePolaskaOd}
-            onChange={handleFilterChange}
-            className="input-field"
-          />
-        </div>
-        <div className="form-group">
-          <label>Vrijeme polaska do:</label>
-          <input
-            type="time"
-            name="vrijemePolaskaDo"
-            value={filters.vrijemePolaskaDo}
-            onChange={handleFilterChange}
-            className="input-field"
-          />
-        </div>
-        {/* Filter za vrijeme dolaska */}
-        <div className="form-group">
-          <label>Vrijeme dolaska od:</label>
-          <input
-            type="time"
-            name="vrijemeDolaskaOd"
-            value={filters.vrijemeDolaskaOd}
-            onChange={handleFilterChange}
-            className="input-field"
-          />
-        </div>
-        <div className="form-group">
-          <label>Vrijeme dolaska do:</label>
-          <input
-            type="time"
-            name="vrijemeDolaskaDo"
-            value={filters.vrijemeDolaskaDo}
-            onChange={handleFilterChange}
-            className="input-field"
-          />
-        </div>
-        <button type="submit" className="pretrazi-dugme" disabled={loading}>
-          Pretraži
-        </button>
       </form>
 
       {loading && <div className="loading">Učitavanje...</div>}
       {error && <div className="error">{error}</div>}
-
-      <div className="letovi-grid">
-        {letovi.length > 0
-          ? letovi.map((let_) => (
-              <div key={let_._id || `let-${let_.polaziste}-${let_.odrediste}`} className="let-kartica">
-                <div className="let-info">
-                  <h3>Let {let_.brojLeta}</h3>
-                  <p>
-                    Ruta: {let_.polaziste} → {let_.odrediste}
-                  </p>
-                  <p>
-                    Vrijeme: {let_.vrijemePolaska} – {let_.vrijemeDolaska}
-                  </p>
-                  <p>Cijena: {let_.cijena} €</p>
-                  {let_.aviokompanija && (
-                    <p>
-                      Aviokompanija: {let_.aviokompanija.naziv}
-                      {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
-                    </p>
-                  )}
-                  {let_.avionId && (
-                    <p className="avion-info">
-                      Avion: {let_.avionId.naziv} ({let_.avionId.model})
-                    </p>
-                  )}
-                </div>
-                <button
-                  className="rezervisi-dugme"
-                  onClick={() => navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })}
-                >
-                  Rezerviši
-                </button>
-              </div>
-            ))
-          : !loading && !error && <div className="no-results">Nema dostupnih letova za odabrane kriterije.</div>}
-      </div>
+      
+{/* Prikaz letova tek nakon pretrage */}
+{hasSearched && (
+  <div className="letovi-grid">
+    {letovi.length > 0 ? (
+      letovi.map((let_) => (
+        <div
+          key={let_._id || `let-${let_.polaziste}-${let_.odrediste}`}
+          className="let-kartica"
+        >
+          <div className="let-info">
+            <h3>Let {let_.brojLeta}</h3>
+            <p>
+              Ruta: {let_.polaziste} → {let_.odrediste}
+            </p>
+            <p>
+              Datum: {let_.datumPolaska} – {let_.datumDolaska}
+            </p>
+            <p>
+              Vrijeme: {let_.vrijemePolaska} – {let_.vrijemeDolaska}
+            </p>
+            <p>Cijena: {let_.cijena} €</p>
+            {let_.aviokompanija && (
+              <p>
+                Aviokompanija: {let_.aviokompanija.naziv}
+                {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
+              </p>
+            )}
+            {let_.avionId && (
+              <p className="avion-info">
+                Avion: {let_.avionId.naziv} ({let_.avionId.model})
+              </p>
+            )}
+          </div>
+          <button
+            className="rezervisi-dugme"
+            onClick={() =>
+              navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })
+            }
+          >
+            Rezerviši
+          </button>
+        </div>
+      ))
+    ) : (
+      !loading &&
+      !error && (
+        <div className="no-results">
+          Nema dostupnih letova za odabrane kriterije.
+        </div>
+      )
+    )}
+  </div>
+)}
     </div>
   );
 };

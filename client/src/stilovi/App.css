@@ -1,5 +1,3 @@
-@import "tailwindcss";
-
 * {
   margin: 0;
   padding: 0;
@@ -564,6 +562,9 @@ form {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .letovi-container h2 {
@@ -572,23 +573,126 @@ form {
   margin-bottom: 2rem;
 }
 
-.letovi-grid {
+/* Pretraga Forma – centrirana */
+.pretraga-forma {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 800px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 1rem;
+  gap: 1rem;
+  grid-template-rows: auto auto; /* dva reda */
 }
 
+/* Filter Grid */
+.filter-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-rows: auto auto; /* prvi red, drugi red */
+}
+
+/* Prvi red: 4 kolone */
+.first-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Drugi red: 3 kolone */
+.second-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+.third-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+
+/* Button Row - centriran */
+.btn-row {
+  display: flex;
+  justify-content: center;
+}
+
+/* Form Group */
+.pretraga-forma .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input Fields */
+.input-field {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  width: 100%;
+  background: white;   /* Osiguravamo bijelu pozadinu */
+  color: #333;
+}
+
+.input-field:focus {
+  border-color: #646cff;
+  box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
+}
+
+/* Određene klase za date i time ako je potrebno */
+.date-input,
+input[type="date"],
+input[type="time"] {
+  background: white;
+  color: #333;
+}
+
+/* Dugme */
+.pretrazi-dugme {
+  padding: 0.7rem 1.5rem;
+  background: #646cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: all 0.2s ease;
+  height: 42px;
+  width: 100%;
+}
+
+.pretrazi-dugme:hover {
+  background: #535bf2;
+  transform: translateY(-1px);
+}
+
+
+/* Letovi rezultati – centrirani i jednaki širine kao forma */
+.letovi-grid {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* povećan razmak između kartica */
+}
+
+/* Let kartice */
 .let-kartica {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;  /* Kartica centrirana; razmak između kartica osigurat ćemo gapom u .letovi-grid */
   background: white;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   padding: 1.5rem;
-  transition: transform 0.2s ease;
-}
-
-.let-kartica:hover {
-  transform: translateY(-5px);
 }
 
 .let-info h3 {
@@ -606,56 +710,61 @@ form {
   width: 100%;
   padding: 0.8rem;
   margin-top: 1rem;
-  background-color: #3498db;
+  background: #3498db;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .rezervisi-dugme:hover {
-  background-color: #2980b9;
+  background: #2980b9;
 }
 
 .rezervisi-dugme:disabled {
-  background-color: #bdc3c7;
+  background: #bdc3c7;
   cursor: not-allowed;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .letovi-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .letovi-container {
-    padding: 1rem;
-  }
-}
-
+/* Loading, Error, No-results */
 .loading {
   text-align: center;
+  padding: 2rem;
   color: #666;
-  font-size: 1.2rem;
-  margin-top: 2rem;
+  font-size: 1.1em;
 }
 
-.error-message {
+.error {
+  background: #fee;
+  color: #c00;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
   text-align: center;
-  color: #dc3545;
-  font-size: 1.2rem;
-  margin-top: 2rem;
+  width: 100%;
+  max-width: 800px;
 }
 
-.no-flights {
+.no-results {
   text-align: center;
+  padding: 3rem;
   color: #666;
-  font-size: 1.2rem;
-  grid-column: 1 / -1;
+  font-size: 1.1em;
 }
 
-/* Pretraga letova */
+/* Responsive */
+@media (max-width: 768px) {
+  .first-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .second-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+/* Pretraga letova
 .pretraga-forma {
   background: white;
   padding: 1.5rem;
@@ -730,7 +839,7 @@ form {
   color: #666;
   font-size: 1.1em;
   grid-column: 1 / -1;
-}
+} */
 
 .avion-info {
   font-size: 0.9em;
@@ -794,7 +903,7 @@ form {
   align-items: center;
   gap: 0.3rem;
 }
-
+/*
 .date-input {
   width: 2.5rem !important;
   height: 2.5rem !important;

@@ -77,6 +77,13 @@ const Pocetna = () => {
               <p>Pretražite i rezervišite letove</p>
             </div>
           </Link>
+          {/* Nova kartica za Rezervacije */}
+          <Link to="/rezervacije" className="pocetna-opcija">
+            <div className="pocetna-opcija-kartica">
+              <h3>Rezervacije</h3>
+              <p>Ažurirajte ili otkažite vaše rezervacije</p>
+            </div>
+          </Link>
         </div>
       </div>
     </div>

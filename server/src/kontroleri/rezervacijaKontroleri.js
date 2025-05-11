@@ -1,4 +1,3 @@
-// rezervacijaKontroleri.js
 import { Booking, Let } from "../modeli/modeli.js";
 import nodemailer from "nodemailer";
 
@@ -13,7 +12,6 @@ const transporter = nodemailer.createTransport({
 
 // Funkcija za slanje potvrde emaila
 const sendConfirmationEmail = async (to, booking) => {
-  // Kreiramo HTML sadržaj emaila koristeći podatke rezervacije
   const htmlContent = `
     <h1>Potvrda rezervacije</h1>
     <p>Poštovani/a,</p>
@@ -37,7 +35,7 @@ const sendConfirmationEmail = async (to, booking) => {
 
   const mailOptions = {
     from: `"NRS Aviokompanija" <${process.env.SENDER_EMAIL}>`,
-    to, // primatelj – email adresa kupca
+    to,
     subject: `Potvrda rezervacije - ${booking.bookingNumber}`,
     html: htmlContent,
   };
@@ -45,6 +43,7 @@ const sendConfirmationEmail = async (to, booking) => {
   await transporter.sendMail(mailOptions);
 };
 
+// Funkcija za slanje emaila o otkazivanju (ostaje nepromijenjena)
 export const sendCancellationEmail = async (to, korisnikIme, booking, letInfo, otkazaniPeriod) => {
   const htmlContent = `
     <h1>Otkazivanje leta</h1>
@@ -67,89 +66,164 @@ export const sendCancellationEmail = async (to, korisnikIme, booking, letInfo, o
 export const createBooking = async (req, res) => {
   try {
     const {
-      bookingNumber,
+      // Umjesto zajedničkog bookingNumber, flightId, itd.
       flightId,
       classType,
       ticketType,
-      adultsCount,
-      childrenCount,
-      infantsCount,
-      passengers,
+      passengers,         // npr. niz objekata za putnike
       paymentMethod,
       cardDetails,
-      seatSelection,
+      seatSelection,      // npr. niz sjedala, redoslijedom odgovarajući nizu putnika
+      userId,
     } = req.body;
 
-    // Validacija obaveznih podataka
-    if (
-      !bookingNumber ||
-      !flightId ||
-      !classType ||
-      !ticketType ||
-      !passengers ||
-      typeof adultsCount === "undefined" ||
-      typeof childrenCount === "undefined" ||
-      typeof infantsCount === "undefined"
-    ) {
+    // Provjera obaveznih podataka...
+    if (!flightId || !classType || !ticketType || !passengers || !userId) {
       return res.status(400).json({ message: "Nedostaju obavezni podaci." });
     }
 
-    // Ako se plaća karticom, validiraj podatke o kartici
-    if (paymentMethod === "Kartica") {
-      if (!cardDetails || !cardDetails.cardNumber || !cardDetails.cardExpiry || !cardDetails.cardCVC) {
-        return res.status(400).json({ message: "Nedostaju podaci o kartici." });
-      }
-      if (!/^\d{16}$/.test(cardDetails.cardNumber)) {
-        return res.status(400).json({ message: "Nevažeći broj kartice. Unesite 16 cifara." });
-      }
-      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(cardDetails.cardExpiry)) {
-        return res.status(400).json({ message: "Nevažeći datum isteka. Koristite format YYYY-MM." });
-      }
-      if (!/^\d{3}$/.test(cardDetails.cardCVC)) {
-        return res.status(400).json({ message: "Nevažeći CVC. Unesite 3 cifre." });
-      }
-    }
-
-    // Provera da li let postoji
     const flight = await Let.findById(flightId);
     if (!flight) {
       return res.status(404).json({ message: "Let nije pronađen." });
     }
 
-    // Kreiranje nove rezervacije
-    const newBooking = new Booking({
-      bookingNumber,
-      flight: flightId,
-      classType,
-      ticketType,
-      adultsCount,
-      childrenCount,
-      infantsCount,
-      passengers,
-      paymentMethod,
-      cardDetails: paymentMethod === "Kartica" ? cardDetails : undefined,
-      seatSelection,
-    });
+    const createdBookings = [];
 
-    await newBooking.save();
+    // Kreiramo rezervaciju za svakog putnika
+    for (let i = 0; i < passengers.length; i++) {
+      // Možete generirati jedinstveni broj rezervacije, npr. pomoću funkcije generisiBookingBroj()
+      const bookingNumber = "BK-" + Math.floor(100000 + Math.random() * 900000) + "-" + (i + 1);
+      
+      // Ako je seatSelection niz, osigurajte da je za svakog putnika dodijeljeno odgovarajuće sjedalo
+      const seatForPassenger = Array.isArray(seatSelection) ? [seatSelection[i]] : [];
+      
+      const newBooking = new Booking({
+        bookingNumber,
+        flight: flightId,
+        classType,
+        ticketType,
+        // Ako rezervirate pojedinačno, obično je broj odraslih 1 i ostatak 0 (ili prilagodite logiku po potrebi)
+        adultsCount: 1,
+        childrenCount: 0,
+        infantsCount: 0,
+        passengers: [passengers[i]], // samo jedan putnik po rezervaciji
+        paymentMethod,
+        cardDetails: paymentMethod === "Kartica" ? cardDetails : undefined,
+        seatSelection: seatForPassenger,
+        user: userId,
+        status: "active",
+      });
 
-    // Populiramo podatke o letu radi uključivanja u email
-    const populatedBooking = await Booking.findById(newBooking._id).populate("flight");
-
-    // Pokušavamo poslati email potvrde na adresu prvog putnika
-    try {
-      const recipientEmail = newBooking.passengers[0]?.email;
-      if (recipientEmail) {
-        await sendConfirmationEmail(recipientEmail, populatedBooking);
-      }
-    } catch (emailError) {
-      console.error("Greška slanja emaila:", emailError);
-      // Ako slanje emaila ne uspije, rezervacija se još uvijek kreira – samo se loguje greška.
+      await newBooking.save();
+      createdBookings.push(newBooking);
     }
 
-    res.status(201).json({ message: "Rezervacija uspješna!", booking: newBooking });
+    // Po potrebi, možete poslati email potvrde ili obaviti dodatne radnje
+
+    res.status(201).json({ message: "Rezervacija uspješna!", bookings: createdBookings });
   } catch (err) {
     console.error("Greška prilikom kreiranja rezervacije:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+// NOVI ENDPOINT ZA PONIŠTAVANJE REZERVACIJE
+export const cancelBooking = async (req, res) => {
+  try {
+    const { bookingId, userId } = req.body;
+    if (!bookingId || !userId) {
+      return res.status(400).json({ message: "Nedostaju bookingId ili userId." });
+    }
+    // Pronalaženje rezervacije koja pripada korisniku
+    const booking = await Booking.findOne({ _id: bookingId, user: userId });
+    if (!booking) {
+      return res.status(404).json({ message: "Rezervacija nije pronađena ili ne pripada korisniku." });
+    }
+    booking.status = "canceled";
+    await booking.save();
+    return res.status(200).json({ message: "Rezervacija uspješno poništena.", booking });
+  } catch (error) {
+    console.error("Greška pri poništavanju rezervacije:", error);
+    res.status(500).json({ message: "Internal server error", details: error.message });
+  }
+};
+
+// NOVI ENDPOINT ZA IZMJENU REZERVACIJE
+export const modifyBooking = async (req, res) => {
+  try {
+    const { bookingId, userId, newSeatSelection, otherChanges } = req.body;
+    if (!bookingId || !userId) {
+      return res.status(400).json({ message: "Nedostaju bookingId ili userId." });
+    }
+    
+    // Dohvati rezervaciju koju uređujemo
+    const booking = await Booking.findOne({ _id: bookingId, user: userId });
+    if (!booking) {
+      return res.status(404).json({ message: "Rezervacija nije pronađena ili ne pripada korisniku." });
+    }
+    
+    // Ako korisnik unosi nova sjedala, provjeri je li neki od njih već rezerviran
+    if (newSeatSelection && Array.isArray(newSeatSelection)) {
+      // Dohvati sve aktivne rezervacije za taj let osim ove rezervacije
+      const otherBookings = await Booking.find({
+        flight: booking.flight,
+        status: "active",
+        _id: { $ne: bookingId }
+      }).select("seatSelection");
+
+      // Izvuci zauzeta sjedala iz svih ostalih aktivnih rezervacija
+      let occupiedSeats = [];
+      otherBookings.forEach(otherBooking => {
+        if (otherBooking.seatSelection && Array.isArray(otherBooking.seatSelection)) {
+          occupiedSeats = occupiedSeats.concat(otherBooking.seatSelection);
+        }
+      });
+
+      // Provjeri postoji li preklapanje između novih sjedala i zauzetih sjedala
+      const conflictSeats = newSeatSelection.filter(seat => occupiedSeats.includes(seat));
+      if (conflictSeats.length > 0) {
+        return res.status(409).json({ 
+          message: "Odabrana sjedala su već rezervirana.",
+          conflictSeats
+        });
+      }
+      
+      // Ako nema konflikata, postavi nova sjedala
+      booking.seatSelection = newSeatSelection;
+    }
+    
+    // Ažuriraj i ostale podatke ako se šalju
+    if (otherChanges) {
+      Object.assign(booking, otherChanges);
+    }
+    
+    const updatedBooking = await booking.save();
+    return res.status(200).json({ message: "Rezervacija uspješno izmijenjena.", booking: updatedBooking });
+  } catch (error) {
+    console.error("Greška pri izmjeni rezervacije:", error);
+    res.status(500).json({ message: "Internal server error", details: error.message });
+  }
+};
+
+// NOVI ENDPOINT ZA DOBIVANJE REZERVACIJA (BOOKING HISTORY)
+export const getBookings = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "Nedostaje userId." });
+    }
+    // Dohvati rezervacije za tog korisnika, popunjavajući i let te ugniježđenu referencu na aviokompaniju
+    const bookings = await Booking.find({ user: userId })
+      .populate({
+        path: "flight",
+        populate: { path: "aviokompanija", select: "naziv" }
+      })
+      .sort({ createdAt: -1 });
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Greška pri dohvaćanju rezervacija:", error);
+    res.status(500).json({ message: "Internal server error", details: error.message });
+  }
+};
+

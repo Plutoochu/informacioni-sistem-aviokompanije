@@ -66,7 +66,8 @@ function validateSeat(seatId, config, selectedClass, seatsPerRow) {
 export const getBookedSeats = async (req, res) => {
   try {
     const flightId = req.params.id;
-    const bookings = await Booking.find({ flight: flightId });
+    // Dohvati samo aktivne rezervacije
+    const bookings = await Booking.find({ flight: flightId, status: "active" });
     const bookedSeats = bookings.reduce((acc, booking) => {
       if (booking.seatSelection && Array.isArray(booking.seatSelection)) {
         return acc.concat(booking.seatSelection);
@@ -79,6 +80,7 @@ export const getBookedSeats = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 export const confirmSeatReservation = async (req, res) => {
   const session = await mongoose.startSession();
