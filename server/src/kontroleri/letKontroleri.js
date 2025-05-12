@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Let, Destinacija, OtkazaniLet, Notifikacija, Korisnik, Booking } from "../modeli/modeli.js";
+import { Let, Destinacija, OtkazaniLet, Notifikacija, Korisnik, Booking, Cijena, Popust } from "../modeli/modeli.js";
 import { sendCancellationEmail } from "./rezervacijaKontroleri.js";
 
 const dolazakSljedeciDan = (vrijemePolaska, vrijemeDolaska) => {
@@ -44,26 +44,13 @@ export const dohvatiLetove = async (req, res) => {
       vrijemeDolaskaOd,
       vrijemeDolaskaDo,
     } = req.query;
-    
-    console.log("Server primio zahtjev sa parametrima:", {
-      odrediste,
-      datumOd,
-      datumDo,
-      aviokompanija,
-      vrijemePolaskaOd,
-      vrijemePolaskaDo,
-      vrijemeDolaskaOd,
-      vrijemeDolaskaDo,
-    });
-    
+
     let query = {};
 
-    // Filter by odrediste
     if (odrediste) {
       query.odrediste = { $regex: new RegExp(odrediste, "i") };
     }
 
-    // Filter by date range (assumes the fields in DB are datumPolaska and datumDolaska)
     if (datumOd && datumDo) {
       const startDate = new Date(datumOd);
       const endDate = new Date(datumDo);
@@ -94,14 +81,8 @@ export const dohvatiLetove = async (req, res) => {
       query.vrijemeDolaska = { $lte: vrijemeDolaskaDo };
     }
 
-    console.log("MongoDB query:", query);
+    const letovi = await Let.find(query).sort({ brojLeta: 1 }).populate("avionId", "naziv model brojSjedista").lean();
 
-    const letovi = await Let.find(query)
-      .sort({ brojLeta: 1 })
-      .populate("avionId", "naziv model brojSjedista")
-      .lean();
-
-    console.log("Pronađeni letovi:", letovi);
     res.status(200).json(letovi);
   } catch (error) {
     console.error("Greška pri dohvatanju letova:", error);
@@ -109,13 +90,13 @@ export const dohvatiLetove = async (req, res) => {
   }
 };
 
-
 export const pretraziLetove = async (req, res) => {
   try {
     const {
       aviokompanija,
       polaziste,
       odrediste,
+      klasa,
       datumOd,
       datumDo,
       vrijemePolaskaOd,
@@ -160,8 +141,6 @@ export const pretraziLetove = async (req, res) => {
       query.vrijemeDolaska = { $lte: vrijemeDolaskaDo };
     }
 
-    console.log("PretraziLetove MongoDB query:", query);
-
     const letovi = await Let.find(query)
       .populate({
         path: "aviokompanija",
@@ -173,12 +152,38 @@ export const pretraziLetove = async (req, res) => {
       })
       .sort({ vrijemePolaska: 1 });
 
-    res.status(200).json(letovi);
+    const letoviSaCijenom = [];
+
+    for (const jedanLet of letovi) {
+      const cijena = await Cijena.findOne({
+        polaziste: jedanLet.polaziste,
+        odrediste: jedanLet.odrediste,
+        aviokompanija: jedanLet.aviokompanija?.naziv,
+        klasa: klasa,
+        odDatuma: { $lte: jedanLet.datumPolaska },
+        doDatuma: { $gte: jedanLet.datumPolaska },
+      });
+
+      if (cijena) {
+        const popust = await Popust.findOne({
+          aviokompanija: jedanLet.aviokompanija?.naziv,
+          klasa: klasa,
+          odDatuma: { $lte: jedanLet.datumPolaska },
+          doDatuma: { $gte: jedanLet.datumPolaska },
+        });
+        letoviSaCijenom.push({
+          ...jedanLet.toObject(),
+          cijenaBezPopusta: popust ? cijena.cijena : "",
+          cijena: popust ? cijena.cijena * ((100 - popust.popust) / 100.0) : cijena.cijena,
+        });
+      }
+    }
+
+    res.status(200).json(letoviSaCijenom);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 export const dodajLet = async (req, res) => {
   try {
@@ -331,8 +336,6 @@ export const dohvatiOtkazaneLetove = async (req, res) => {
   try {
     const otkazani = await OtkazaniLet.find({}).lean();
 
-    console.log(`Dohvaćeno ${otkazani.length} otkazanih letova.`);
-
     res.status(200).json(otkazani);
   } catch (err) {
     console.error("Greška pri dohvatanju otkazanih letova:", err);
@@ -344,12 +347,6 @@ export const obrisiOtkazaniLet = async (req, res) => {
   try {
     const { flightId, from, to } = req.body;
 
-    console.log("➡️ Stigao DELETE zahtjev za aktivaciju leta sa podacima:", {
-      flightId,
-      from,
-      to,
-    });
-
     if (!flightId || !from || !to) {
       return res.status(400).json({ message: "Nedostaju podaci za brisanje." });
     }
@@ -358,12 +355,6 @@ export const obrisiOtkazaniLet = async (req, res) => {
       flightId,
       from: { $lte: new Date(from) },
       to: { $gte: new Date(to) },
-    });
-
-    console.log("➡️ Tipovi:", {
-      flightId: typeof flightId,
-      from: typeof from,
-      to: typeof to,
     });
 
     res.status(200).json({ message: "Let ponovo aktiviran." });

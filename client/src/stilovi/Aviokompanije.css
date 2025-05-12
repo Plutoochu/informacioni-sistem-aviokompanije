@@ -14,10 +14,6 @@
   --font-family: "Inter", sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 body {
   background-color: var(--background-color);
   font-family: var(--font-family);

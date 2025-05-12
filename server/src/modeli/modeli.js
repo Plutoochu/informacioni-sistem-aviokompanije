@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 
-const KorisnikSchema = new mongoose.Schema({
+const korisnikSchema = new Schema({
   ime: {
     type: String,
     required: true,
@@ -32,14 +32,14 @@ const KorisnikSchema = new mongoose.Schema({
   },
 });
 
-const DestinacijaSchema = new mongoose.Schema({
-  grad: { type: String, required: true }, // City name
-  nazivAerodroma: { type: String, required: true }, // Airport name
-  IATA: { type: String, required: true, uppercase: true, unique: true }, // IATA code (uppercase)
-  ICAO: { type: String, required: true, uppercase: true, unique: true }, // ICAO code (uppercase)
+const destinacijaSchema = new Schema({
+  grad: { type: String, required: true },
+  nazivAerodroma: { type: String, required: true },
+  IATA: { type: String, required: true, uppercase: true, unique: true },
+  ICAO: { type: String, required: true, uppercase: true, unique: true },
 });
-// Model za avion
-const AvionSchema = new mongoose.Schema({
+
+const avionSchema = new Schema({
   naziv: {
     type: String,
     required: true,
@@ -82,8 +82,7 @@ const AvionSchema = new mongoose.Schema({
   },
 });
 
-// Model za reset token
-const ResetTokenSchema = new mongoose.Schema({
+const resetTokenSchema = new Schema({
   email: {
     type: String,
     required: true,
@@ -99,14 +98,14 @@ const ResetTokenSchema = new mongoose.Schema({
   },
 });
 
-const LetSchema = new mongoose.Schema(
+const letSchema = new Schema(
   {
     brojLeta: {
       type: String,
       required: true,
     },
     aviokompanija: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Aviokompanija",
       required: true,
     },
@@ -139,21 +138,20 @@ const LetSchema = new mongoose.Schema(
       required: true,
     },
     avionId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Avion",
       required: true,
     },
-   // cijenaKarte: { type: Number, required: true }
   },
   {
     timestamps: true,
   }
 );
 
-const OtkazaniLetSchema = new mongoose.Schema(
+const otkazaniLetSchema = new Schema(
   {
     flightId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Let",
       required: true,
     },
@@ -169,10 +167,10 @@ const OtkazaniLetSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const NotifikacijaSchema = new mongoose.Schema(
+const notifikacijaSchema = new Schema(
   {
     korisnik: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Korisnik",
       required: true,
     },
@@ -188,14 +186,14 @@ const NotifikacijaSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const BookingSchema = new mongoose.Schema(
+const bookingSchema = new Schema(
   {
     bookingNumber: {
       type: String,
       required: true,
     },
     flight: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Let",
       required: true,
     },
@@ -233,22 +231,22 @@ const BookingSchema = new mongoose.Schema(
       cardCVC: { type: String },
     },
     seatSelection: {
-      type: Array, // npr. niz stringova koji predstavljaju brojeve sjedala
+      type: Array,
     },
-    user: {                             // Novo polje
-      type: mongoose.Schema.Types.ObjectId,
+    user: {
+      type: Schema.Types.ObjectId,
       ref: "Korisnik",
       required: true,
     },
     status: {
       type: String,
-      default: "active"
-    }
+      default: "active",
+    },
   },
   { timestamps: true }
 );
 
-const aviokompanijaSchema = new mongoose.Schema(
+const aviokompanijaSchema = new Schema(
   {
     naziv: {
       type: String,
@@ -266,14 +264,82 @@ const aviokompanijaSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Notifikacija = mongoose.model("Notifikacija", NotifikacijaSchema);
-const OtkazaniLet = mongoose.model("OtkazaniLet", OtkazaniLetSchema);
-const Korisnik = mongoose.model("Korisnik", KorisnikSchema);
-const Destinacija = mongoose.model("Destinacija", DestinacijaSchema);
-const Avion = mongoose.model("Avion", AvionSchema);
-const ResetToken = mongoose.model("ResetToken", ResetTokenSchema);
-const Let = mongoose.model("Let", LetSchema);
-const Booking = mongoose.model("Booking", BookingSchema);
-const Aviokompanija = mongoose.model("Aviokompanija", aviokompanijaSchema);
+const cijenaSchema = new Schema({
+  polaziste: {
+    type: String,
+    required: true,
+  },
+  odrediste: {
+    type: String,
+    required: true,
+  },
+  aviokompanija: {
+    type: String,
+    required: true,
+  },
+  klasa: {
+    type: String,
+    required: true,
+  },
+  odDatuma: {
+    type: Date,
+    required: true,
+  },
+  doDatuma: {
+    type: Date,
+    required: true,
+  },
+  cijena: {
+    type: Number,
+    required: true,
+  },
+});
 
-export { Korisnik, Destinacija, Avion, ResetToken, Let, OtkazaniLet, Notifikacija, Booking, Aviokompanija };
+const popustSchema = new Schema({
+  aviokompanija: {
+    type: String,
+    required: true,
+  },
+  klasa: {
+    type: String,
+    required: true,
+  },
+  odDatuma: {
+    type: Date,
+    required: true,
+  },
+  doDatuma: {
+    type: Date,
+    required: true,
+  },
+  popust: {
+    type: Number,
+    required: true,
+  },
+});
+
+const Notifikacija = model("Notifikacija", notifikacijaSchema);
+const OtkazaniLet = model("OtkazaniLet", otkazaniLetSchema);
+const Korisnik = model("Korisnik", korisnikSchema);
+const Destinacija = model("Destinacija", destinacijaSchema);
+const Avion = model("Avion", avionSchema);
+const ResetToken = model("ResetToken", resetTokenSchema);
+const Let = model("Let", letSchema);
+const Booking = model("Booking", bookingSchema);
+const Aviokompanija = model("Aviokompanija", aviokompanijaSchema);
+const Cijena = model("Cijena", cijenaSchema);
+const Popust = model("Popust", popustSchema);
+
+export {
+  Korisnik,
+  Destinacija,
+  Avion,
+  ResetToken,
+  Let,
+  OtkazaniLet,
+  Notifikacija,
+  Booking,
+  Aviokompanija,
+  Cijena,
+  Popust,
+};

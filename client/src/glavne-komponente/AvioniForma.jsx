@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../stilovi/AvioniForma.css";
-import "../stilovi/App.css";
 
 const getBaseUrl = () => {
   if (window.location.hostname === "localhost") {

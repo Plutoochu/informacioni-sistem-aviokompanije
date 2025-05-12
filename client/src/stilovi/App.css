@@ -1,12 +1,14 @@
+@import "tailwindcss";
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
 html,
 body {
   height: 100%;
+  min-height: 100vh;
+  padding-bottom: 16rem;
 }
 
 body {
@@ -14,36 +16,11 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#root {
-  height: 100vh;
-}
-
-.app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.App {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
 .logo {
-  height: 6em;
-  will-change: filter;
   transition: all 0.3s ease;
-  margin-bottom: 1rem;
-}
-
-.logo.avion:hover {
-  filter: drop-shadow(0 0 1.5em #1a73e8aa);
-  transform: translateY(-3px);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
 }
 
 .card {
@@ -148,10 +125,6 @@ form {
 }
 
 @media (max-width: 600px) {
-  .App {
-    padding: 1rem;
-  }
-
   .logo {
     height: 4em;
   }
@@ -204,16 +177,6 @@ form {
   margin-bottom: 0.5rem;
   color: #333;
   text-align: left;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.7em 1.2em;
-  border: 2px solid #646cff;
-  border-radius: 8px;
-  font-size: 1em;
-  background-color: #1a1a1a;
-  color: rgba(255, 255, 255, 0.87);
 }
 
 .reset-password-form button {
@@ -319,16 +282,7 @@ form {
   height: 50px;
 }
 
-.navigacija-lijevo {
-  display: flex;
-  align-items: center;
-}
-
 .logo {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
 }
 
 .navigacija-desno {
@@ -363,27 +317,11 @@ form {
   background-color: #535bf2;
 }
 
-/* Main Content Styles */
-.main-content {
-  flex: 1;
-  position: relative;
-}
-
 /* Početna Stranica Styles */
 .pocetna-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80");
-  background-size: cover;
-  background-position: center;
-  padding: 2rem;
+  padding-top: 2rem;
 }
 
 .pocetna-card {
@@ -517,15 +455,6 @@ form {
   font-weight: 500;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 0.7em 1em;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 1em;
-  transition: border-color 0.3s;
-}
-
 .form-group input:focus {
   outline: none;
   border-color: #646cff;
@@ -617,7 +546,6 @@ form {
   width: 100%;
 }
 
-
 /* Button Row - centriran */
 .btn-row {
   display: flex;
@@ -637,7 +565,7 @@ form {
   border-radius: 4px;
   font-size: 1rem;
   width: 100%;
-  background: white;   /* Osiguravamo bijelu pozadinu */
+  background: white; /* Osiguravamo bijelu pozadinu */
   color: #333;
 }
 
@@ -673,7 +601,6 @@ input[type="time"] {
   transform: translateY(-1px);
 }
 
-
 /* Letovi rezultati – centrirani i jednaki širine kao forma */
 .letovi-grid {
   width: 100%;
@@ -688,10 +615,10 @@ input[type="time"] {
 .let-kartica {
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;  /* Kartica centrirana; razmak između kartica osigurat ćemo gapom u .letovi-grid */
+  margin: 0 auto; /* Kartica centrirana; razmak između kartica osigurat ćemo gapom u .letovi-grid */
   background: white;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
 }
 
@@ -762,7 +689,6 @@ input[type="time"] {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
 
 /* Pretraga letova
 .pretraga-forma {
@@ -1072,4 +998,22 @@ input[type="time"] {
 
 .mark-as-read-button:hover {
   background-color: #45a049;
+}
+
+.slanted-strike {
+  position: relative;
+  display: inline-block;
+}
+
+.slanted-strike::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 90%;
+  height: 2px;
+  background-color: hsl(0, 0%, 60%); /* Change as needed */
+  transform: rotate(-25deg); /* Slant angle */
+  transform-origin: center;
+  pointer-events: none;
 }

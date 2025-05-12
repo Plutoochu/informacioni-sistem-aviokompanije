@@ -13,9 +13,9 @@ const Navigacija = () => {
 
   return (
     <nav className="navigacija">
-      <div className="navigacija-lijevo">
-        <Link to="/" className="logo">
-          Aviokompanija
+      <div>
+        <Link to="/pocetna" className="logo avion">
+          NRS Aviokompanija
         </Link>
       </div>
 
@@ -29,16 +29,16 @@ const Navigacija = () => {
               Profil
             </Link>
             <button onClick={handleOdjava} className="navigacija-dugme">
-              Odjavi se
+              Odjavite se
             </button>
           </>
         ) : (
           <>
             <Link to="/prijava" className="navigacija-link">
-              Prijavi se
+              Prijavite se
             </Link>
             <Link to="/registracija" className="navigacija-dugme">
-              Registruj se
+              Registrujte se
             </Link>
           </>
         )}

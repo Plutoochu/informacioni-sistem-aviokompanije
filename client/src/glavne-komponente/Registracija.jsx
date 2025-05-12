@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../stilovi/Registracija.css";
-import "../stilovi/App.css";
 
 const getBaseUrl = () => {
   if (window.location.hostname === "localhost") {

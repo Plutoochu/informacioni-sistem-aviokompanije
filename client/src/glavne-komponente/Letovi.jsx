@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../stilovi/App.css";
 
 const getBaseUrl = () => {
   return window.location.hostname === "localhost"
@@ -23,6 +22,7 @@ const Letovi = () => {
     datumOd: "",
     datumDo: "",
     aviokompanija: "",
+    klasa: "",
     vrijemePolaskaOd: "",
     vrijemePolaskaDo: "",
     vrijemeDolaskaOd: "",
@@ -54,15 +54,11 @@ const Letovi = () => {
     }
   };
 
-  const generisiCijenu = () => {
-    return Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
-  };
-
   // Pomoćna funkcija za format vremena (npr. osigurava format "HH:MM")
   const formatTime = (timeStr) => {
     if (!timeStr) return timeStr;
-    let [hours, minutes] = timeStr.split(':');
-    hours = hours.padStart(2, '0');
+    let [hours, minutes] = timeStr.split(":");
+    hours = hours.padStart(2, "0");
     return `${hours}:${minutes}`;
   };
 
@@ -82,6 +78,7 @@ const Letovi = () => {
       if (filters.datumOd) params.datumOd = filters.datumOd;
       if (filters.datumDo) params.datumDo = filters.datumDo;
       if (filters.aviokompanija) params.aviokompanija = filters.aviokompanija;
+      if (filters.klasa) params.klasa = filters.klasa;
       if (filters.vrijemePolaskaOd) params.vrijemePolaskaOd = formatTime(filters.vrijemePolaskaOd);
       if (filters.vrijemePolaskaDo) params.vrijemePolaskaDo = formatTime(filters.vrijemePolaskaDo);
       if (filters.vrijemeDolaskaOd) params.vrijemeDolaskaOd = formatTime(filters.vrijemeDolaskaOd);
@@ -109,7 +106,8 @@ const Letovi = () => {
         vrijemePolaska: let_.vrijemePolaska || "",
         vrijemeDolaska: let_.vrijemeDolaska || "",
         brojLeta: let_.brojLeta || "",
-        cijena: generisiCijenu(),
+        cijena: let_.cijena,
+        cijenaBezPopusta: let_.cijenaBezPopusta,
         avionId: let_.avionId
           ? {
               naziv: let_.avionId.naziv || "",
@@ -117,14 +115,8 @@ const Letovi = () => {
             }
           : null,
         aviokompanija: {
-          naziv:
-            let_.aviokompanija?.naziv ||
-            let_.aviokompanijaNaziv ||
-            "Nepoznata aviokompanija",
-          kod:
-            let_.aviokompanija?.kod ||
-            let_.aviokompanijaKod ||
-            "",
+          naziv: let_.aviokompanija?.naziv || let_.aviokompanijaNaziv || "Nepoznata aviokompanija",
+          kod: let_.aviokompanija?.kod || let_.aviokompanijaKod || "",
         },
       }));
 
@@ -157,7 +149,6 @@ const Letovi = () => {
     fetchDestinacije();
     fetchAviokompanije();
     // Ne učitavamo letove automatski – prikazujemo ih tek nakon pretrage
-    // eslint-disable-next-line
   }, []);
 
   return (
@@ -167,7 +158,7 @@ const Letovi = () => {
         {/* Prvi red: Od, Do, Datum od, Datum do */}
         <div className="first-row">
           <div className="form-group">
-            <label>Od:</label>
+            <label>Polazište:</label>
             <select
               name="polaziste"
               value={filters.polaziste}
@@ -183,7 +174,7 @@ const Letovi = () => {
             </select>
           </div>
           <div className="form-group">
-            <label>Do:</label>
+            <label>Odredište:</label>
             <select
               name="odrediste"
               value={filters.odrediste}
@@ -263,6 +254,17 @@ const Letovi = () => {
         {/* Treći red: Vrijeme dolaska od, Vrijeme dolaska do, Dugme Pretraži */}
         <div className="third-row">
           <div className="form-group">
+            <label htmlFor="klasa">Klasa</label>
+            <select id="klasa" name="klasa" value={filters.klasa} onChange={handleFilterChange} required>
+              <option value="">-- Odaberite klasu --</option>
+              {["Ekonomska", "Biznis", "Prva"].map((klasa) => (
+                <option key={klasa} value={klasa}>
+                  {klasa}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
             <label>Vrijeme dolaska od:</label>
             <input
               type="time"
@@ -282,70 +284,62 @@ const Letovi = () => {
               className="input-field"
             />
           </div>
-          <div className="form-group btn-row">
-            <button type="submit" className="pretrazi-dugme" disabled={loading}>
-              Pretraži
-            </button>
-          </div>
+        </div>
+        <div className="form-group btn-row">
+          <button type="submit" className="pretrazi-dugme" disabled={loading}>
+            Pretraži
+          </button>
         </div>
       </form>
 
       {loading && <div className="loading">Učitavanje...</div>}
       {error && <div className="error">{error}</div>}
-      
-{/* Prikaz letova tek nakon pretrage */}
-{hasSearched && (
-  <div className="letovi-grid">
-    {letovi.length > 0 ? (
-      letovi.map((let_) => (
-        <div
-          key={let_._id || `let-${let_.polaziste}-${let_.odrediste}`}
-          className="let-kartica"
-        >
-          <div className="let-info">
-            <h3>Let {let_.brojLeta}</h3>
-            <p>
-              Ruta: {let_.polaziste} → {let_.odrediste}
-            </p>
-            <p>
-              Datum: {let_.datumPolaska} – {let_.datumDolaska}
-            </p>
-            <p>
-              Vrijeme: {let_.vrijemePolaska} – {let_.vrijemeDolaska}
-            </p>
-            <p>Cijena: {let_.cijena} €</p>
-            {let_.aviokompanija && (
-              <p>
-                Aviokompanija: {let_.aviokompanija.naziv}
-                {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
-              </p>
-            )}
-            {let_.avionId && (
-              <p className="avion-info">
-                Avion: {let_.avionId.naziv} ({let_.avionId.model})
-              </p>
-            )}
-          </div>
-          <button
-            className="rezervisi-dugme"
-            onClick={() =>
-              navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })
-            }
-          >
-            Rezerviši
-          </button>
+
+      {/* Prikaz letova tek nakon pretrage */}
+      {hasSearched && (
+        <div className="letovi-grid">
+          {letovi.length > 0
+            ? letovi.map((let_) => (
+                <div key={let_._id || `let-${let_.polaziste}-${let_.odrediste}`} className="let-kartica">
+                  <div className="let-info">
+                    <h3>Let {let_.brojLeta}</h3>
+                    <p>
+                      Ruta: {let_.polaziste} → {let_.odrediste}
+                    </p>
+                    <p>
+                      Datum: {let_.datumPolaska} - {let_.datumDolaska}
+                    </p>
+                    <p>
+                      Vrijeme: {let_.vrijemePolaska} - {let_.vrijemeDolaska}
+                    </p>
+                    <p>
+                      Cijena {let_.cijenaBezPopusta && "s popustom"}:{" "}
+                      {let_.cijenaBezPopusta && <span className="slanted-strike mr-2">{let_.cijenaBezPopusta} KM</span>}
+                      <span>{let_.cijena} KM</span>
+                    </p>
+                    {let_.aviokompanija && (
+                      <p>
+                        Aviokompanija: {let_.aviokompanija.naziv}
+                        {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
+                      </p>
+                    )}
+                    {let_.avionId && (
+                      <p className="avion-info">
+                        Avion: {let_.avionId.naziv} ({let_.avionId.model})
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    className="rezervisi-dugme"
+                    onClick={() => navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })}
+                  >
+                    Rezerviši
+                  </button>
+                </div>
+              ))
+            : !loading && !error && <div className="no-results">Nema dostupnih letova za odabrane kriterije.</div>}
         </div>
-      ))
-    ) : (
-      !loading &&
-      !error && (
-        <div className="no-results">
-          Nema dostupnih letova za odabrane kriterije.
-        </div>
-      )
-    )}
-  </div>
-)}
+      )}
     </div>
   );
 };
