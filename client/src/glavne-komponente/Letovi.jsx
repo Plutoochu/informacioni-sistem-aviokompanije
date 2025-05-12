@@ -22,6 +22,7 @@ const Letovi = () => {
     datumOd: "",
     datumDo: "",
     aviokompanija: "",
+    klasa: "",
     vrijemePolaskaOd: "",
     vrijemePolaskaDo: "",
     vrijemeDolaskaOd: "",
@@ -53,10 +54,6 @@ const Letovi = () => {
     }
   };
 
-  const generisiCijenu = () => {
-    return Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
-  };
-
   // Pomoćna funkcija za format vremena (npr. osigurava format "HH:MM")
   const formatTime = (timeStr) => {
     if (!timeStr) return timeStr;
@@ -81,6 +78,7 @@ const Letovi = () => {
       if (filters.datumOd) params.datumOd = filters.datumOd;
       if (filters.datumDo) params.datumDo = filters.datumDo;
       if (filters.aviokompanija) params.aviokompanija = filters.aviokompanija;
+      if (filters.klasa) params.klasa = filters.klasa;
       if (filters.vrijemePolaskaOd) params.vrijemePolaskaOd = formatTime(filters.vrijemePolaskaOd);
       if (filters.vrijemePolaskaDo) params.vrijemePolaskaDo = formatTime(filters.vrijemePolaskaDo);
       if (filters.vrijemeDolaskaOd) params.vrijemeDolaskaOd = formatTime(filters.vrijemeDolaskaOd);
@@ -108,7 +106,8 @@ const Letovi = () => {
         vrijemePolaska: let_.vrijemePolaska || "",
         vrijemeDolaska: let_.vrijemeDolaska || "",
         brojLeta: let_.brojLeta || "",
-        cijena: generisiCijenu(),
+        cijena: let_.cijena,
+        cijenaBezPopusta: let_.cijenaBezPopusta,
         avionId: let_.avionId
           ? {
               naziv: let_.avionId.naziv || "",
@@ -150,7 +149,6 @@ const Letovi = () => {
     fetchDestinacije();
     fetchAviokompanije();
     // Ne učitavamo letove automatski – prikazujemo ih tek nakon pretrage
-    // eslint-disable-next-line
   }, []);
 
   return (
@@ -160,7 +158,7 @@ const Letovi = () => {
         {/* Prvi red: Od, Do, Datum od, Datum do */}
         <div className="first-row">
           <div className="form-group">
-            <label>Od:</label>
+            <label>Polazište:</label>
             <select
               name="polaziste"
               value={filters.polaziste}
@@ -176,7 +174,7 @@ const Letovi = () => {
             </select>
           </div>
           <div className="form-group">
-            <label>Do:</label>
+            <label>Odredište:</label>
             <select
               name="odrediste"
               value={filters.odrediste}
@@ -256,6 +254,17 @@ const Letovi = () => {
         {/* Treći red: Vrijeme dolaska od, Vrijeme dolaska do, Dugme Pretraži */}
         <div className="third-row">
           <div className="form-group">
+            <label htmlFor="klasa">Klasa</label>
+            <select id="klasa" name="klasa" value={filters.klasa} onChange={handleFilterChange} required>
+              <option value="">-- Odaberite klasu --</option>
+              {["Ekonomska", "Biznis", "Prva"].map((klasa) => (
+                <option key={klasa} value={klasa}>
+                  {klasa}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
             <label>Vrijeme dolaska od:</label>
             <input
               type="time"
@@ -275,11 +284,11 @@ const Letovi = () => {
               className="input-field"
             />
           </div>
-          <div className="form-group btn-row">
-            <button type="submit" className="pretrazi-dugme" disabled={loading}>
-              Pretraži
-            </button>
-          </div>
+        </div>
+        <div className="form-group btn-row">
+          <button type="submit" className="pretrazi-dugme" disabled={loading}>
+            Pretraži
+          </button>
         </div>
       </form>
 
@@ -298,12 +307,16 @@ const Letovi = () => {
                       Ruta: {let_.polaziste} → {let_.odrediste}
                     </p>
                     <p>
-                      Datum: {let_.datumPolaska} – {let_.datumDolaska}
+                      Datum: {let_.datumPolaska} - {let_.datumDolaska}
                     </p>
                     <p>
-                      Vrijeme: {let_.vrijemePolaska} – {let_.vrijemeDolaska}
+                      Vrijeme: {let_.vrijemePolaska} - {let_.vrijemeDolaska}
                     </p>
-                    <p>Cijena: {let_.cijena} €</p>
+                    <p>
+                      Cijena {let_.cijenaBezPopusta && "s popustom"}:{" "}
+                      {let_.cijenaBezPopusta && <span className="slanted-strike mr-2">{let_.cijenaBezPopusta} KM</span>}
+                      <span>{let_.cijena} KM</span>
+                    </p>
                     {let_.aviokompanija && (
                       <p>
                         Aviokompanija: {let_.aviokompanija.naziv}

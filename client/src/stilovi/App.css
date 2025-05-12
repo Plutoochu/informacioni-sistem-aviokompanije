@@ -1051,3 +1051,21 @@ input[type="time"] {
 .mark-as-read-button:hover {
   background-color: #45a049;
 }
+
+.slanted-strike {
+  position: relative;
+  display: inline-block;
+}
+
+.slanted-strike::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 90%;
+  height: 2px;
+  background-color: hsl(0, 0%, 60%); /* Change as needed */
+  transform: rotate(-25deg); /* Slant angle */
+  transform-origin: center;
+  pointer-events: none;
+}

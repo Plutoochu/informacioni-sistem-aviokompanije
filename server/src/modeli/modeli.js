@@ -296,14 +296,6 @@ const cijenaSchema = new Schema({
 });
 
 const popustSchema = new Schema({
-  polaziste: {
-    type: String,
-    required: true,
-  },
-  odrediste: {
-    type: String,
-    required: true,
-  },
   aviokompanija: {
     type: String,
     required: true,

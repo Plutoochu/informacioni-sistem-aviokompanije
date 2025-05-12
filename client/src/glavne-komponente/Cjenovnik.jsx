@@ -262,7 +262,7 @@ const Cjenovnik = () => {
           </button>
         )}
       </div>
-      <Popusti destinacije={destinacije} aviokompanije={aviokompanije} />
+      <Popusti aviokompanije={aviokompanije} />
     </div>
   );
 };

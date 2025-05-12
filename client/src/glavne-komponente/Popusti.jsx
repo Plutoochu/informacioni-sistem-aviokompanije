@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { dohvatiPopuste, dodajPopust, azurirajPopust, obrisiPopust } from "../pomocne-funkcije/cijenePopustiApi";
 
-const Popusti = ({ destinacije, aviokompanije }) => {
+const Popusti = ({ aviokompanije }) => {
   const [popusti, setPopusti] = useState([]);
   const [dodavanjePopusta, setDodavanjePopusta] = useState(false);
   const [popustIdAzuriranje, setPopustIdAzuriranje] = useState("");
 
   const [noviPopust, setNoviPopust] = useState({
-    polaziste: "",
-    odrediste: "",
     aviokompanija: "",
     klasa: "",
     odDatuma: "",
@@ -52,8 +50,6 @@ const Popusti = ({ destinacije, aviokompanije }) => {
     }
 
     // setNoviPopust({
-    //   polaziste: "",
-    //   odrediste: "",
     //   aviokompanija: "",
     //   klasa: "",
     //   odDatuma: "",
@@ -73,8 +69,6 @@ const Popusti = ({ destinacije, aviokompanije }) => {
     setPopustIdAzuriranje(popust._id);
     setDodavanjePopusta(true);
     setNoviPopust({
-      polaziste: popust.polaziste,
-      odrediste: popust.odrediste,
       aviokompanija: popust.aviokompanija,
       klasa: popust.klasa,
       odDatuma: popust.odDatuma.slice(0, 10),
@@ -85,8 +79,6 @@ const Popusti = ({ destinacije, aviokompanije }) => {
 
   const handleOtkazi = async () => {
     setNoviPopust({
-      polaziste: "",
-      odrediste: "",
       aviokompanija: "",
       klasa: "",
       odDatuma: "",
@@ -106,7 +98,6 @@ const Popusti = ({ destinacije, aviokompanije }) => {
             <thead>
               <tr>
                 <th>Klasa</th>
-                <th>Ruta</th>
                 <th>Aviokompanija</th>
                 <th>Od - do</th>
                 <th>Popust (%)</th>
@@ -118,9 +109,6 @@ const Popusti = ({ destinacije, aviokompanije }) => {
                 return (
                   <tr key={id}>
                     <td>{popust.klasa}</td>
-                    <td>
-                      {popust.polaziste} → {popust.odrediste}
-                    </td>
                     <td>{popust.aviokompanija}</td>
                     <td>
                       {popust.odDatuma.slice(0, 10)} - {popust.doDatuma.slice(0, 10)}
@@ -161,20 +149,6 @@ const Popusti = ({ destinacije, aviokompanije }) => {
                   ))}
                 </select>
               </div>
-
-              {["polaziste", "odrediste"].map((polje, id) => (
-                <div className="form-group" key={id}>
-                  <label htmlFor={polje}>{polje === "polaziste" ? "Polazište" : "Odredište"}</label>
-                  <select id={polje} name={polje} value={noviPopust[polje]} onChange={handleChange} required>
-                    <option value="">-- Odaberite --</option>
-                    {destinacije.map((dest) => (
-                      <option key={dest._id} value={dest.grad}>
-                        {dest.grad} - {dest.nazivAerodroma}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ))}
 
               <div className="form-group">
                 <label htmlFor="aviokompanija">Aviokompanija</label>
