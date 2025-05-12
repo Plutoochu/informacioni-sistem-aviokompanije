@@ -295,6 +295,37 @@ const cijenaSchema = new Schema({
   },
 });
 
+const popustSchema = new Schema({
+  polaziste: {
+    type: String,
+    required: true,
+  },
+  odrediste: {
+    type: String,
+    required: true,
+  },
+  aviokompanija: {
+    type: String,
+    required: true,
+  },
+  klasa: {
+    type: String,
+    required: true,
+  },
+  odDatuma: {
+    type: Date,
+    required: true,
+  },
+  doDatuma: {
+    type: Date,
+    required: true,
+  },
+  popust: {
+    type: Number,
+    required: true,
+  },
+});
+
 const Notifikacija = model("Notifikacija", notifikacijaSchema);
 const OtkazaniLet = model("OtkazaniLet", otkazaniLetSchema);
 const Korisnik = model("Korisnik", korisnikSchema);
@@ -305,5 +336,18 @@ const Let = model("Let", letSchema);
 const Booking = model("Booking", bookingSchema);
 const Aviokompanija = model("Aviokompanija", aviokompanijaSchema);
 const Cijena = model("Cijena", cijenaSchema);
+const Popust = model("Popust", popustSchema);
 
-export { Korisnik, Destinacija, Avion, ResetToken, Let, OtkazaniLet, Notifikacija, Booking, Aviokompanija, Cijena };
+export {
+  Korisnik,
+  Destinacija,
+  Avion,
+  ResetToken,
+  Let,
+  OtkazaniLet,
+  Notifikacija,
+  Booking,
+  Aviokompanija,
+  Cijena,
+  Popust,
+};

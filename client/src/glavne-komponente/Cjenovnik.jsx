@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { dohvatiDestinacije, dohvatiAviokompanije } from "../pomocne-funkcije/fetch-funkcije";
-import { dohvatiCjenovnik, dodajCijenu, azurirajCijenu, obrisiCijenu } from "../pomocne-funkcije/cijeneApi";
+import { dohvatiCjenovnik, dodajCijenu, azurirajCijenu, obrisiCijenu } from "../pomocne-funkcije/cijenePopustiApi";
+import Popusti from "./Popusti";
 
-const CjenovnikLetova = () => {
+const Cjenovnik = () => {
   const [aviokompanije, setAviokompanije] = useState([]);
   const [destinacije, setDestinacije] = useState([]);
   const [cjenovnik, setCjenovnik] = useState([]);
@@ -53,6 +54,8 @@ const CjenovnikLetova = () => {
       const noviCjenovnik = [...cjenovnik];
       noviCjenovnik[i] = { _id: cijenaIdAzuriranje, ...novaCijena };
       setCjenovnik(noviCjenovnik);
+
+      setDodavanjeCijene(false);
     } else {
       const res = await dodajCijenu(novaCijena);
       setCjenovnik((s) => [...s, { _id: res._id, ...novaCijena }]);
@@ -259,8 +262,9 @@ const CjenovnikLetova = () => {
           </button>
         )}
       </div>
+      <Popusti destinacije={destinacije} aviokompanije={aviokompanije} />
     </div>
   );
 };
 
-export default CjenovnikLetova;
+export default Cjenovnik;

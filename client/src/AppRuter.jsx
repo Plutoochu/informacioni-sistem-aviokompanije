@@ -19,7 +19,7 @@ import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacija
 import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
 import AzurirajRezervacije from "./glavne-komponente/AzurirajRezervacije";
 import { AuthProvider, useAuth } from "./kontekst/AuthContext";
-import CjenovnikLetova from "./glavne-komponente/CjenovnikLetova";
+import Cjenovnik from "./glavne-komponente/Cjenovnik";
 
 // Komponenta za zaštićene admin rute
 const ProtectedAdminRoute = ({ children }) => {
@@ -59,7 +59,7 @@ function App() {
               <Route path="/korisnici" element={<UpravljanjeKorisnicima />} />
               <Route path="/upravljanje-avionima" element={<UpravljanjeAvionima />} />
               <Route path="/destinacije" element={<UpravljanjeDestinacijama />} />
-              <Route path="/cjenovnik" element={<CjenovnikLetova />} />
+              <Route path="/cjenovnik" element={<Cjenovnik />} />
 
               <Route path="/prijava" element={<Prijava />} />
               <Route path="/registracija" element={<Registracija />} />
