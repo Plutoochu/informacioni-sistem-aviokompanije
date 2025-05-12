@@ -44,19 +44,19 @@ const Popusti = ({ aviokompanije }) => {
       const noviPopusti = [...popusti];
       noviPopusti[i] = { _id: popustIdAzuriranje, ...noviPopust };
       setPopusti(noviPopusti);
+
+      setNoviPopust({
+        aviokompanija: "",
+        klasa: "",
+        odDatuma: "",
+        doDatuma: "",
+        popust: "",
+      });
+      setDodavanjePopusta(false);
     } else {
       const res = await dodajPopust(noviPopust);
       setPopusti((s) => [...s, { _id: res._id, ...noviPopust }]);
     }
-
-    // setNoviPopust({
-    //   aviokompanija: "",
-    //   klasa: "",
-    //   odDatuma: "",
-    //   doDatuma: "",
-    //   popust: "",
-    // });
-    // setDodavanjePopusta(false);
   };
 
   const handleObrisi = async (_id) => {

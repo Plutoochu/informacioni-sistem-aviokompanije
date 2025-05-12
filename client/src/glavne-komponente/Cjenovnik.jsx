@@ -55,22 +55,20 @@ const Cjenovnik = () => {
       noviCjenovnik[i] = { _id: cijenaIdAzuriranje, ...novaCijena };
       setCjenovnik(noviCjenovnik);
 
+      setNovaCijena({
+        polaziste: "",
+        odrediste: "",
+        aviokompanija: "",
+        klasa: "",
+        odDatuma: "",
+        doDatuma: "",
+        cijena: "",
+      });
       setDodavanjeCijene(false);
     } else {
       const res = await dodajCijenu(novaCijena);
       setCjenovnik((s) => [...s, { _id: res._id, ...novaCijena }]);
     }
-
-    // setNovaCijena({
-    //   polaziste: "",
-    //   odrediste: "",
-    //   aviokompanija: "",
-    //   klasa: "",
-    //   odDatuma: "",
-    //   doDatuma: "",
-    //   cijena: "",
-    // });
-    // setDodavanjeCijene(false);
   };
 
   const handleObrisi = async (_id) => {

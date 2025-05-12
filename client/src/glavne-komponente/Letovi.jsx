@@ -315,7 +315,7 @@ const Letovi = () => {
                     <p>
                       Cijena {let_.cijenaBezPopusta && "s popustom"}:{" "}
                       {let_.cijenaBezPopusta && <span className="slanted-strike mr-2">{let_.cijenaBezPopusta} KM</span>}
-                      <span>{let_.cijena} KM</span>
+                      <span>{let_.cijena.toFixed(2)} KM</span>
                     </p>
                     {let_.aviokompanija && (
                       <p>
