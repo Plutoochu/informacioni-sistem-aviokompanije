@@ -15,6 +15,7 @@ const Rezervacija = () => {
   const { id } = useParams();
   const location = useLocation();
   const passedFlight = location.state?.flight;
+  const classType = location.state?.klasa;
 
   // Stanja za mapu sjedista
   const [showSeatMap, setShowSeatMap] = useState(false);
@@ -24,18 +25,42 @@ const Rezervacija = () => {
   const [letInfo, setLetInfo] = useState(passedFlight || null);
   const [loading, setLoading] = useState(passedFlight ? false : true);
   const [greska, setGreska] = useState(null);
-  const [cijena, setCijena] = useState(passedFlight ? passedFlight.cijena : 0);
+  const [cijenaKarte, setCijena] = useState(passedFlight ? passedFlight.cijena : 0);
   const [bookingNumber, setBookingNumber] = useState("");
 
   // Opcije rezervacije
-  const [classType, setClassType] = useState("Ekonomska");
   const [ticketType, setTicketType] = useState("Jednosmjerna"); // "Jednosmjerna" ili "Povratna"
-  const [adultsCount, setAdultsCount] = useState(1);
-  const [childrenCount, setChildrenCount] = useState(0);
+  const [adultsCount, setAdultsCount] = useState(2);
+  const [childrenCount, setChildrenCount] = useState(1);
   const [infantsCount, setInfantsCount] = useState(0);
 
   // Podaci putnika – dinamički se generišu prema broju putnika
-  const [passengers, setPassengers] = useState([]);
+  const [passengers, setPassengers] = useState([
+    {
+      ime: "Neki",
+      prezime: "Putnik",
+      idNumber: "12341234",
+      datumRodjenja: "1997-04-06",
+      email: "asd@asd.asd",
+      telefon: "062111222",
+    },
+    {
+      ime: "Neki",
+      prezime: "Putnik",
+      idNumber: "12341234",
+      datumRodjenja: "1997-04-06",
+      email: "asd@asd.asd",
+      telefon: "062111222",
+    },
+    {
+      ime: "Dijete 1",
+      prezime: "Putnik",
+      idNumber: "12341234",
+      datumRodjenja: "2018-04-06",
+      email: "asd@asd.asd",
+      telefon: "062111222",
+    },
+  ]);
 
   const [aviokompanije, setAviokompanije] = useState([]);
 
@@ -51,10 +76,10 @@ const Rezervacija = () => {
   // Način plaćanja
   const [paymentMethod, setPaymentMethod] = useState("Kartica");
   // Kreditna kartica – stariji state je zamijenjen novim dijeljenjem na mjesec i godinu
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiryMonth, setCardExpiryMonth] = useState("");
-  const [cardExpiryYear, setCardExpiryYear] = useState("");
-  const [cardCVC, setCardCVC] = useState("");
+  const [cardNumber, setCardNumber] = useState("1234567891234567");
+  const [cardExpiryMonth, setCardExpiryMonth] = useState("07");
+  const [cardExpiryYear, setCardExpiryYear] = useState("2025");
+  const [cardCVC, setCardCVC] = useState("557");
 
   const generisiBookingBroj = () => {
     return "BK-" + Math.floor(100000 + Math.random() * 900000);
@@ -67,12 +92,12 @@ const Rezervacija = () => {
           const response = await axios.get(`${getBaseUrl()}/api/letovi/${id}`);
           const flightData = response.data;
 
-          const formattedFlight = {
-            ...flightData,
-            aviokompanija: flightData.aviokompanija?._id
-              ? flightData.aviokompanija
-              : { _id: flightData.aviokompanija, naziv: flightData.aviokompanijaNaziv },
-          };
+          // const formattedFlight = {
+          //   ...flightData,
+          //   aviokompanija: flightData.aviokompanija?._id
+          //     ? flightData.aviokompanija
+          //     : { _id: flightData.aviokompanija, naziv: flightData.aviokompanijaNaziv },
+          // };
 
           console.log("Dohvaćen let:", flightData);
           setLetInfo(flightData);
@@ -188,14 +213,12 @@ const Rezervacija = () => {
       passengers,
       paymentMethod,
       cardDetails: paymentMethod === "Kartica" ? cardDetails : undefined,
+      cijenaKarte: passedFlight.cijena,
       // seatSelection opcionalno, ako postoji
     };
 
-    console.log("Podaci rezervacije:", bookingData);
     setReservationData(bookingData);
     setShowSeatMap(true);
-
-    setReservationData(bookingData);
 
     navigate("/mapa-sjedista", {
       state: {
@@ -257,12 +280,15 @@ const Rezervacija = () => {
         <strong>Prtljag dozvoljen:</strong> 1 ručni + 1 čekirani (23kg)
       </p>
       <p>
-        <strong>Cijena karte:</strong> {cijena} €
+        <strong>Cijena jedne karte:</strong> {cijenaKarte} KM
+      </p>
+      <p>
+        <strong>Klasa:</strong> {classType}
       </p>
 
       <h3>Odaberi opcije rezervacije</h3>
       <form className="rezervacija-forma" onSubmit={handleSubmit}>
-        {/* Izbor klase */}
+        {/* Izbor klase
         <div className="form-group">
           <label>Klasa:</label>
           <select value={classType} onChange={(e) => setClassType(e.target.value)}>
@@ -270,7 +296,7 @@ const Rezervacija = () => {
             <option value="Biznis">Biznis</option>
             <option value="Prva klasa">Prva klasa</option>
           </select>
-        </div>
+        </div> */}
 
         {/* Izbor tipa karte */}
         <div className="form-group">
@@ -344,18 +370,16 @@ const Rezervacija = () => {
                   />
                 </div>
                 <div className="form-group">
-                <input
-                  type="text"
-                  placeholder="Broj pasoša ili ID (XXXXXXXX)"
-                  maxLength="8"
-                  pattern="[A-Z0-9]{1,8}"
-                  value={passenger.idNumber}
-                  onChange={(e) =>
-                    handlePassengerChange(index, "idNumber", e.target.value.toUpperCase())
-                  }
-                  required
-                />
-              </div>
+                  <input
+                    type="text"
+                    placeholder="Broj pasoša ili ID (XXXXXXXX)"
+                    maxLength="8"
+                    pattern="[A-Z0-9]{1,8}"
+                    value={passenger.idNumber}
+                    onChange={(e) => handlePassengerChange(index, "idNumber", e.target.value.toUpperCase())}
+                    required
+                  />
+                </div>
                 <div className="form-group">
                   <input
                     type="date"
@@ -375,18 +399,16 @@ const Rezervacija = () => {
                   />
                 </div>
                 <div className="form-group">
-                <input
-                  type="tel"
-                  placeholder="Telefon"
-                  maxLength="9"
-                  pattern="[0-9]{9}"
-                  value={passenger.telefon}
-                  onChange={(e) =>
-                    handlePassengerChange(index, "telefon", e.target.value.replace(/\D/g, ""))
-                  }
-                  required
-                />
-              </div>
+                  <input
+                    type="tel"
+                    placeholder="Telefon"
+                    maxLength="9"
+                    pattern="[0-9]{9}"
+                    value={passenger.telefon}
+                    onChange={(e) => handlePassengerChange(index, "telefon", e.target.value.replace(/\D/g, ""))}
+                    required
+                  />
+                </div>
               </div>
             ))}
           </div>

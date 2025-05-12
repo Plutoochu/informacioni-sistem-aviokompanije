@@ -70,11 +70,12 @@ export const createBooking = async (req, res) => {
       flightId,
       classType,
       ticketType,
-      passengers,         // npr. niz objekata za putnike
+      passengers, // npr. niz objekata za putnike
       paymentMethod,
       cardDetails,
-      seatSelection,      // npr. niz sjedala, redoslijedom odgovarajući nizu putnika
+      seatSelection, // npr. niz sjedala, redoslijedom odgovarajući nizu putnika
       userId,
+      cijenaKarte,
     } = req.body;
 
     // Provjera obaveznih podataka...
@@ -93,10 +94,10 @@ export const createBooking = async (req, res) => {
     for (let i = 0; i < passengers.length; i++) {
       // Možete generirati jedinstveni broj rezervacije, npr. pomoću funkcije generisiBookingBroj()
       const bookingNumber = "BK-" + Math.floor(100000 + Math.random() * 900000) + "-" + (i + 1);
-      
+
       // Ako je seatSelection niz, osigurajte da je za svakog putnika dodijeljeno odgovarajuće sjedalo
       const seatForPassenger = Array.isArray(seatSelection) ? [seatSelection[i]] : [];
-      
+
       const newBooking = new Booking({
         bookingNumber,
         flight: flightId,
@@ -112,6 +113,7 @@ export const createBooking = async (req, res) => {
         seatSelection: seatForPassenger,
         user: userId,
         status: "active",
+        cijenaKarte: cijenaKarte,
       });
 
       await newBooking.save();
@@ -119,6 +121,7 @@ export const createBooking = async (req, res) => {
     }
 
     // Po potrebi, možete poslati email potvrde ili obaviti dodatne radnje
+    // await sendConfirmationEmail();
 
     res.status(201).json({ message: "Rezervacija uspješna!", bookings: createdBookings });
   } catch (err) {
@@ -126,7 +129,6 @@ export const createBooking = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 // NOVI ENDPOINT ZA PONIŠTAVANJE REZERVACIJE
 export const cancelBooking = async (req, res) => {
@@ -156,48 +158,48 @@ export const modifyBooking = async (req, res) => {
     if (!bookingId || !userId) {
       return res.status(400).json({ message: "Nedostaju bookingId ili userId." });
     }
-    
+
     // Dohvati rezervaciju koju uređujemo
     const booking = await Booking.findOne({ _id: bookingId, user: userId });
     if (!booking) {
       return res.status(404).json({ message: "Rezervacija nije pronađena ili ne pripada korisniku." });
     }
-    
+
     // Ako korisnik unosi nova sjedala, provjeri je li neki od njih već rezerviran
     if (newSeatSelection && Array.isArray(newSeatSelection)) {
       // Dohvati sve aktivne rezervacije za taj let osim ove rezervacije
       const otherBookings = await Booking.find({
         flight: booking.flight,
         status: "active",
-        _id: { $ne: bookingId }
+        _id: { $ne: bookingId },
       }).select("seatSelection");
 
       // Izvuci zauzeta sjedala iz svih ostalih aktivnih rezervacija
       let occupiedSeats = [];
-      otherBookings.forEach(otherBooking => {
+      otherBookings.forEach((otherBooking) => {
         if (otherBooking.seatSelection && Array.isArray(otherBooking.seatSelection)) {
           occupiedSeats = occupiedSeats.concat(otherBooking.seatSelection);
         }
       });
 
       // Provjeri postoji li preklapanje između novih sjedala i zauzetih sjedala
-      const conflictSeats = newSeatSelection.filter(seat => occupiedSeats.includes(seat));
+      const conflictSeats = newSeatSelection.filter((seat) => occupiedSeats.includes(seat));
       if (conflictSeats.length > 0) {
-        return res.status(409).json({ 
+        return res.status(409).json({
           message: "Odabrana sjedala su već rezervirana.",
-          conflictSeats
+          conflictSeats,
         });
       }
-      
+
       // Ako nema konflikata, postavi nova sjedala
       booking.seatSelection = newSeatSelection;
     }
-    
+
     // Ažuriraj i ostale podatke ako se šalju
     if (otherChanges) {
       Object.assign(booking, otherChanges);
     }
-    
+
     const updatedBooking = await booking.save();
     return res.status(200).json({ message: "Rezervacija uspješno izmijenjena.", booking: updatedBooking });
   } catch (error) {
@@ -217,7 +219,7 @@ export const getBookings = async (req, res) => {
     const bookings = await Booking.find({ user: userId })
       .populate({
         path: "flight",
-        populate: { path: "aviokompanija", select: "naziv" }
+        populate: { path: "aviokompanija", select: "naziv" },
       })
       .sort({ createdAt: -1 });
     res.status(200).json(bookings);
@@ -226,4 +228,3 @@ export const getBookings = async (req, res) => {
     res.status(500).json({ message: "Internal server error", details: error.message });
   }
 };
-

@@ -242,6 +242,9 @@ const bookingSchema = new Schema(
       type: String,
       default: "active",
     },
+    cijenaKarte: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
