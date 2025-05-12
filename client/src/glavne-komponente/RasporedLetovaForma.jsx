@@ -95,14 +95,13 @@ const RasporedLetovaForma = () => {
         const otkazaniRes = await dohvatiOtkazaneLetove();
         const aviokompanijeRes = await dohvatiAviokompanije();
 
-        // Filtriranje letova koji imaju važeće podatke
         const validLetovi = letoviRes.filter((let_) => {
           return let_.brojLeta && let_.vrijemePolaska && let_.vrijemeDolaska && let_.polaziste && let_.odrediste;
         });
 
         setDestinacije(destRes);
         setAvioni(avionRes);
-        setLetovi(validLetovi); // Set filtered list
+        setLetovi(validLetovi);
         setOtkazaniLetovi(otkazaniRes);
         setAviokompanije(aviokompanijeRes);
       } catch (err) {
@@ -197,7 +196,7 @@ const RasporedLetovaForma = () => {
       //   avionId: "",
       //   aviokompanija: "",
       // });
-      setErrorMessage(""); // Očisti eventualnu staru poruku
+      setErrorMessage("");
     } catch (error) {
       console.error("Greška:", error);
 
@@ -209,7 +208,6 @@ const RasporedLetovaForma = () => {
 
   return (
     <div className="flight-layout-container">
-      {/* Sekcija: Forma za dodavanje/uređivanje */}
       {showForm && (
         <div className="flight-rasporedLetova-form">
           <h2>{isEditing ? "Uredi let" : "Dodaj let"}</h2>
@@ -338,7 +336,6 @@ const RasporedLetovaForma = () => {
         </div>
       )}
 
-      {/* Sekcija: Lista letova */}
       <div className="flight-list">
         <button
           className="btn-add"
@@ -365,7 +362,7 @@ const RasporedLetovaForma = () => {
         </button>
         <h2>Raspored letova</h2>
         {letovi.length === 0 ? (
-          <p>Nema letova s važećim podacima.</p> // Prikazuj poruku ako nema validnih letova
+          <p>Nema letova s važećim podacima.</p>
         ) : (
           <table>
             <thead>
@@ -434,7 +431,7 @@ const RasporedLetovaForma = () => {
                 <strong>{selectedFlightForCancel?.polaziste}</strong> →{" "}
                 <strong>{selectedFlightForCancel?.odrediste}</strong>
                 <br />
-                Vrijeme: {selectedFlightForCancel?.vrijemePolaska} – {selectedFlightForCancel?.vrijemeDolaska}
+                Vrijeme: {selectedFlightForCancel?.vrijemePolaska} - {selectedFlightForCancel?.vrijemeDolaska}
               </p>
               <div className="modal-buttons">
                 <button type="submit" className="btn-submit">
