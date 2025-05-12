@@ -7,6 +7,8 @@
 html,
 body {
   height: 100%;
+  min-height: 100vh;
+  padding-bottom: 16rem;
 }
 
 body {
@@ -14,36 +16,11 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#root {
-  height: 100vh;
-}
-
-.app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.App {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
 .logo {
-  height: 6em;
-  will-change: filter;
   transition: all 0.3s ease;
-  margin-bottom: 1rem;
-}
-
-.logo.avion:hover {
-  filter: drop-shadow(0 0 1.5em #1a73e8aa);
-  transform: translateY(-3px);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
 }
 
 .card {
@@ -148,10 +125,6 @@ form {
 }
 
 @media (max-width: 600px) {
-  .App {
-    padding: 1rem;
-  }
-
   .logo {
     height: 4em;
   }
@@ -309,16 +282,7 @@ form {
   height: 50px;
 }
 
-.navigacija-lijevo {
-  display: flex;
-  align-items: center;
-}
-
 .logo {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
 }
 
 .navigacija-desno {
@@ -353,27 +317,11 @@ form {
   background-color: #535bf2;
 }
 
-/* Main Content Styles */
-.main-content {
-  flex: 1;
-  position: relative;
-}
-
 /* Početna Stranica Styles */
 .pocetna-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80");
-  background-size: cover;
-  background-position: center;
-  padding: 2rem;
+  padding-top: 2rem;
 }
 
 .pocetna-card {

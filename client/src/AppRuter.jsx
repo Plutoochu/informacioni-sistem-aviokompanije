@@ -47,34 +47,32 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="app">
-          <Navigacija />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Navigate to="/prijava" replace />} />
-              <Route path="/pocetna" element={<AdminRedirect />} />
+        <Navigacija />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Navigate to="/prijava" replace />} />
+            <Route path="/pocetna" element={<AdminRedirect />} />
 
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              <Route path="/raspored-letova" element={<RasporedLetovaForma />} />
-              <Route path="/korisnici" element={<UpravljanjeKorisnicima />} />
-              <Route path="/upravljanje-avionima" element={<UpravljanjeAvionima />} />
-              <Route path="/destinacije" element={<UpravljanjeDestinacijama />} />
-              <Route path="/cjenovnik" element={<Cjenovnik />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/raspored-letova" element={<RasporedLetovaForma />} />
+            <Route path="/korisnici" element={<UpravljanjeKorisnicima />} />
+            <Route path="/upravljanje-avionima" element={<UpravljanjeAvionima />} />
+            <Route path="/destinacije" element={<UpravljanjeDestinacijama />} />
+            <Route path="/cjenovnik" element={<Cjenovnik />} />
 
-              <Route path="/prijava" element={<Prijava />} />
-              <Route path="/registracija" element={<Registracija />} />
-              <Route path="/profil" element={<Profil />} />
-              <Route path="/letovi" element={<Letovi />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/avioni" element={<AvioniForma />} />
-              <Route path="/rezervacija/:id" element={<Rezervacija />} />
-              <Route path="/mapa-sjedista" element={<MapaSjedista />} />
-              <Route path="/aviokompanije" element={<UpravljanjeAviokompanijama />} />
-              <Route path="/rezervacije" element={<AzurirajRezervacije />} />
-            </Routes>
-          </main>
-        </div>
+            <Route path="/prijava" element={<Prijava />} />
+            <Route path="/registracija" element={<Registracija />} />
+            <Route path="/profil" element={<Profil />} />
+            <Route path="/letovi" element={<Letovi />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/avioni" element={<AvioniForma />} />
+            <Route path="/rezervacija/:id" element={<Rezervacija />} />
+            <Route path="/mapa-sjedista" element={<MapaSjedista />} />
+            <Route path="/aviokompanije" element={<UpravljanjeAviokompanijama />} />
+            <Route path="/rezervacije" element={<AzurirajRezervacije />} />
+          </Routes>
+        </main>
       </AuthProvider>
     </Router>
   );
