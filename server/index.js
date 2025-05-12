@@ -13,6 +13,8 @@ import letRute from "./src/rute/letRute.js";
 import resetPasswordRoute from "./src/rute/resetPasswordRoute.js";
 import rezervacijaRute from "./src/rute/rezervacijaRute.js";
 import sjedistaRute from "./src/rute/sjedistaRute.js";
+import cijeneRute from "./src/rute/cijeneRute.js";
+// import apiRute from "./src/rute/index.js"
 
 const app = express();
 
@@ -30,6 +32,9 @@ app.use("/api/letovi", letRute);
 app.use("/api/", resetPasswordRoute);
 app.use("/api/rezervacije", rezervacijaRute);
 app.use("/api/sjedista", sjedistaRute);
+app.use("/api/cijene", cijeneRute);
+
+// app.use("/api", apiRute);
 
 app.listen(config.port, () => console.log(`Server pokrenut na portu: ${config.port}`));
 

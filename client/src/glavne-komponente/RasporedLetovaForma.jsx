@@ -7,11 +7,7 @@ import {
   dohvatiOtkazaneLetove,
   aktivirajLet,
 } from "../pomocne-funkcije/let-fetch-funkcije";
-import {
-  dohvatiDestinacije,
-  dohvatiAviokompanije,
-  dohvatiSveZrakoplove,
-} from "../pomocne-funkcije/fetch-funkcije";
+import { dohvatiDestinacije, dohvatiAviokompanije, dohvatiSveZrakoplove } from "../pomocne-funkcije/fetch-funkcije";
 import "../stilovi/RasporedLetova.css";
 
 const RasporedLetovaForma = () => {
@@ -54,9 +50,7 @@ const RasporedLetovaForma = () => {
 
       const otkazaniRes = await dohvatiOtkazaneLetove();
 
-      const updatedLet = letovi.map((let_) =>
-        let_._id === let_._id ? { ...let_, status: "Aktivan" } : let_
-      );
+      const updatedLet = letovi.map((let_) => (let_._id === let_._id ? { ...let_, status: "Aktivan" } : let_));
       setLetovi(updatedLet);
       setOtkazaniLetovi(otkazaniRes);
     } catch (err) {
@@ -82,9 +76,7 @@ const RasporedLetovaForma = () => {
 
       const otkazaniRes = await dohvatiOtkazaneLetove();
 
-      const updatedLet = letovi.map((let_) =>
-        let_._id === let_._id ? { ...let_, status: "Aktivan" } : let_
-      );
+      const updatedLet = letovi.map((let_) => (let_._id === let_._id ? { ...let_, status: "Aktivan" } : let_));
       setLetovi(updatedLet);
       setOtkazaniLetovi(otkazaniRes);
     } catch (err) {
@@ -105,13 +97,7 @@ const RasporedLetovaForma = () => {
 
         // Filtriranje letova koji imaju važeće podatke
         const validLetovi = letoviRes.filter((let_) => {
-          return (
-            let_.brojLeta &&
-            let_.vrijemePolaska &&
-            let_.vrijemeDolaska &&
-            let_.polaziste &&
-            let_.odrediste
-          );
+          return let_.brojLeta && let_.vrijemePolaska && let_.vrijemeDolaska && let_.polaziste && let_.odrediste;
         });
 
         setDestinacije(destRes);
@@ -195,13 +181,7 @@ const RasporedLetovaForma = () => {
       }
       const letoviRes = await dohvatiSveLetove();
       const validLetovi = letoviRes.filter((let_) => {
-        return (
-          let_.brojLeta &&
-          let_.vrijemePolaska &&
-          let_.vrijemeDolaska &&
-          let_.polaziste &&
-          let_.odrediste
-        );
+        return let_.brojLeta && let_.vrijemePolaska && let_.vrijemeDolaska && let_.polaziste && let_.odrediste;
       });
       setLetovi(validLetovi);
       // setFormData({
@@ -221,10 +201,7 @@ const RasporedLetovaForma = () => {
     } catch (error) {
       console.error("Greška:", error);
 
-      const backendMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Greška pri dodavanju.";
+      const backendMessage = error.response?.data?.message || error.message || "Greška pri dodavanju.";
 
       setErrorMessage(backendMessage);
     }
@@ -260,15 +237,8 @@ const RasporedLetovaForma = () => {
             ))}
             {["polaziste", "odrediste"].map((field) => (
               <div className="form-group" key={field}>
-                <label htmlFor={field}>
-                  {field === "polaziste" ? "Polazište" : "Odredište"}
-                </label>
-                <select
-                  id={field}
-                  name={field}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  required>
+                <label htmlFor={field}>{field === "polaziste" ? "Polazište" : "Odredište"}</label>
+                <select id={field} name={field} value={formData[field]} onChange={handleChange} required>
                   <option value="">-- Odaberi --</option>
                   {destinacije.map((dest) => (
                     <option key={dest._id} value={dest.grad}>
@@ -286,7 +256,8 @@ const RasporedLetovaForma = () => {
                 name="aviokompanija"
                 value={formData.aviokompanija}
                 onChange={handleChange}
-                required>
+                required
+              >
                 <option value="">-- Odaberi aviokompaniju --</option>
                 {aviokompanije.map((avio) => (
                   <option key={avio._id} value={avio._id}>
@@ -298,12 +269,7 @@ const RasporedLetovaForma = () => {
 
             <div className="form-group">
               <label htmlFor="avionId">Avion</label>
-              <select
-                id="avionId"
-                name="avionId"
-                value={formData.avionId}
-                onChange={handleChange}
-                required>
+              <select id="avionId" name="avionId" value={formData.avionId} onChange={handleChange} required>
                 <option value="">-- Odaberi avion --</option>
                 {avioni.map((avion) => (
                   <option key={avion._id} value={avion._id}>
@@ -326,13 +292,7 @@ const RasporedLetovaForma = () => {
 
             <div className="form-group">
               <label>Datum polaska</label>
-              <input
-                type="date"
-                name="datumPolaska"
-                value={formData.datumPolaska}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" name="datumPolaska" value={formData.datumPolaska} onChange={handleChange} required />
             </div>
 
             <div className="flex gap-4">
@@ -364,23 +324,14 @@ const RasporedLetovaForma = () => {
                 </div>
                 <div className="form-group">
                   <label>Datum do</label>
-                  <input
-                    type="date"
-                    name="datumDo"
-                    value={formData.datumDo}
-                    onChange={handleChange}
-                    required
-                  />
+                  <input type="date" name="datumDo" value={formData.datumDo} onChange={handleChange} required />
                 </div>
               </>
             ) : null}
             <button className="btn-submit" type="submit">
               {isEditing ? "Ažuriraj" : "Spremi"}
             </button>
-            <button
-              type="button"
-              className="btn-cancel"
-              onClick={() => setShowForm(false)}>
+            <button type="button" className="btn-cancel" onClick={() => setShowForm(false)}>
               Otkaži
             </button>
           </form>
@@ -408,7 +359,8 @@ const RasporedLetovaForma = () => {
             setSelectedFlightId(null);
             setErrorMessage("");
             setShowForm(true);
-          }}>
+          }}
+        >
           Dodaj let
         </button>
         <h2>Raspored letova</h2>
@@ -442,42 +394,24 @@ const RasporedLetovaForma = () => {
                       : "N/A"}
                   </td>
                   <td>{let_.avionId?.naziv || "N/A"}</td>
-                  <td>
-                    {aviokompanije.find((a) => a._id === let_.aviokompanija)
-                      ?.naziv || "N/A"}{" "}
-                  </td>
-                  <td>
-                    {let_.datumPolaska ? let_.datumPolaska.slice(0, 10) : "N/A"}
-                  </td>
-                  <td>
-                    {let_.datumDolaska ? let_.datumDolaska.slice(0, 10) : "N/A"}
-                  </td>
-                  <td
-                    className={
-                      isFlightCanceled(let_)
-                        ? "flight-canceled"
-                        : "flight-active"
-                    }>
+                  <td>{aviokompanije.find((a) => a._id === let_.aviokompanija)?.naziv || "N/A"} </td>
+                  <td>{let_.datumPolaska ? let_.datumPolaska.slice(0, 10) : "N/A"}</td>
+                  <td>{let_.datumDolaska ? let_.datumDolaska.slice(0, 10) : "N/A"}</td>
+                  <td className={isFlightCanceled(let_) ? "flight-canceled" : "flight-active"}>
                     {isFlightCanceled(let_) ? "Otkazan" : "Aktivan"}
                   </td>
                   <td>
                     {isFlightCanceled(let_) ? (
-                      <button
-                        className="btn-add"
-                        onClick={() => handleReactivateFlight(let_)}>
+                      <button className="btn-add" onClick={() => handleReactivateFlight(let_)}>
                         Aktiviraj
                       </button>
                     ) : (
                       <>
                         <div className="flight-actions">
-                          <button
-                            className="btn-edit"
-                            onClick={() => handleEdit(let_)}>
+                          <button className="btn-edit" onClick={() => handleEdit(let_)}>
                             Uredi
                           </button>
-                          <button
-                            className="btn-cancel"
-                            onClick={() => handleCancelClick(let_)}>
+                          <button className="btn-cancel" onClick={() => handleCancelClick(let_)}>
                             Otkaži
                           </button>
                         </div>
@@ -500,17 +434,13 @@ const RasporedLetovaForma = () => {
                 <strong>{selectedFlightForCancel?.polaziste}</strong> →{" "}
                 <strong>{selectedFlightForCancel?.odrediste}</strong>
                 <br />
-                Vrijeme: {selectedFlightForCancel?.vrijemePolaska} –{" "}
-                {selectedFlightForCancel?.vrijemeDolaska}
+                Vrijeme: {selectedFlightForCancel?.vrijemePolaska} – {selectedFlightForCancel?.vrijemeDolaska}
               </p>
               <div className="modal-buttons">
                 <button type="submit" className="btn-submit">
                   Potvrdi otkazivanje
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setShowCancelModal(false)}
-                  className="btn-cancel">
+                <button type="button" onClick={() => setShowCancelModal(false)} className="btn-cancel">
                   Zatvori
                 </button>
               </div>

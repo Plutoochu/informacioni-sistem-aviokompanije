@@ -206,16 +206,6 @@ form {
   text-align: left;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 0.7em 1.2em;
-  border: 2px solid #646cff;
-  border-radius: 8px;
-  font-size: 1em;
-  background-color: #1a1a1a;
-  color: rgba(255, 255, 255, 0.87);
-}
-
 .reset-password-form button {
   width: 100%;
   padding: 0.7em 1.2em;
@@ -515,15 +505,6 @@ form {
   margin-bottom: 0.5rem;
   color: #333;
   font-weight: 500;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.7em 1em;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 1em;
-  transition: border-color 0.3s;
 }
 
 .form-group input:focus {
