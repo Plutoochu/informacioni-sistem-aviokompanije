@@ -68,22 +68,23 @@ const MapaSjedista = () => {
     if (flightData && flightData._id) {
       const key = `reservation_${reservation.userId}_${flightData._id}`;
       // Pretpostavimo da imate endpoint /api/rezervacije/count koji broji rezervacije za let
-      axios.get(`${getBaseUrl()}/api/rezervacije/count`, {
-        params: { userId: reservation.userId, flightId: flightData._id }
-      }).then((res) => {
-        // Ako nema rezervacija, ukloni ključ
-        if (res.data.count === 0) {
-          localStorage.removeItem(key);
-          setReservationComplete(false);
-        } else {
-          localStorage.setItem(key, "true");
-          setReservationComplete(true);
-        }
-      }).catch(err => console.error(err));
+      axios
+        .get(`${getBaseUrl()}/api/rezervacije/count`, {
+          params: { userId: reservation.userId, flightId: flightData._id },
+        })
+        .then((res) => {
+          // Ako nema rezervacija, ukloni ključ
+          if (res.data.count === 0) {
+            localStorage.removeItem(key);
+            setReservationComplete(false);
+          } else {
+            localStorage.setItem(key, "true");
+            setReservationComplete(true);
+          }
+        })
+        .catch((err) => console.error(err));
     }
   }, [flightData, reservation.userId]);
-  
-
 
   // Ako letData nije kompletan (npr. nedostaje avionId), osvežavamo ga s backenda
   useEffect(() => {
@@ -128,13 +129,7 @@ const MapaSjedista = () => {
 
   // Postavljanje dinamičke konfiguracije sjedala (ako su dostupni svi potrebni podaci)
   useEffect(() => {
-    if (
-      flightData &&
-      avion &&
-      flightData.konfiguracijaSjedista &&
-      avion.sjedalaPoRedu &&
-      avion.brojSjedista
-    ) {
+    if (flightData && avion && flightData.konfiguracijaSjedista && avion.sjedalaPoRedu && avion.brojSjedista) {
       try {
         const config = parseSeatConfiguration(flightData.konfiguracijaSjedista);
         const firstRows = Math.ceil(config.first.totalSeats / avion.sjedalaPoRedu.F);
@@ -315,7 +310,7 @@ const MapaSjedista = () => {
       alert(`Morate odabrati tačno ${totalPassengers} sjedišta za ${totalPassengers} putnika`);
       return;
     }
-    
+
     const payload = {
       ...reservation,
       userId: reservation.userId || (korisnik && korisnik.id), // dodaj userId ako nedostaje
@@ -338,20 +333,17 @@ const MapaSjedista = () => {
       const key = `reservation_${payload.userId}_${flightData._id}`;
       localStorage.setItem(key, "true");
       window.location.reload();
-
     } catch (error) {
       console.error("Greška pri potvrdi rezervacije:", error);
       alert("Došlo je do greške pri potvrdi rezervacije");
     }
   };
-  
 
   return (
     <div className="seat-map-container">
       <h2>Odabir sjedišta za let {flight.brojLeta}</h2>
       <p>
-        <strong>Putnika:</strong> {totalPassengers} | <strong>Klasa:</strong>{" "}
-        {reservation.classType}
+        <strong>Putnika:</strong> {totalPassengers} | <strong>Klasa:</strong> {reservation.classType}
       </p>
 
       <div className="seat-map-legend">

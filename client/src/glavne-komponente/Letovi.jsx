@@ -19,10 +19,10 @@ const Letovi = () => {
   const [filters, setFilters] = useState({
     polaziste: "",
     odrediste: "",
-    datumOd: "",
-    datumDo: "",
+    datumOd: "2025-05-07",
+    datumDo: "2025-05-20",
     aviokompanija: "",
-    klasa: "",
+    klasa: "Ekonomska",
     vrijemePolaskaOd: "",
     vrijemePolaskaDo: "",
     vrijemeDolaskaOd: "",
@@ -315,7 +315,7 @@ const Letovi = () => {
                     <p>
                       Cijena {let_.cijenaBezPopusta && "s popustom"}:{" "}
                       {let_.cijenaBezPopusta && <span className="slanted-strike mr-2">{let_.cijenaBezPopusta} KM</span>}
-                      <span>{let_.cijena} KM</span>
+                      <span>{let_.cijena.toFixed(2)} KM</span>
                     </p>
                     {let_.aviokompanija && (
                       <p>
@@ -331,7 +331,9 @@ const Letovi = () => {
                   </div>
                   <button
                     className="rezervisi-dugme"
-                    onClick={() => navigate(`/rezervacija/${let_._id}`, { state: { flight: let_ } })}
+                    onClick={() =>
+                      navigate(`/rezervacija/${let_._id}`, { state: { flight: let_, klasa: filters.klasa } })
+                    }
                   >
                     Rezerviši
                   </button>

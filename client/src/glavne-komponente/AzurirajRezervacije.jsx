@@ -59,11 +59,11 @@ const AzurirajRezervacije = () => {
   // Filtriranje rezervacija – aktivne i booking history
   const currentDate = new Date();
   const activeBookings = bookings.filter((booking) => {
-    const flightDate = new Date(booking.flight.datumPolaska);
+    const flightDate = new Date(booking.flight?.datumPolaska);
     return booking.status === "active" && flightDate >= currentDate;
   });
   const pastBookings = bookings.filter((booking) => {
-    const flightDate = new Date(booking.flight.datumPolaska);
+    const flightDate = new Date(booking.flight?.datumPolaska);
     return flightDate < currentDate || booking.status !== "active";
   });
 
@@ -75,11 +75,7 @@ const AzurirajRezervacije = () => {
         userId: korisnik.id,
       });
       alert(response.data.message);
-      setBookings(
-        bookings.map((b) =>
-          b._id === bookingId ? { ...b, status: "canceled" } : b
-        )
-      );
+      setBookings(bookings.map((b) => (b._id === bookingId ? { ...b, status: "canceled" } : b)));
     } catch (error) {
       console.error("Greška pri poništavanju rezervacije:", error);
       alert("Došlo je do greške pri poništavanju rezervacije.");
@@ -91,9 +87,7 @@ const AzurirajRezervacije = () => {
     const bookingToEdit = bookings.find((b) => b._id === bookingId);
     if (bookingToEdit) {
       setEditingReservation(bookingToEdit);
-      setNewSeatSelection(
-        bookingToEdit.seatSelection ? bookingToEdit.seatSelection.join(", ") : ""
-      );
+      setNewSeatSelection(bookingToEdit.seatSelection ? bookingToEdit.seatSelection.join(", ") : "");
       setShowEditModal(true);
     }
   };
@@ -102,7 +96,10 @@ const AzurirajRezervacije = () => {
   const handleSaveEdit = async (e) => {
     e.preventDefault();
     // Parsiramo unesena sjedala (odvojena zarezom)
-    const updatedSeats = newSeatSelection.split(",").map((s) => s.trim()).filter(Boolean);
+    const updatedSeats = newSeatSelection
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     // Ograničenje: dozvoljeno je odabrati točno jedno sjedalo
     if (updatedSeats.length !== 1) {
       alert("Za uređivanje rezervacije morate odabrati točno jedno sjedalo za jednog putnika.");
@@ -117,9 +114,7 @@ const AzurirajRezervacije = () => {
       alert(response.data.message);
       // Ažuriramo stanje rezervacija
       setBookings((prevBookings) =>
-        prevBookings.map((b) =>
-          b._id === editingReservation._id ? { ...b, seatSelection: updatedSeats } : b
-        )
+        prevBookings.map((b) => (b._id === editingReservation._id ? { ...b, seatSelection: updatedSeats } : b))
       );
       setShowEditModal(false);
       setEditingReservation(null);
@@ -155,21 +150,19 @@ const AzurirajRezervacije = () => {
         <strong>Let:</strong> {booking.flight.brojLeta}
       </p>
       <p>
-        <strong>Datum leta:</strong>{" "}
-        {new Date(booking.flight.datumPolaska).toLocaleDateString()}
+        <strong>Datum leta:</strong> {new Date(booking.flight?.datumPolaska).toLocaleDateString()}
       </p>
       <p>
         <strong>Ruta leta:</strong> {booking.flight.polaziste} - {booking.flight.odrediste}
       </p>
       <p>
-        <strong>Vrijeme leta:</strong>{" "}
-        {booking.flight.vrijemePolaska} - {booking.flight.vrijemeDolaska}
+        <strong>Vrijeme leta:</strong> {booking.flight.vrijemePolaska} - {booking.flight.vrijemeDolaska}
       </p>
       <p>
         <strong>Aviokompanija:</strong> {booking.flight.aviokompanija?.naziv}
       </p>
       <p>
-        <strong>Cijena karte:</strong> {booking.flight.cijenaKarte} &euro;
+        <strong>Cijena karte:</strong> {booking.cijenaKarte} KM
       </p>
       <p>
         <strong>Klasa leta:</strong> {booking.classType}
@@ -189,13 +182,10 @@ const AzurirajRezervacije = () => {
         <strong>Status:</strong> {booking.status}
       </p>
       <p>
-        <strong>Odabir sjedišta:</strong>{" "}
-        {booking.seatSelection && booking.seatSelection.join(", ")}
+        <strong>Odabir sjedišta:</strong> {booking.seatSelection && booking.seatSelection.join(", ")}
       </p>
       <div className="booking-actions">
-        <button onClick={() => handleEdit(booking._id)}>
-          Izmijeni rezervaciju
-        </button>
+        <button onClick={() => handleEdit(booking._id)}>Izmijeni rezervaciju</button>
         <button
           className="cancel-button"
           onClick={() => {
@@ -213,7 +203,7 @@ const AzurirajRezervacije = () => {
   return (
     <div className="azuriraj-rezervacije-container">
       <h2>Moje rezervacije</h2>
-      
+
       {/* Sekcija za aktivne rezervacije */}
       <div className="active-reservations">
         <h3>Aktivne rezervacije</h3>

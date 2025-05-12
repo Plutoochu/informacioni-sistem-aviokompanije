@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   dodajAviokompaniju,
   obrisiAviokompaniju,
@@ -40,13 +40,8 @@ const UpravljanjeAviokompanijama = () => {
 
     try {
       if (editId) {
-        const azurirano = await azurirajAviokompaniju(
-          editId,
-          novaAviokompanija
-        );
-        setAviokompanije((prev) =>
-          prev.map((a) => (a._id === editId ? azurirano : a))
-        );
+        const azurirano = await azurirajAviokompaniju(editId, novaAviokompanija);
+        setAviokompanije((prev) => prev.map((a) => (a._id === editId ? azurirano : a)));
       } else {
         const dodana = await dodajAviokompaniju(novaAviokompanija);
         setAviokompanije([...aviokompanije, dodana]);
@@ -74,15 +69,9 @@ const UpravljanjeAviokompanijama = () => {
 
   return (
     <div className="avio-container">
-      <h2>Upravljanje aviokompanijama</h2>
-
+      <h1 className="text-3xl">Upravljanje aviokompanijama</h1>
       <div className="form-container">
-        <input
-          type="text"
-          placeholder="Naziv aviokompanije"
-          value={naziv}
-          onChange={(e) => setNaziv(e.target.value)}
-        />
+        <input type="text" placeholder="Naziv aviokompanije" value={naziv} onChange={(e) => setNaziv(e.target.value)} />
         <input
           type="text"
           placeholder="Kod aviokompanije (npr. JU, LH)"
@@ -90,12 +79,10 @@ const UpravljanjeAviokompanijama = () => {
           onChange={(e) => setKod(e.target.value.toUpperCase())}
           maxLength="3"
         />
-        <button onClick={handleDodajIliAzuriraj}>
-          {editId ? "Ažuriraj" : "Dodaj"} aviokompaniju
-        </button>
+        <button onClick={handleDodajIliAzuriraj}>{editId ? "Ažuriraj" : "Dodaj"} aviokompaniju</button>
       </div>
 
-      <h3>Lista Aviokompanija</h3>
+      <h1 className="text-3xl">Lista aviokompanija</h1>
       {aviokompanije.length === 0 ? (
         <p>Trenutno nema aviokompanija.</p>
       ) : (
@@ -114,18 +101,16 @@ const UpravljanjeAviokompanijama = () => {
                   <td>{a.naziv}</td>
                   <td>{a.kod}</td>
                   <td>
-                    <button
-                      className="avio-btn edit"
-                      onClick={() => handleEdit(a)}>
+                    <button className="avio-btn edit" onClick={() => handleEdit(a)}>
                       Uredi
                     </button>
                     <button
                       className="avio-btn delete"
                       onClick={() =>
-                        window.confirm(
-                          "Jeste li sigurni da želite obrisati ovu aviokompaniju?"
-                        ) && handleBrisanje(a._id)
-                      }>
+                        window.confirm("Jeste li sigurni da želite obrisati ovu aviokompaniju?") &&
+                        handleBrisanje(a._id)
+                      }
+                    >
                       Obriši
                     </button>
                   </td>

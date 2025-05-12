@@ -81,7 +81,6 @@ export const getBookedSeats = async (req, res) => {
   }
 };
 
-
 export const confirmSeatReservation = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();

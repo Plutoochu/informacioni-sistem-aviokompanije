@@ -161,7 +161,7 @@ export const pretraziLetove = async (req, res) => {
         aviokompanija: jedanLet.aviokompanija?.naziv,
         klasa: klasa,
         odDatuma: { $lte: jedanLet.datumPolaska },
-        doDatuma: { $gte: jedanLet.datumPolaska },
+        doDatuma: { $gte: jedanLet.datumDolaska },
       });
 
       if (cijena) {

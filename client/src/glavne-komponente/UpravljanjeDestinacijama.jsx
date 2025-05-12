@@ -82,7 +82,7 @@ const UpravljanjeDestinacijama = () => {
 
   return (
     <div className="odrediste-container">
-      <h2>Upravljanje destinacijama</h2>
+      <h1 className="text-3xl">Upravljanje destinacijama</h1>
 
       <div className="form-container">
         <input type="text" placeholder="Grad" value={grad} onChange={(e) => setGrad(e.target.value)} />
@@ -102,7 +102,7 @@ const UpravljanjeDestinacijama = () => {
         <button onClick={handleDodajIliAzuriraj}>{editId ? "Ažuriraj" : "Dodaj"} destinaciju</button>
       </div>
 
-      <h3>Postojeće destinacije</h3>
+      <h1 className="text-3xl">Postojeće destinacije</h1>
       <div className="odrediste-list">
         {destinacije.map((d) => (
           <div key={d._id} className="odrediste-card">

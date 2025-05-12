@@ -55,22 +55,20 @@ const Cjenovnik = () => {
       noviCjenovnik[i] = { _id: cijenaIdAzuriranje, ...novaCijena };
       setCjenovnik(noviCjenovnik);
 
+      setNovaCijena({
+        polaziste: "",
+        odrediste: "",
+        aviokompanija: "",
+        klasa: "",
+        odDatuma: "",
+        doDatuma: "",
+        cijena: "",
+      });
       setDodavanjeCijene(false);
     } else {
       const res = await dodajCijenu(novaCijena);
       setCjenovnik((s) => [...s, { _id: res._id, ...novaCijena }]);
     }
-
-    // setNovaCijena({
-    //   polaziste: "",
-    //   odrediste: "",
-    //   aviokompanija: "",
-    //   klasa: "",
-    //   odDatuma: "",
-    //   doDatuma: "",
-    //   cijena: "",
-    // });
-    // setDodavanjeCijene(false);
   };
 
   const handleObrisi = async (_id) => {
@@ -108,8 +106,8 @@ const Cjenovnik = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 max-w-11/12 mx-auto">
-      <h1 className="mt-8 text-5xl text-center">Cjenovnik</h1>
+    <div className="flex flex-col gap-5 max-w-11/12 mx-auto pb-12">
+      <h1 className="mt-8 text-4xl text-center font-semibold">Cjenovnik</h1>
       <div className="flex flex-col bg-white p-5 rounded-xl gap-4">
         {cjenovnik.length > 0 ? (
           <table>

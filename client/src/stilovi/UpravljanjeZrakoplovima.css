@@ -37,6 +37,7 @@ h1 {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  border: 1px groove gray;
 }
 
 .zrakoplovi-tablica th,
