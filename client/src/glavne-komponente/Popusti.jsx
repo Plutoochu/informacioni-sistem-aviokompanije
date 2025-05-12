@@ -91,7 +91,7 @@ const Popusti = ({ aviokompanije }) => {
 
   return (
     <>
-      <h1 className="mt-8 text-5xl text-center">Popusti</h1>
+      <h1 className="mt-8 text-4xl text-center font-semibold">Popusti</h1>
       <div className="flex flex-col bg-white p-5 rounded-xl gap-4">
         {popusti.length > 0 ? (
           <table>

@@ -134,7 +134,7 @@ const UpravljanjeAvionima = () => {
 
   return (
     <div className="upravljanje-zrakoplovima-container">
-      <h1>Upravljanje Zrakoplovima</h1>
+      <h1 className="text-3xl">Upravljanje avionima</h1>
 
       {error && <div className="error-message">{error}</div>}
 
