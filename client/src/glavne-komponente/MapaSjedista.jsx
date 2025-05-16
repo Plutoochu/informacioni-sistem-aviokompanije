@@ -206,103 +206,149 @@ const MapaSjedista = () => {
     const seats = [];
     const { firstClass, businessClass, economyClass } = dynamicAirplaneConfig;
 
-    // Renderiranje Prve klase
-    seats.push(
-      <div key="first-label" className="class-label">
-        Prva klasa
+// Kanoniziramo rezerviranu klasu sjedala
+let canonicalClass = "";
+if (reservation.classType) {
+  const inputClass = reservation.classType.trim().toLowerCase();
+  if (inputClass.includes("prva")) {
+    canonicalClass = "prva klasa";
+  } else if (inputClass.includes("biznis")) {
+    canonicalClass = "biznis";
+  } else if (inputClass.includes("ekonomska")) {
+    canonicalClass = "ekonomska";
+  }
+}
+console.log("Canonical class:", canonicalClass);
+
+// Definirajte mapping
+const alertMapping = {
+  "prva klasa": "Prvoj klasi",
+  "biznis": "Biznis klasi",
+  "ekonomska": "Ekonomskoj klasi",
+};
+
+// Renderiranje Prve klase
+seats.push(
+  <div key="first-label" className="class-label">
+    Prva klasa
+  </div>
+);
+for (let row = firstClass.startRow; row < firstClass.startRow + firstClass.rows; row++) {
+  const rowSeats = [];
+  for (let col = 0; col < firstClass.seatsPerRow; col++) {
+    const seatLetter = String.fromCharCode(65 + col);
+    const seatId = `${seatLetter}${row}`;
+    const isBooked = isSeatBooked(seatId);
+    const isSelected = isSeatSelected(seatId);
+    // Ako canonicalClass nije "prva klasa", sjedalo je označeno kao disabled
+    const disabledClass = canonicalClass === "prva klasa" ? "" : "disabled";
+    
+    rowSeats.push(
+      <div
+        key={seatId}
+        className={`seat first ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} ${disabledClass}`}
+        onClick={() => {
+          if (isBooked) return;
+          if (disabledClass !== "") {
+            alert(`Možete odabrati samo sjedišta u ${alertMapping[canonicalClass]}`);
+            return;
+          }
+          handleSeatClick({ id: seatId, class: "first" });
+        }}
+      >
+        {seatId}
       </div>
     );
-    for (let row = firstClass.startRow; row < firstClass.startRow + firstClass.rows; row++) {
-      const rowSeats = [];
-      for (let col = 0; col < firstClass.seatsPerRow; col++) {
-        const seatLetter = String.fromCharCode(65 + col);
-        const seatId = `${seatLetter}${row}`;
-        const isBooked = isSeatBooked(seatId);
-        const isSelected = isSeatSelected(seatId);
-        rowSeats.push(
-          <div
-            key={seatId}
-            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} first ${
-              reservation.classType !== "Prva klasa" ? "disabled" : ""
-            }`}
-            onClick={() => !isBooked && handleSeatClick({ id: seatId, class: "first" })}
-          >
-            {seatId}
-          </div>
-        );
-      }
-      seats.push(
-        <div key={`row-${row}`} className="seat-row">
-          {rowSeats}
-        </div>
-      );
-    }
+  }
+  seats.push(
+    <div key={`row-${row}`} className="seat-row">
+      {rowSeats}
+    </div>
+  );
+}
 
-    // Renderiranje Biznis klase
-    seats.push(
-      <div key="business-label" className="class-label">
-        Biznis klasa
+
+// Renderiranje Biznis klase
+seats.push(
+  <div key="business-label" className="class-label">
+    Biznis klasa
+  </div>
+);
+for (let row = businessClass.startRow; row < businessClass.startRow + businessClass.rows; row++) {
+  const rowSeats = [];
+  for (let col = 0; col < businessClass.seatsPerRow; col++) {
+    const seatLetter = String.fromCharCode(65 + col);
+    const seatId = `${seatLetter}${row}`;
+    const isBooked = isSeatBooked(seatId);
+    const isSelected = isSeatSelected(seatId);
+    // Ako canonicalClass nije "biznis", sjedalo je disabled
+    const disabledClass = canonicalClass === "biznis" ? "" : "disabled";
+    
+    rowSeats.push(
+      <div
+        key={seatId}
+        className={`seat business ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} ${disabledClass}`}
+        onClick={() => {
+          if (isBooked) return;
+          if (disabledClass !== "") {
+            alert(`Možete odabrati samo sjedišta u ${alertMapping[canonicalClass]}`);
+            return;
+          }
+          handleSeatClick({ id: seatId, class: "business" });
+        }}
+      >
+        {seatId}
       </div>
     );
-    for (let row = businessClass.startRow; row < businessClass.startRow + businessClass.rows; row++) {
-      const rowSeats = [];
-      for (let col = 0; col < businessClass.seatsPerRow; col++) {
-        const seatLetter = String.fromCharCode(65 + col);
-        const seatId = `${seatLetter}${row}`;
-        const isBooked = isSeatBooked(seatId);
-        const isSelected = isSeatSelected(seatId);
-        rowSeats.push(
-          <div
-            key={seatId}
-            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} business ${
-              reservation.classType !== "Biznis" ? "disabled" : ""
-            }`}
-            onClick={() => !isBooked && handleSeatClick({ id: seatId, class: "business" })}
-          >
-            {seatId}
-          </div>
-        );
-      }
-      seats.push(
-        <div key={`row-${row}`} className="seat-row">
-          {rowSeats}
-        </div>
-      );
-    }
+  }
+  seats.push(
+    <div key={`row-${row}`} className="seat-row">
+      {rowSeats}
+    </div>
+  );
+}
 
-    // Renderiranje Ekonomske klase
-    seats.push(
-      <div key="economy-label" className="class-label">
-        Ekonomska klasa
+// Renderiranje Ekonomske klase
+seats.push(
+  <div key="economy-label" className="class-label">
+    Ekonomska klasa
+  </div>
+);
+for (let row = economyClass.startRow; row < economyClass.startRow + economyClass.rows; row++) {
+  const rowSeats = [];
+  for (let col = 0; col < economyClass.seatsPerRow; col++) {
+    const seatLetter = String.fromCharCode(65 + col);
+    const seatId = `${seatLetter}${row}`;
+    const isBooked = isSeatBooked(seatId);
+    const isSelected = isSeatSelected(seatId);
+    // Ako canonicalClass nije "ekonomska", sjedalo je disabled
+    const disabledClass = canonicalClass === "ekonomska" ? "" : "disabled";
+    
+    rowSeats.push(
+      <div
+        key={seatId}
+        className={`seat economy ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} ${disabledClass}`}
+        onClick={() => {
+          if (isBooked) return;
+          if (disabledClass !== "") {
+            alert(`Možete odabrati samo sjedišta u ${alertMapping[canonicalClass]}`);
+            return;
+          }
+          handleSeatClick({ id: seatId, class: "economy" });
+        }}
+      >
+        {seatId}
       </div>
     );
-    for (let row = economyClass.startRow; row < economyClass.startRow + economyClass.rows; row++) {
-      const rowSeats = [];
-      for (let col = 0; col < economyClass.seatsPerRow; col++) {
-        const seatLetter = String.fromCharCode(65 + col);
-        const seatId = `${seatLetter}${row}`;
-        const isBooked = isSeatBooked(seatId);
-        const isSelected = isSeatSelected(seatId);
-        rowSeats.push(
-          <div
-            key={seatId}
-            className={`seat ${isBooked ? "booked" : ""} ${isSelected ? "selected" : ""} economy ${
-              reservation.classType !== "Ekonomska" ? "disabled" : ""
-            }`}
-            onClick={() => !isBooked && handleSeatClick({ id: seatId, class: "economy" })}
-          >
-            {seatId}
-          </div>
-        );
-      }
-      seats.push(
-        <div key={`row-${row}`} className="seat-row">
-          {rowSeats}
-        </div>
-      );
-    }
+  }
+  seats.push(
+    <div key={`row-${row}`} className="seat-row">
+      {rowSeats}
+    </div>
+  );
+}
 
-    return seats;
+return seats;
   };
 
   const handleConfirmSeats = async () => {

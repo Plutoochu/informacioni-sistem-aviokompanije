@@ -321,6 +321,55 @@ const popustSchema = new Schema({
   },
 });
 
+// NOVI MODEL: Loyalty
+const loyaltySchema = new Schema(
+  {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "Korisnik",
+      required: true,
+    },
+    totalPoints: {
+      type: Number,
+      default: 0,
+    },
+    breakdown: [
+      {
+        bookingId: {
+          type: Schema.Types.ObjectId,
+          ref: "Booking",
+          required: true,
+        },
+        flightNumber: {
+          type: String,
+          required: true,
+        },
+        points: {
+          type: Number,
+          required: true,
+        },
+        route: {
+          type: String,
+          default: "Nepoznato",
+        },
+        flightDate: {
+          type: String, // formatiran datum kao string, npr. "19/05/2025"
+          default: "Nepoznato",
+        },
+        flightTime: {
+          type: String, // npr. "10:00 - 12:00"
+          default: "Nepoznato",
+        },
+        ticketPrice: {
+          type: Number,
+          default: 0,
+        },
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
 const Notifikacija = model("Notifikacija", notifikacijaSchema);
 const OtkazaniLet = model("OtkazaniLet", otkazaniLetSchema);
 const Korisnik = model("Korisnik", korisnikSchema);
@@ -332,6 +381,7 @@ const Booking = model("Booking", bookingSchema);
 const Aviokompanija = model("Aviokompanija", aviokompanijaSchema);
 const Cijena = model("Cijena", cijenaSchema);
 const Popust = model("Popust", popustSchema);
+const Loyalty = model("Loyalty", loyaltySchema);
 
 export {
   Korisnik,
@@ -345,4 +395,5 @@ export {
   Aviokompanija,
   Cijena,
   Popust,
+  Loyalty,
 };
