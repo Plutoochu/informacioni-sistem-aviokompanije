@@ -35,8 +35,8 @@ const Rezervacija = () => {
   const [infantsCount, setInfantsCount] = useState(0);
 
   // Podaci putnika – dinamički se generišu prema broju putnika
-  const [passengers, setPassengers] = useState([
-    {
+  const [passengers, setPassengers] = useState([]);
+    /*{
       ime: "Neki",
       prezime: "Putnik",
       idNumber: "12341234",
@@ -60,7 +60,7 @@ const Rezervacija = () => {
       email: "asd@asd.asd",
       telefon: "062111222",
     },
-  ]);
+  ]);*/
 
   const [aviokompanije, setAviokompanije] = useState([]);
 

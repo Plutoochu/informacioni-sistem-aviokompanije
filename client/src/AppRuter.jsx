@@ -18,6 +18,7 @@ import UpravljanjeAvionima from "./glavne-komponente/UpravljanjeAvionima";
 import UpravljanjeDestinacijama from "./glavne-komponente/UpravljanjeDestinacijama";
 import UpravljanjeKorisnicima from "./glavne-komponente/UpravljanjeKorisnicima";
 import AzurirajRezervacije from "./glavne-komponente/AzurirajRezervacije";
+import Lojalnost from "./glavne-komponente/Lojalnost";
 import { AuthProvider, useAuth } from "./kontekst/AuthContext";
 import Cjenovnik from "./glavne-komponente/Cjenovnik";
 
@@ -71,6 +72,7 @@ function App() {
             <Route path="/mapa-sjedista" element={<MapaSjedista />} />
             <Route path="/aviokompanije" element={<UpravljanjeAviokompanijama />} />
             <Route path="/rezervacije" element={<AzurirajRezervacije />} />
+            <Route path="/loyalty" element={<Lojalnost />} />
           </Routes>
         </main>
       </AuthProvider>

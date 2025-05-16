@@ -14,6 +14,7 @@ import resetPasswordRoute from "./src/rute/resetPasswordRoute.js";
 import rezervacijaRute from "./src/rute/rezervacijaRute.js";
 import sjedistaRute from "./src/rute/sjedistaRute.js";
 import cijenePopustiRute from "./src/rute/cijenePopustiRute.js";
+import loyaltyRoutes from "./src/rute/lojalnostRute.js";
 // import apiRute from "./src/rute/index.js"
 
 const app = express();
@@ -33,6 +34,7 @@ app.use("/api/", resetPasswordRoute);
 app.use("/api/rezervacije", rezervacijaRute);
 app.use("/api/sjedista", sjedistaRute);
 app.use("/api", cijenePopustiRute);
+app.use("/api/loyalty", loyaltyRoutes);
 
 // app.use("/api", apiRute);
 
