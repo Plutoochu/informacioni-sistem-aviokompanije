@@ -263,6 +263,13 @@ const aviokompanijaSchema = new Schema(
       uppercase: true,
       maxlength: 3,
     },
+    percentagePoints: {
+      type: Number,
+      required: true,
+      default: 0.02,
+      min: 0,
+      max: 1,
+    },
   },
   { timestamps: true }
 );
