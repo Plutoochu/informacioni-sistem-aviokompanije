@@ -1,4 +1,4 @@
-import { Booking, Let } from "../modeli/modeli.js";
+import { Booking, Let, Loyalty } from "../modeli/modeli.js";
 import nodemailer from "nodemailer";
 import { updateLoyaltyAfterBooking } from "../kontroleri/lojalnostKontroleri.js";  // Uvoz funkcije za update loyalty
 
@@ -44,7 +44,7 @@ const sendConfirmationEmail = async (to, booking) => {
   await transporter.sendMail(mailOptions);
 };
 
-// Funkcija za slanje emaila o otkazivanju (ostaje nepromijenjena)
+// Funkcija za slanje emaila o otkazivanju
 export const sendCancellationEmail = async (to, korisnikIme, booking, letInfo, otkazaniPeriod) => {
   const htmlContent = `
     <h1>Otkazivanje leta</h1>
@@ -70,17 +70,45 @@ export const createBooking = async (req, res) => {
       flightId,
       classType,
       ticketType,
-      passengers,       // niz objekata za putnike
+      passengers,
       paymentMethod,
       cardDetails,
-      seatSelection,    // niz sjedala, redoslijedom odgovarajući nizu putnika
+      seatSelection,
       userId,
-      cijenaKarte,
+      cijenaKarte,    // konačna cijena (npr. 560 KM)
+      originalCijena, // može biti poslano, a ako nije, postavit ćemo default na cijenaKarte
     } = req.body;
 
-    // Provjera obaveznih podataka
-    if (!flightId || !classType || !ticketType || !passengers || !userId) {
-      return res.status(400).json({ message: "Nedostaju obavezni podaci." });
+    // Ako originalCijena nije poslan, postavljamo je na vrijednost cijenaKarte.
+    const originalCijenaFinal = originalCijena || cijenaKarte;
+    
+    // Debugging log – ispišite payload koji ste primili u createBooking
+    console.log("createBooking payload:", { 
+      flightId, 
+      classType, 
+      ticketType, 
+      passengers, 
+      paymentMethod, 
+      cardDetails, 
+      seatSelection, 
+      userId, 
+      cijenaKarte, 
+      originalCijena: originalCijenaFinal 
+    });
+
+    if (
+      !flightId ||
+      !classType ||
+      !ticketType ||
+      !passengers ||
+      !userId ||
+      !cijenaKarte ||
+      !originalCijenaFinal
+    ) {
+      return res.status(400).json({
+        message:
+          "Nedostaju obavezni podaci (uključujući originalCijena i cijenaKarte).",
+      });
     }
 
     const flight = await Let.findById(flightId);
@@ -95,7 +123,6 @@ export const createBooking = async (req, res) => {
       const bookingNumber =
         "BK-" + Math.floor(100000 + Math.random() * 900000) + "-" + (i + 1);
 
-      // Ako je seatSelection niz, osigurajte da je za svakog putnika dodijeljeno odgovarajuće sjedalo
       const seatForPassenger = Array.isArray(seatSelection)
         ? [seatSelection[i]]
         : [];
@@ -108,25 +135,27 @@ export const createBooking = async (req, res) => {
         adultsCount: 1,
         childrenCount: 0,
         infantsCount: 0,
-        passengers: [passengers[i]], // samo jedan putnik po rezervaciji
+        passengers: [passengers[i]],
         paymentMethod,
         cardDetails: paymentMethod === "Kartica" ? cardDetails : undefined,
         seatSelection: seatForPassenger,
         user: userId,
         status: "active",
-        cijenaKarte: cijenaKarte,
+        cijenaKarte,         // finalna cijena (npr. 560 KM)
+        originalCijena: originalCijenaFinal, // originalna cijena (ako nema popusta, jednaka je finalnoj)
       });
 
       await newBooking.save();
-
-      // Ažuriramo loyalty podatke nakon kreiranja rezervacije
       await updateLoyaltyAfterBooking(newBooking);
-
       createdBookings.push(newBooking);
     }
-
-    // Opcionalno: slanje email potvrde (ako je implementirano)
-    // await sendConfirmationEmail(primateljevaEmailAdresa, createdBookings[0]);
+    
+    // Reset activeDiscount za korisnika – discount vrijedi samo za ovu rezervaciju
+    const loyalty = await Loyalty.findOne({ user: userId });
+    if (loyalty) {
+      loyalty.activeDiscount = 0;
+      await loyalty.save();
+    }
 
     res.status(201).json({ message: "Rezervacija uspješna!", bookings: createdBookings });
   } catch (err) {

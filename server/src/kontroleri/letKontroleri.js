@@ -103,12 +103,12 @@ export const pretraziLetove = async (req, res) => {
       vrijemePolaskaDo,
       vrijemeDolaskaOd,
       vrijemeDolaskaDo,
+      discount,
     } = req.query;
     const query = {};
 
     // Filtriranje po aviokompaniji (ID)
     if (aviokompanija) {
-      // Ako je aviokompanija predmet pretrage (ID) – pretvorite ga u ObjectId
       query.aviokompanija = new mongoose.Types.ObjectId(aviokompanija);
     }
 
@@ -123,7 +123,7 @@ export const pretraziLetove = async (req, res) => {
       if (datumDo) query.datumPolaska.$lte = new Date(datumDo);
     }
 
-    // Filtriranje po vremenu polaska (stored as string "HH:MM")
+    // Filtriranje po vremenu polaska (pohranjeno kao string "HH:MM")
     if (vrijemePolaskaOd && vrijemePolaskaDo) {
       query.vrijemePolaska = { $gte: vrijemePolaskaOd, $lte: vrijemePolaskaDo };
     } else if (vrijemePolaskaOd) {
@@ -132,7 +132,7 @@ export const pretraziLetove = async (req, res) => {
       query.vrijemePolaska = { $lte: vrijemePolaskaDo };
     }
 
-    // Filtriranje po vremenu dolaska (stored as string "HH:MM")
+    // Filtriranje po vremenu dolaska (pohranjeno kao string "HH:MM")
     if (vrijemeDolaskaOd && vrijemeDolaskaDo) {
       query.vrijemeDolaska = { $gte: vrijemeDolaskaOd, $lte: vrijemeDolaskaDo };
     } else if (vrijemeDolaskaOd) {
@@ -141,6 +141,7 @@ export const pretraziLetove = async (req, res) => {
       query.vrijemeDolaska = { $lte: vrijemeDolaskaDo };
     }
 
+    // Dohvaćamo letove iz kolekcije Let
     const letovi = await Let.find(query)
       .populate({
         path: "aviokompanija",
@@ -153,8 +154,12 @@ export const pretraziLetove = async (req, res) => {
       .sort({ vrijemePolaska: 1 });
 
     const letoviSaCijenom = [];
+    // Parsiramo loyalty discount iz query parametra – ako postoji, loyaltyDiscount je broj, inače 0
+    const loyaltyDiscount = parseFloat(discount) || 0;
 
+    // Iteriramo kroz dobijene letove te dohvaćamo odgovarajuću cijenu i popust
     for (const jedanLet of letovi) {
+      // Dohvat cijene iz kolekcije Cijena
       const cijena = await Cijena.findOne({
         polaziste: jedanLet.polaziste,
         odrediste: jedanLet.odrediste,
@@ -163,22 +168,42 @@ export const pretraziLetove = async (req, res) => {
         odDatuma: { $lte: jedanLet.datumPolaska },
         doDatuma: { $gte: jedanLet.datumDolaska },
       });
-
+    
       if (cijena) {
+        // Originalna cijena iz cjenovnika
+        const originalPrice = cijena.cijena; // npr. 45 KM
+        let calculatedPrice = originalPrice;
+    
+        // Dohvat registriranog popusta iz kolekcije Popust
         const popust = await Popust.findOne({
           aviokompanija: jedanLet.aviokompanija?.naziv,
           klasa: klasa,
           odDatuma: { $lte: jedanLet.datumPolaska },
-          doDatuma: { $gte: jedanLet.datumPolaska },
+          doDatuma: { $gte: jedanLet.datumDolaska },
         });
+    
+        // Ako postoji popust iz kolekcije Popust, primjenjujemo ga
+        if (popust) {
+          calculatedPrice = originalPrice * ((100 - popust.popust) / 100.0);
+        }
+    
+        // Parsiramo loyalty discount iz query parametra – ako postoji
+        const loyaltyDiscount = parseFloat(discount) || 0;
+        if (loyaltyDiscount > 0) {
+          calculatedPrice = calculatedPrice * (1 - loyaltyDiscount);
+        }
+    
+        // Ako je kalkulirana cijena manja od originalne, znači da je popust primijenjen
+        const showOriginal = calculatedPrice < originalPrice;
+    
         letoviSaCijenom.push({
           ...jedanLet.toObject(),
-          cijenaBezPopusta: popust ? cijena.cijena : "",
-          cijena: popust ? cijena.cijena * ((100 - popust.popust) / 100.0) : cijena.cijena,
+          cijenaBezPopusta: showOriginal ? originalPrice : "",
+          cijena: calculatedPrice,
         });
       }
     }
-
+    
     res.status(200).json(letoviSaCijenom);
   } catch (error) {
     res.status(500).json({ message: error.message });

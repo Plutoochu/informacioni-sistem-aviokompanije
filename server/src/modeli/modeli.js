@@ -244,6 +244,10 @@ const bookingSchema = new Schema(
     },
     cijenaKarte: {
       type: Number,
+      required: true,
+    },
+    originalCijena: { 
+      type: Number, 
     },
   },
   { timestamps: true }
@@ -340,6 +344,10 @@ const loyaltySchema = new Schema(
       type: Number,
       default: 0,
     },
+    activeDiscount: {
+      type: Number,
+      default: 0,
+    },
     breakdown: [
       {
         bookingId: {
@@ -360,11 +368,11 @@ const loyaltySchema = new Schema(
           default: "Nepoznato",
         },
         flightDate: {
-          type: String, // formatiran datum kao string, npr. "19/05/2025"
+          type: String,
           default: "Nepoznato",
         },
         flightTime: {
-          type: String, // npr. "10:00 - 12:00"
+          type: String,
           default: "Nepoznato",
         },
         ticketPrice: {
@@ -376,6 +384,7 @@ const loyaltySchema = new Schema(
   },
   { timestamps: true }
 );
+
 
 const Notifikacija = model("Notifikacija", notifikacijaSchema);
 const OtkazaniLet = model("OtkazaniLet", otkazaniLetSchema);

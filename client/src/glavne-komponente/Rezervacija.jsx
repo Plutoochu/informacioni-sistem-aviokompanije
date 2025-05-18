@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "../stilovi/Rezervacija.css"; // Uvozimo stilove
+import { useAuth } from "../kontekst/AuthContext";
 
 const getBaseUrl = () => {
   if (window.location.hostname === "localhost") {
@@ -16,6 +17,9 @@ const Rezervacija = () => {
   const location = useLocation();
   const passedFlight = location.state?.flight;
   const classType = location.state?.klasa;
+
+  // Pozivamo useAuth jednom na vrhu
+  const { korisnik } = useAuth();
 
   // Stanja za mapu sjedista
   const [showSeatMap, setShowSeatMap] = useState(false);
@@ -36,31 +40,6 @@ const Rezervacija = () => {
 
   // Podaci putnika – dinamički se generišu prema broju putnika
   const [passengers, setPassengers] = useState([]);
-    /*{
-      ime: "Neki",
-      prezime: "Putnik",
-      idNumber: "12341234",
-      datumRodjenja: "1997-04-06",
-      email: "asd@asd.asd",
-      telefon: "062111222",
-    },
-    {
-      ime: "Neki",
-      prezime: "Putnik",
-      idNumber: "12341234",
-      datumRodjenja: "1997-04-06",
-      email: "asd@asd.asd",
-      telefon: "062111222",
-    },
-    {
-      ime: "Dijete 1",
-      prezime: "Putnik",
-      idNumber: "12341234",
-      datumRodjenja: "2018-04-06",
-      email: "asd@asd.asd",
-      telefon: "062111222",
-    },
-  ]);*/
 
   const [aviokompanije, setAviokompanije] = useState([]);
 
@@ -75,7 +54,7 @@ const Rezervacija = () => {
 
   // Način plaćanja
   const [paymentMethod, setPaymentMethod] = useState("Kartica");
-  // Kreditna kartica – stariji state je zamijenjen novim dijeljenjem na mjesec i godinu
+  // Kreditna kartica – podaci
   const [cardNumber, setCardNumber] = useState("1234567891234567");
   const [cardExpiryMonth, setCardExpiryMonth] = useState("07");
   const [cardExpiryYear, setCardExpiryYear] = useState("2025");
@@ -91,14 +70,6 @@ const Rezervacija = () => {
         try {
           const response = await axios.get(`${getBaseUrl()}/api/letovi/${id}`);
           const flightData = response.data;
-
-          // const formattedFlight = {
-          //   ...flightData,
-          //   aviokompanija: flightData.aviokompanija?._id
-          //     ? flightData.aviokompanija
-          //     : { _id: flightData.aviokompanija, naziv: flightData.aviokompanijaNaziv },
-          // };
-
           console.log("Dohvaćen let:", flightData);
           setLetInfo(flightData);
           setCijena(flightData.cijena || 0);
@@ -144,33 +115,27 @@ const Rezervacija = () => {
 
   // Validacija podataka kreditne kartice
   const validateCardDetails = () => {
-    // Broj kartice – očisti eventualne razmake i provjeri da sadrži točno 16 znamenki
     const cleanedCardNumber = cardNumber;
     const cardNumberRegex = /^\d{16}$/;
     if (!cardNumberRegex.test(cleanedCardNumber)) {
       alert("Nevažeći broj kartice. Unesite točno 16 cifara.");
       return false;
     }
-    // Validacija CVC – točno 3 cifre
     const cvcRegex = /^\d{3}$/;
     if (!cvcRegex.test(cardCVC)) {
       alert("Nevažeći CVC. Unesite točno 3 cifre.");
       return false;
     }
-    // Provjera da su odabrani mjesec i godina za datum isteka
     if (!cardExpiryMonth || !cardExpiryYear) {
       alert("Molimo odaberite datum isteka kartice.");
       return false;
     }
-    // Kombinovanje u format "YYYY-MM"
     const expiryString = `${cardExpiryYear}-${cardExpiryMonth}`;
-    // Regex za provjeru formata "YYYY-MM"
     const expiryRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
     if (!expiryRegex.test(expiryString)) {
       alert("Nevažeći datum isteka. Koristite format YYYY-MM.");
       return false;
     }
-    // Provjera da li je kartica istekla
     const currentDate = new Date();
     const currentYearTwo = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1;
@@ -185,23 +150,42 @@ const Rezervacija = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (paymentMethod === "Kartica") {
       if (!validateCardDetails()) {
         return;
       }
     }
-
+  
     const cardDetails =
       paymentMethod === "Kartica"
         ? {
-            cardNumber: cardNumber.replace(/\s+/g, ""), // briše eventualne razmake
-            // Kombinujemo na način: "2027-09" umjesto "09/2027"
+            cardNumber: cardNumber.replace(/\s+/g, ""),
             cardExpiry: `${cardExpiryYear}-${cardExpiryMonth}`,
             cardCVC,
           }
         : null;
-
+  
+    // Dohvatimo activeDiscount iz Loyalty podataka
+    let activeDiscount = 0;
+    try {
+      const loyaltyRes = await axios.get(`${getBaseUrl()}/api/loyalty`, {
+        params: { userId: korisnik.id },
+      });
+      activeDiscount = loyaltyRes.data.activeDiscount || 0;
+      console.log("Aktivni discount:", activeDiscount);
+    } catch (error) {
+      console.error("Greška pri pribavljanju loyalty podataka:", error);
+    }
+  
+    /* 
+       Ako je discount aktivan, pretpostavljamo da je 
+       passedFlight.cijena već diskontirana (npr. 280 KM) te je originalna cijena zapravo dvostruka (560),
+       dok u slučaju da discount nije aktivan, passedFlight.cijena je već originalna.
+    */
+    const originalPrice = activeDiscount > 0 ? passedFlight.cijena * 2 : passedFlight.cijena;
+    const finalPrice = originalPrice * (1 - activeDiscount); // npr. 560 * 0.5 = 280
+  
     const bookingData = {
       bookingNumber,
       flightId: letInfo._id,
@@ -213,27 +197,35 @@ const Rezervacija = () => {
       passengers,
       paymentMethod,
       cardDetails: paymentMethod === "Kartica" ? cardDetails : undefined,
-      cijenaKarte: passedFlight.cijena,
-      // seatSelection opcionalno, ako postoji
+      cijenaKarte: finalPrice,         // finalna cijena (npr. 280 KM)
+      originalCijena: originalPrice,    // originalna cijena (npr. 560 KM)
     };
-
+  
+    // Spremamo u state rezervacije (npr. za daljnje korake)
     setReservationData(bookingData);
     setShowSeatMap(true);
-
+  
+    console.log("Booking data:", bookingData);
+  
+    try {
+      // Resetiramo activeDiscount u bazi (popust vrijedi samo za ovu rezervaciju)
+      await axios.post(`${getBaseUrl()}/api/loyalty/resetDiscount`, { userId: korisnik.id });
+    } catch (error) {
+      console.error("Greška pri resetiranju discounta:", error);
+    }
+  
+    // Prosljeđujemo bookingData na stranicu za odabir sjedala
     navigate("/mapa-sjedista", {
-      state: {
-        reservation: bookingData,
-        flight: letInfo,
-      },
+      state: { reservation: bookingData, flight: letInfo, discount: activeDiscount },
     });
   };
-
+  
+   
   if (loading) return <div>Učitavanje...</div>;
   if (greska) return <div>{greska}</div>;
   if (!letInfo) return <div>Nema informacija o letu.</div>;
 
-  // Generisanje opcija za mjesec (01 do 12)
-  // Opcije za mjesec – od "01" do "12"
+  // Opcije za mjesec i godinu za karticu
   const monthOptions = Array.from({ length: 12 }, (_, i) => {
     const month = (i + 1).toString().padStart(2, "0");
     return (
@@ -243,7 +235,6 @@ const Rezervacija = () => {
     );
   });
 
-  // Opcije za godinu – puni brojevi, od trenutne godine do trenutne + 10
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 11 }, (_, i) => {
     const yearFull = currentYear + i;
@@ -261,7 +252,7 @@ const Rezervacija = () => {
         <strong>Booking broj:</strong> {bookingNumber}
       </p>
       <p>
-        <strong>Aviokompanija:</strong>
+        <strong>Aviokompanija:</strong>{" "}
         {letInfo.aviokompanija?.naziv ||
           aviokompanije.find((a) => a._id === letInfo.aviokompanija?._id)?.naziv ||
           aviokompanije.find((a) => a._id === letInfo.aviokompanija)?.naziv ||
@@ -288,17 +279,6 @@ const Rezervacija = () => {
 
       <h3>Odaberi opcije rezervacije</h3>
       <form className="rezervacija-forma" onSubmit={handleSubmit}>
-        {/* Izbor klase
-        <div className="form-group">
-          <label>Klasa:</label>
-          <select value={classType} onChange={(e) => setClassType(e.target.value)}>
-            <option value="Ekonomska">Ekonomska</option>
-            <option value="Biznis">Biznis</option>
-            <option value="Prva klasa">Prva klasa</option>
-          </select>
-        </div> */}
-
-        {/* Izbor tipa karte */}
         <div className="form-group">
           <label>Tip karte:</label>
           <div>
@@ -325,7 +305,6 @@ const Rezervacija = () => {
           </div>
         </div>
 
-        {/* Broj putnika */}
         <div className="form-group">
           <label>Putnici:</label>
           <div className="passengers-count">
@@ -344,7 +323,6 @@ const Rezervacija = () => {
           </div>
         </div>
 
-        {/* Unos podataka putnika */}
         {parseInt(adultsCount) + parseInt(childrenCount) + parseInt(infantsCount) > 0 && (
           <div className="passengers-details">
             <h4>Unesite podatke putnika</h4>
@@ -414,7 +392,6 @@ const Rezervacija = () => {
           </div>
         )}
 
-        {/* Izbor načina plaćanja */}
         <div className="form-group">
           <label>Način plaćanja:</label>
           <div>
@@ -441,7 +418,6 @@ const Rezervacija = () => {
           </div>
         </div>
 
-        {/* Dodatna polja za kreditnu karticu – prikazuju se samo ako je izabran način plaćanja "Kartica" */}
         {paymentMethod === "Kartica" && (
           <div className="credit-card-details">
             <div className="form-group">
