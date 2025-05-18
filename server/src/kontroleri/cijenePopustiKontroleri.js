@@ -74,6 +74,21 @@ const obrisiPopust = async (req, res) => {
   }
 };
 
+// NOVI ENDPOINT:
+// Primijeni popust na zadanoj cijeni – vraća sniženu cijenu
+const primijeniPopust = async (req, res) => {
+  try {
+    const { originalPrice, discount } = req.body;
+    if (typeof originalPrice !== "number" || typeof discount !== "number") {
+      return res.status(400).json({ message: "Nedostaju ili neispravni podaci." });
+    }
+    const discountedPrice = originalPrice * (1 - discount);
+    res.status(200).json({ originalPrice, discount, discountedPrice });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export {
   dohvatiCjenovnik,
   dodajCijenu,
@@ -83,4 +98,5 @@ export {
   dodajPopust,
   azurirajPopust,
   obrisiPopust,
+  primijeniPopust, // novododani endpoint
 };

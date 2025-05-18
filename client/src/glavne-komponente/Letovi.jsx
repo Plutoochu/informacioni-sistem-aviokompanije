@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../kontekst/AuthContext"; // Pretpostavljamo da imate AuthContext
 
 const getBaseUrl = () => {
   return window.location.hostname === "localhost"
@@ -9,13 +10,14 @@ const getBaseUrl = () => {
 };
 
 const Letovi = () => {
+  const { korisnik } = useAuth(); // Dohvaćamo trenutnog korisnika
   const [letovi, setLetovi] = useState([]);
   const [destinacije, setDestinacije] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [aviokompanije, setAviokompanije] = useState([]);
 
-  // Filteri
+  // Filteri za pretragu letova
   const [filters, setFilters] = useState({
     polaziste: "",
     odrediste: "",
@@ -30,6 +32,14 @@ const Letovi = () => {
   });
 
   const navigate = useNavigate();
+
+  // Funkcija za format vremena (npr. osigurava format "HH:MM")
+  const formatTime = (timeStr) => {
+    if (!timeStr) return timeStr;
+    let [hours, minutes] = timeStr.split(":");
+    hours = hours.padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
 
   const fetchDestinacije = async () => {
     try {
@@ -54,24 +64,31 @@ const Letovi = () => {
     }
   };
 
-  // Pomoćna funkcija za format vremena (npr. osigurava format "HH:MM")
-  const formatTime = (timeStr) => {
-    if (!timeStr) return timeStr;
-    let [hours, minutes] = timeStr.split(":");
-    hours = hours.padStart(2, "0");
-    return `${hours}:${minutes}`;
+  // Funkcija za dohvat loyalty discounta za trenutnog korisnika iz baze
+  const fetchActiveDiscount = async () => {
+    if (!korisnik || !korisnik.id) return 0;
+    try {
+      const response = await axios.get(`${getBaseUrl()}/api/loyalty`, {
+        params: { userId: korisnik.id },
+      });
+      // Ovdje očekujemo da getLoyalty vraća activeDiscount
+      return response.data.activeDiscount || 0;
+    } catch (err) {
+      console.error("Greška pri dohvatanju loyalty discounta:", err);
+      return 0;
+    }
   };
 
-  // Prikaz letova tek nakon pretrage => state za pretragu
+  // State koji označava da je pretraga izvršena
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Dohvat letova – sada će se pozvati samo nakon pretrage
+  // Dohvat letova nakon pretrage – uključuje dohvat activeDiscounta
   const fetchLetovi = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Građenje query parametara
+      // Građenje query parametara prema filterima
       const params = {};
       if (filters.polaziste) params.polaziste = filters.polaziste;
       if (filters.odrediste) params.odrediste = filters.odrediste;
@@ -79,10 +96,14 @@ const Letovi = () => {
       if (filters.datumDo) params.datumDo = filters.datumDo;
       if (filters.aviokompanija) params.aviokompanija = filters.aviokompanija;
       if (filters.klasa) params.klasa = filters.klasa;
-      if (filters.vrijemePolaskaOd) params.vrijemePolaskaOd = formatTime(filters.vrijemePolaskaOd);
-      if (filters.vrijemePolaskaDo) params.vrijemePolaskaDo = formatTime(filters.vrijemePolaskaDo);
-      if (filters.vrijemeDolaskaOd) params.vrijemeDolaskaOd = formatTime(filters.vrijemeDolaskaOd);
-      if (filters.vrijemeDolaskaDo) params.vrijemeDolaskaDo = formatTime(filters.vrijemeDolaskaDo);
+      if (filters.vrijemePolaskaOd)
+        params.vrijemePolaskaOd = formatTime(filters.vrijemePolaskaOd);
+      if (filters.vrijemePolaskaDo)
+        params.vrijemePolaskaDo = formatTime(filters.vrijemePolaskaDo);
+      if (filters.vrijemeDolaskaOd)
+        params.vrijemeDolaskaOd = formatTime(filters.vrijemeDolaskaOd);
+      if (filters.vrijemeDolaskaDo)
+        params.vrijemeDolaskaDo = formatTime(filters.vrijemeDolaskaDo);
 
       console.log("Pozivam API sa parametrima:", params);
       const response = await axios.get(`${getBaseUrl()}/api/letovi`, { params });
@@ -95,18 +116,22 @@ const Letovi = () => {
         throw new Error("Neočekivani format podataka sa servera");
       }
 
-      // Uključujemo i datum polaska i datum dolaska u formatiranje (pretpostavljamo da ih API vraća)
+      // Dohvatamo aktivni discount iz baze
+      const activeDiscount = await fetchActiveDiscount();
+      console.log("Aktivni loyalty discount:", activeDiscount);
+
+      // Formatiramo letove i primjenjujemo discount na cijenu
       const formattedLetovi = response.data.map((let_) => ({
         _id: let_._id || "",
         polaziste: let_.polaziste || "",
         odrediste: let_.odrediste || "",
-        // Formatiramo datum koristeći toLocaleDateString() – prilagodite prema željenom formatu
         datumPolaska: let_.datumPolaska ? new Date(let_.datumPolaska).toLocaleDateString() : "",
         datumDolaska: let_.datumDolaska ? new Date(let_.datumDolaska).toLocaleDateString() : "",
         vrijemePolaska: let_.vrijemePolaska || "",
         vrijemeDolaska: let_.vrijemeDolaska || "",
         brojLeta: let_.brojLeta || "",
-        cijena: let_.cijena,
+        // Ako postoji aktivni discount, nova cijena = originalna cijena * (1 - activeDiscount)
+        cijena: activeDiscount > 0 ? let_.cijena * (1 - activeDiscount) : let_.cijena,
         cijenaBezPopusta: let_.cijenaBezPopusta,
         avionId: let_.avionId
           ? {
@@ -148,14 +173,14 @@ const Letovi = () => {
   useEffect(() => {
     fetchDestinacije();
     fetchAviokompanije();
-    // Ne učitavamo letove automatski – prikazujemo ih tek nakon pretrage
+    // Letovi se učitavaju tek nakon pretrage
   }, []);
 
   return (
     <div className="letovi-container">
       <h2>Pretraga Letova</h2>
       <form onSubmit={handleSearch} className="pretraga-forma">
-        {/* Prvi red: Od, Do, Datum od, Datum do */}
+        {/* Prvi red: Polazište, Odredište, Datum od, Datum do */}
         <div className="first-row">
           <div className="form-group">
             <label>Polazište:</label>
@@ -291,10 +316,10 @@ const Letovi = () => {
           </button>
         </div>
       </form>
-
+      
       {loading && <div className="loading">Učitavanje...</div>}
       {error && <div className="error">{error}</div>}
-
+      
       {/* Prikaz letova tek nakon pretrage */}
       {hasSearched && (
         <div className="letovi-grid">
@@ -314,7 +339,11 @@ const Letovi = () => {
                     </p>
                     <p>
                       Cijena {let_.cijenaBezPopusta && "s popustom"}:{" "}
-                      {let_.cijenaBezPopusta && <span className="slanted-strike mr-2">{let_.cijenaBezPopusta} KM</span>}
+                      {let_.cijenaBezPopusta && (
+                        <span className="slanted-strike mr-2">
+                          {let_.cijenaBezPopusta} KM
+                        </span>
+                      )}
                       <span>{let_.cijena.toFixed(2)} KM</span>
                     </p>
                     {let_.aviokompanija && (
@@ -339,7 +368,11 @@ const Letovi = () => {
                   </button>
                 </div>
               ))
-            : !loading && !error && <div className="no-results">Nema dostupnih letova za odabrane kriterije.</div>}
+            : !loading && !error && (
+                <div className="no-results">
+                  Nema dostupnih letova za odabrane kriterije.
+                </div>
+              )}
         </div>
       )}
     </div>

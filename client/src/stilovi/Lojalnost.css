@@ -1,120 +1,169 @@
-/* Lojalnost.css */
+/* Lojalnost.css - Modernizirani stilovi */
 
+/* Glavni kontejner */
 .loyalty-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: #ffffff;
-    color: #333;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    font-family: 'Roboto', sans-serif;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  color: #333;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Header */
+.loyalty-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Modern notifikacija */
+.loyalty-notification {
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  color: #0050b3;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Summary */
+.loyalty-summary {
+  text-align: center;
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  color: #333;
+  line-height: 1.2;
+}
+
+/* Loyalty points display */
+.loyalty-points {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.loyalty-coin {
+  width: 20px;
+  height: auto;
+  margin-right: 2px;
+  vertical-align: middle;
+}
+
+.loyalty-number {
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+/* Dugme za preuzimanje bodova (Redeem button) */
+.redeem-button {
+  display: block;
+  padding: 0.75em 1.5em;
+  border: none;
+  background: linear-gradient(45deg, #0078d7, #005bb5);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin: 1rem auto;
+}
+
+.loyalty-redeem-message {
+  text-align: center;
+}
+
+.redeem-message {
+  text-align: center;
+}
+
+.redeem-button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(45deg, #005bb5, #004885);
+}
+
+/* Grid za prikaz zapisa o rezervacijama */
+.loyalty-breakdown {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.loyalty-item {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.loyalty-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Stil zaglavlja pojedinačnih zapisa */
+.loyalty-item-header {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #000408;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.4rem;
+}
+
+/* Stil detalja rezervacija */
+.loyalty-details {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-top: 0.8rem;
+}
+
+.loyalty-detail {
+  margin: 0.4rem 0;
+}
+
+.loyalty-label {
+  font-weight: bold;
+  margin-right: 0.3rem;
+  color: #666;
+}
+
+/* Footer */
+.loyalty-footer {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.loyalty-link {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #0078d7;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.loyalty-link:hover {
+  background-color: #005bb5;
+}
+
+@media (max-width: 600px) {
+  .loyalty-container {
+    padding: 1rem;
   }
-  
-  .loyalty-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #000; /* umjesto #0078d7 */
-  }  
-  
-  .loyalty-summary {
-    text-align: center;
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    color: #333;
-    line-height: 1.2;  /* Podesite po potrebi da se tekst bolje uklopi */
-  }
-  
-  .loyalty-points {
-    display: inline-flex;       /* Koristi inline-flex za poravnanje unutar teksta */
-    align-items: center;          /* Centriranje unutar kontejnera */
-    vertical-align: middle;       /* Osigurava da kontejner ostane usklađen sa baseline-om teksta */
-    white-space: nowrap;
-  }
-  
-  .loyalty-coin {
-    width: 20px;                /* Prilagodite veličinu po želji */
-    height: auto;
-    margin-right: 2px;          /* Manji razmak između ikone i broja */
-    vertical-align: middle;     /* Podesite vertikalno poravnanje ikone */
-  }
-  
-  .loyalty-number {
-    font-weight: bold;          /* Broj skupljenih poena boldiramo */
-    vertical-align: middle;     /* Poravnanje broja s ikonom */
-  }
-  
-  
-  .loyalty-breakdown {
-    display: grid;
-    grid-template-columns: 1fr; /* Svi elementi zauzimaju 100% širine jednog stupca */
-    gap: 1.5rem;
-}  
-  .loyalty-item {
-    background: #f9f9f9;
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  .loyalty-item:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  .loyalty-item-header {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: #000408;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.4rem;
-  }
-  
-  .loyalty-details {
-    font-size: 0.95rem;
-    line-height: 1.4;
-    margin-top: 0.8rem;
-  }
-  
-  .loyalty-detail {
-    margin: 0.4rem 0;
-  }
-  
-  .loyalty-label {
-    font-weight: bold;
-    margin-right: 0.3rem;
-    color: #666;
-  }
-  
-  .loyalty-footer {
-    text-align: center;
-    margin-top: 2rem;
-  }
-  
-  .loyalty-link {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #0078d7;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-  }
-  
-  .loyalty-link:hover {
-    background-color: #005bb5;
-  }
-  
-  @media (max-width: 600px) {
-    .loyalty-container {
-      padding: 1rem;
-    }
-  }
-  
+}
