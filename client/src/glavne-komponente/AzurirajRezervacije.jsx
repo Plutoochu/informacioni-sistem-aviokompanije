@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../kontekst/AuthContext";
+import { useLanguage } from "../kontekst/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import "../stilovi/AzurirajRezervacije.css";
 
@@ -17,6 +18,7 @@ const getBaseUrl = () => {
 
 const AzurirajRezervacije = () => {
   const { korisnik } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +47,7 @@ const AzurirajRezervacije = () => {
         setBookings(updatedBookings);
       } catch (err) {
         console.error("Greška pri dohvaćanju rezervacija:", err);
-        setError("Greška prilikom dohvaćanja rezervacija.");
+        setError(t('reservations.cancelError'));
       } finally {
         setLoading(false);
       }
@@ -54,7 +56,7 @@ const AzurirajRezervacije = () => {
     if (korisnik && korisnik.id) {
       fetchBookings();
     }
-  }, [korisnik]);
+  }, [korisnik, t]);
 
   // Filtriranje rezervacija – aktivne i booking history
   const currentDate = new Date();
@@ -78,7 +80,7 @@ const AzurirajRezervacije = () => {
       setBookings(bookings.map((b) => (b._id === bookingId ? { ...b, status: "canceled" } : b)));
     } catch (error) {
       console.error("Greška pri poništavanju rezervacije:", error);
-      alert("Došlo je do greške pri poništavanju rezervacije.");
+      alert(t('reservations.cancelError'));
     }
   };
 
@@ -127,7 +129,7 @@ const AzurirajRezervacije = () => {
   if (loading) {
     return (
       <div className="azuriraj-rezervacije-container">
-        <p>Učitavanje rezervacija...</p>
+        <p>{t('common.loading')}</p>
       </div>
     );
   }
@@ -144,28 +146,28 @@ const AzurirajRezervacije = () => {
   const renderBookingCard = (booking) => (
     <div key={booking._id} className="booking-card">
       <p>
-        <strong>Rezervacija ID:</strong> {booking._id}
+        <strong>{t('reservations.bookingNumber')}:</strong> {booking._id}
       </p>
       <p>
-        <strong>Let:</strong> {booking.flight.brojLeta}
+        <strong>{t('flights.flightNumber')}:</strong> {booking.flight.brojLeta}
       </p>
       <p>
-        <strong>Datum leta:</strong> {new Date(booking.flight?.datumPolaska).toLocaleDateString()}
+        <strong>{t('flights.date')}:</strong> {new Date(booking.flight?.datumPolaska).toLocaleDateString()}
       </p>
       <p>
-        <strong>Ruta leta:</strong> {booking.flight.polaziste} - {booking.flight.odrediste}
+        <strong>{t('flights.route')}:</strong> {booking.flight.polaziste} - {booking.flight.odrediste}
       </p>
       <p>
-        <strong>Vrijeme leta:</strong> {booking.flight.vrijemePolaska} - {booking.flight.vrijemeDolaska}
+        <strong>{t('flights.time')}:</strong> {booking.flight.vrijemePolaska} - {booking.flight.vrijemeDolaska}
       </p>
       <p>
         <strong>Aviokompanija:</strong> {booking.flight.aviokompanija?.naziv}
       </p>
       <p>
-        <strong>Cijena karte:</strong> {booking.cijenaKarte} KM
+        <strong>{t('flights.price')}:</strong> {booking.cijenaKarte} KM
       </p>
       <p>
-        <strong>Klasa leta:</strong> {booking.classType}
+        <strong>{t('flights.class')}:</strong> {booking.classType}
       </p>
       <p>
         <strong>Putnik:</strong>{" "}
@@ -179,22 +181,22 @@ const AzurirajRezervacije = () => {
           : "Nema podataka"}
       </p>
       <p>
-        <strong>Status:</strong> {booking.status}
+        <strong>{t('reservations.status')}:</strong> {booking.status}
       </p>
       <p>
-        <strong>Odabir sjedišta:</strong> {booking.seatSelection && booking.seatSelection.join(", ")}
+        <strong>{t('booking.seatSelection')}:</strong> {booking.seatSelection && booking.seatSelection.join(", ")}
       </p>
       <div className="booking-actions">
-        <button onClick={() => handleEdit(booking._id)}>Izmijeni rezervaciju</button>
+        <button onClick={() => handleEdit(booking._id)}>{t('reservations.modify')}</button>
         <button
           className="cancel-button"
           onClick={() => {
-            if (window.confirm("Da li ste sigurni da želite otkazati rezervaciju?")) {
+            if (window.confirm(t('reservations.cancelSuccess'))) {
               handleCancel(booking._id);
             }
           }}
         >
-          Poništi rezervaciju
+          {t('reservations.cancel')}
         </button>
       </div>
     </div>
@@ -202,51 +204,51 @@ const AzurirajRezervacije = () => {
 
   return (
     <div className="azuriraj-rezervacije-container">
-      <h2>Moje rezervacije</h2>
+      <h2 className="azuriraj-rezervacije-header">{t('reservations.title')}</h2>
 
-      {/* Sekcija za aktivne rezervacije */}
-      <div className="active-reservations">
-        <h3>Aktivne rezervacije</h3>
-        {activeBookings.length === 0 ? (
-          <p>Nema aktivnih rezervacija.</p>
+      {/* Aktivne rezervacije */}
+      <section>
+        <h3>{t('reservations.active')}</h3>
+        {activeBookings.length > 0 ? (
+          <div className="azuriraj-rezervacije-lista">
+            {activeBookings.map(renderBookingCard)}
+          </div>
         ) : (
-          activeBookings.map((booking) => renderBookingCard(booking))
+          <p style={{ textAlign: "center" }}>{t('reservations.noReservations')}</p>
         )}
-      </div>
+      </section>
 
-      {/* Sekcija za Booking History – ista struktura kao za aktivne rezervacije */}
-      <div className="booking-history">
-        <h3>Booking History</h3>
-        {pastBookings.length === 0 ? (
-          <p>Nema rezervacija u historiji.</p>
+      {/* Booking History */}
+      <section>
+        <h3>{t('dashboard.flightHistory')}</h3>
+        {pastBookings.length > 0 ? (
+          <div className="azuriraj-rezervacije-lista">
+            {pastBookings.map(renderBookingCard)}
+          </div>
         ) : (
-          pastBookings.map((booking) => renderBookingCard(booking))
+          <p style={{ textAlign: "center" }}>{t('reservations.noReservations')}</p>
         )}
-      </div>
+      </section>
 
       {/* Modal za uređivanje rezervacije */}
       {showEditModal && editingReservation && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Uredi rezervaciju {editingReservation._id}</h3>
+          <div className="modal">
+            <h3>{t('reservations.modify')}</h3>
             <form onSubmit={handleSaveEdit}>
-              <label htmlFor="seatEdit">Nova sjedala (odvojena zarezom):</label>
+              <label htmlFor="seatSelection">{t('booking.seatSelection')}:</label>
               <input
-                id="seatEdit"
+                id="seatSelection"
                 type="text"
                 value={newSeatSelection}
                 onChange={(e) => setNewSeatSelection(e.target.value)}
+                placeholder="A1"
+                required
               />
-              <div className="modal-buttons">
-                <button type="submit">Spremi izmjene</button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setEditingReservation(null);
-                  }}
-                >
-                  Odustani
+              <div className="modal-actions">
+                <button type="submit">{t('common.save')}</button>
+                <button type="button" onClick={() => setShowEditModal(false)}>
+                  {t('common.cancel')}
                 </button>
               </div>
             </form>

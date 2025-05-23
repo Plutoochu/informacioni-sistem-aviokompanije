@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../kontekst/LanguageContext";
 import axios from "axios";
 
 const getBaseUrl = () => {
@@ -10,6 +11,7 @@ const getBaseUrl = () => {
 };
 
 const Profil = () => {
+  const { t } = useLanguage();
   const [podaci, setPodaci] = useState({
     ime: "",
     prezime: "",
@@ -39,12 +41,12 @@ const Profil = () => {
         setPodaci(response.data);
       } catch (error) {
         console.error("Greška pri dohvatanju profila:", error);
-        setGreska("Došlo je do greške pri dohvatanju podataka");
+        setGreska(t('profile.updateError'));
       }
     };
 
     dohvatiProfil();
-  }, [navigate]);
+  }, [navigate, t]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,7 +61,7 @@ const Profil = () => {
 
     // Client-side validation
     if (!podaci.email || !podaci.telefon || !podaci.ime || !podaci.prezime) {
-      setGreska("Sva polja moraju biti popunjena.");
+      setGreska(t('common.required'));
       return;
     }
 
@@ -71,11 +73,11 @@ const Profil = () => {
         },
       });
 
-      setPoruka("Profil uspješno ažuriran");
+      setPoruka(t('profile.updateSuccess'));
       setGreska("");
       setPodaci(response.data);
     } catch (error) {
-      setGreska(error.response?.data?.message || "Došlo je do greške pri ažuriranju profila");
+      setGreska(error.response?.data?.message || t('profile.updateError'));
       setPoruka("");
     }
   };
@@ -83,11 +85,11 @@ const Profil = () => {
   return (
     <div className="profil-container">
       <div className="profil-card">
-        <h2>Upravljanje profilom</h2>
+        <h2>{t('profile.title')}</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="ime">Ime:</label>
+            <label htmlFor="ime">{t('profile.firstName')}:</label>
             <input
               type="text"
               id="ime"
@@ -100,7 +102,7 @@ const Profil = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="prezime">Prezime:</label>
+            <label htmlFor="prezime">{t('profile.lastName')}:</label>
             <input
               type="text"
               id="prezime"
@@ -113,7 +115,7 @@ const Profil = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">{t('profile.email')}:</label>
             <input
               type="email"
               id="email"
@@ -126,7 +128,7 @@ const Profil = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="telefon">Telefon:</label>
+            <label htmlFor="telefon">{t('profile.phone')}:</label>
             <input
               type="text"
               id="telefon"
@@ -139,7 +141,7 @@ const Profil = () => {
           </div>
 
           <button type="submit" className="button">
-            Sačuvaj promjene
+            {t('profile.save')}
           </button>
 
           {poruka && <p className="success">{poruka}</p>}

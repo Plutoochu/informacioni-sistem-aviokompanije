@@ -333,3 +333,44 @@ export const oznaciKaoProcitano = async (req, res) => {
     res.status(500).json({ message: "Greška pri označavanju notifikacije" });
   }
 };
+
+// Update language preference
+export const updateLanguagePreference = async (req, res) => {
+  try {
+    const { language } = req.body;
+    const korisnikId = req.korisnik.id;
+
+    if (!language || typeof language !== 'string') {
+      return res.status(400).json({ message: "Nevažeći jezik" });
+    }
+
+    // Validacija da li je jezik podržan
+    const supportedLanguages = ['bs', 'en', 'de', 'es', 'it', 'fr'];
+    if (!supportedLanguages.includes(language)) {
+      return res.status(400).json({ message: "Nepodržani jezik" });
+    }
+
+    const updatedKorisnik = await Korisnik.findByIdAndUpdate(
+      korisnikId,
+      { 
+        $set: { 
+          languagePreference: language 
+        }
+      },
+      { new: true }
+    ).select('-lozinka');
+
+    if (!updatedKorisnik) {
+      return res.status(404).json({ message: "Korisnik nije pronađen" });
+    }
+
+    res.status(200).json({
+      message: "Jezik uspješno ažuriran",
+      korisnik: updatedKorisnik
+    });
+
+  } catch (error) {
+    console.error("Greška pri ažuriranju jezika:", error);
+    res.status(500).json({ message: "Greška servera" });
+  }
+};

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../kontekst/AuthContext";
+import { useLanguage } from "../kontekst/LanguageContext";
 import { Link } from "react-router-dom";
 import coin from "../assets/coin.png";
 import "../stilovi/Lojalnost.css";
@@ -15,6 +16,7 @@ const REDEEM_THRESHOLD = 50; // Prag otkupa bodova
 
 const Lojalnost = () => {
   const { korisnik } = useAuth();
+  const { t } = useLanguage();
   const [loyalty, setLoyalty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,7 +31,7 @@ const Lojalnost = () => {
       setLoyalty(response.data);
     } catch (err) {
       console.error("Greška pri dohvaćanju loyalty podataka:", err);
-      setError("Greška pri dohvaćanju loyalty podataka.");
+      setError(t('loyalty.redeemError'));
     } finally {
       setLoading(false);
     }
@@ -53,14 +55,14 @@ const Lojalnost = () => {
       fetchLoyalty();
     } catch (err) {
       console.error("Greška pri otkupljivanju poena:", err);
-      setRedeemMsg(err.response?.data?.message || "Došlo je do greške pri otkupljivanju bodova.");
+      setRedeemMsg(err.response?.data?.message || t('loyalty.redeemError'));
     }
   };
 
   if (loading) {
     return (
       <div className="loyalty-container">
-        <p>Učitavanje loyalty podataka...</p>
+        <p>{t('common.loading')}</p>
       </div>
     );
   }
@@ -82,8 +84,8 @@ const Lojalnost = () => {
   // Poruka o mogućnosti otkupa bodova:
   const redeemInfo =
     loyalty.totalPoints >= REDEEM_THRESHOLD
-      ? "Imate dovoljno bodova za otkup bodova!"
-      : `Imate skupljenih ${loyalty.totalPoints} bodova – potrebno je minimalno ${REDEEM_THRESHOLD} bodova za otkup.`;
+      ? t('loyalty.discountActive')
+      : `${t('loyalty.totalPoints')}: ${loyalty.totalPoints} - ${t('loyalty.notEnoughPoints')} (${t('common.required')}: ${REDEEM_THRESHOLD})`;
 
   // Kreiramo listu za prikaz loyalty zapisa tako da izbacimo one zapise vezane uz redemption
   const displayBreakdown =
@@ -95,7 +97,7 @@ const Lojalnost = () => {
 
   return (
     <div className="loyalty-container">
-      <h2 className="loyalty-header">Loyalty Program</h2>
+      <h2 className="loyalty-header">{t('loyalty.title')}</h2>
       
     {/* {loyaltyNotification && (
         <div className="loyalty-notification">
@@ -104,7 +106,7 @@ const Lojalnost = () => {
     )} */}
 
       <p className="loyalty-summary">
-        Vaše trenutno stanje loyalty poena:{" "}
+        {t('loyalty.totalPoints')}:{" "}
         <span className="loyalty-points">
           <img src={coin} alt="Coin" className="loyalty-coin" />
           <span className="loyalty-number">{loyalty.totalPoints}</span>
@@ -113,49 +115,46 @@ const Lojalnost = () => {
 
       <p className="loyalty-redeem-message">{redeemInfo}</p>
 
+      {/* Dugme za otkupljivanje poena ako ih ima dovoljno */}
       {loyalty.totalPoints >= REDEEM_THRESHOLD && (
-        <button onClick={handleRedeem} className="redeem-button">
-          Otkupi {REDEEM_THRESHOLD} bodova za 50% popusta
+        <button className="loyalty-redeem-button" onClick={handleRedeem}>
+          {t('loyalty.redeemPoints')} ({REDEEM_THRESHOLD} {t('loyalty.points')})
         </button>
       )}
 
-      {redeemMsg && (
-        <div className="redeem-message">
-          {redeemMsg}
-        </div>
-      )}
+      {/* Poruka nakon otkupa */}
+      {redeemMsg && <p className="loyalty-redeem-result">{redeemMsg}</p>}
 
-      <h3 className="loyalty-header" style={{ fontSize: "1.5rem" }}>
-        Detalji po rezervacijama
-      </h3>
-
+      {/* Prikaz loyalty history */}
+      <h3 className="loyalty-history-header">{t('loyalty.pointsHistory')}</h3>
       {displayBreakdown && displayBreakdown.length > 0 ? (
-        <div className="loyalty-breakdown">
-          {displayBreakdown.map((item) => (
-            <div key={item.bookingId} className="loyalty-item">
-              <div className="loyalty-item-content">
-                <div className="loyalty-item-header">
-                  Rezervacija: {item.bookingId}
-                </div>
+        <div className="loyalty-history">
+          {displayBreakdown.map((item, index) => (
+            <div key={index} className="loyalty-history-item">
+              <div className="loyalty-points-earned">
+                <img src={coin} alt="Coin" className="loyalty-coin-small" />
+                <span className="loyalty-points-text">+{item.points}</span>
+              </div>
+              <div className="loyalty-flight-info">
                 <div className="loyalty-details">
                   <div className="loyalty-detail">
-                    <span className="loyalty-label">Let:</span> {item.flightNumber}
+                    <span className="loyalty-label">{t('loyalty.flightNumber')}:</span> {item.flightNumber}
                   </div>
                   <div className="loyalty-detail">
-                    <span className="loyalty-label">Ruta:</span> {item.route || "Nepoznato"}
+                    <span className="loyalty-label">{t('loyalty.route')}:</span> {item.route || "Nepoznato"}
                   </div>
                   <div className="loyalty-detail">
-                    <span className="loyalty-label">Datum leta:</span> {item.flightDate || "Nepoznato"}
+                    <span className="loyalty-label">{t('loyalty.date')}:</span> {item.flightDate || "Nepoznato"}
                   </div>
                   <div className="loyalty-detail">
-                    <span className="loyalty-label">Vrijeme:</span> {item.flightTime || "Nepoznato"}
+                    <span className="loyalty-label">{t('flights.time')}:</span> {item.flightTime || "Nepoznato"}
                   </div>
                   <div className="loyalty-detail">
-                    <span className="loyalty-label">Cijena karte:</span>{" "}
+                    <span className="loyalty-label">{t('loyalty.price')}:</span>{" "}
                     {item.ticketPrice ? item.ticketPrice + " KM" : "Nepoznato"}
                   </div>
                   <div className="loyalty-detail">
-                    <span className="loyalty-label">Loyalty poeni:</span> {item.points}
+                    <span className="loyalty-label">{t('loyalty.points')}:</span> {item.points}
                   </div>
                 </div>
               </div>
@@ -164,13 +163,13 @@ const Lojalnost = () => {
         </div>
       ) : (
         <p style={{ textAlign: "center" }}>
-          Nema podataka o loyalty poenima za rezervacije.
+          {t('loyalty.pointsHistory')} - {t('common.info')}.
         </p>
       )}
 
       <div className="loyalty-footer">
         <Link to="/pocetna" className="loyalty-link">
-          Povratak na početnu
+          {t('nav.home')}
         </Link>
       </div>
     </div>

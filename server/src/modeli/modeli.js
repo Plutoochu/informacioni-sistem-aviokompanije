@@ -26,6 +26,11 @@ const korisnikSchema = new Schema({
   telefon: {
     type: String,
   },
+  languagePreference: {
+    type: String,
+    enum: ["bs", "en", "de", "es", "it", "fr"],
+    default: "bs",
+  },
   datumRegistracije: {
     type: Date,
     default: Date.now,

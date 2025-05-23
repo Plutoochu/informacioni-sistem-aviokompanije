@@ -1,9 +1,12 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../kontekst/AuthContext";
+import { useLanguage } from "../kontekst/LanguageContext";
+import LanguageSwitcher from "../reusable-komponente/LanguageSwitcher";
 
 const Navigacija = () => {
   const { korisnik, odjaviKorisnika } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const handleOdjava = () => {
@@ -22,23 +25,38 @@ const Navigacija = () => {
       <div className="navigacija-desno">
         {korisnik ? (
           <>
-            <Link to="/pocetna" className="navigacija-link">
-              Početna
-            </Link>
+            {korisnik.role !== "admin" && (
+              <>
+                <Link to="/pocetna" className="navigacija-link">
+                  {t('nav.home')}
+                </Link>
+                <Link to="/letovi" className="navigacija-link">
+                  {t('nav.flights')}
+                </Link>
+                <Link to="/rezervacije" className="navigacija-link">
+                  {t('nav.reservations')}
+                </Link>
+                <Link to="/loyalty" className="navigacija-link">
+                  {t('nav.loyalty')}
+                </Link>
+              </>
+            )}
             <Link to="/profil" className="navigacija-link">
-              Profil
+              {t('nav.profile')}
             </Link>
+            <LanguageSwitcher />
             <button onClick={handleOdjava} className="navigacija-dugme">
-              Odjavite se
+              {t('nav.logout')}
             </button>
           </>
         ) : (
           <>
+            <LanguageSwitcher />
             <Link to="/prijava" className="navigacija-link">
-              Prijavite se
+              {t('nav.login')}
             </Link>
             <Link to="/registracija" className="navigacija-dugme">
-              Registrujte se
+              {t('nav.register')}
             </Link>
           </>
         )}

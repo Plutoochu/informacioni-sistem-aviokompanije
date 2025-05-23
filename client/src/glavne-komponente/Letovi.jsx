@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../kontekst/AuthContext"; // Pretpostavljamo da imate AuthContext
+import { useAuth } from "../kontekst/AuthContext";
+import { useLanguage } from "../kontekst/LanguageContext";
 
 const getBaseUrl = () => {
   return window.location.hostname === "localhost"
@@ -10,7 +11,8 @@ const getBaseUrl = () => {
 };
 
 const Letovi = () => {
-  const { korisnik } = useAuth(); // Dohvaćamo trenutnog korisnika
+  const { korisnik } = useAuth();
+  const { t } = useLanguage();
   const [letovi, setLetovi] = useState([]);
   const [destinacije, setDestinacije] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -49,7 +51,7 @@ const Letovi = () => {
       setDestinacije(data);
     } catch (err) {
       console.error("Greška pri dohvatanju destinacija:", err);
-      setError("Greška pri dohvatanju destinacija.");
+      setError(t('flights.error'));
       setDestinacije([]);
     }
   };
@@ -178,19 +180,19 @@ const Letovi = () => {
 
   return (
     <div className="letovi-container">
-      <h2>Pretraga Letova</h2>
+      <h2>{t('flights.title')}</h2>
       <form onSubmit={handleSearch} className="pretraga-forma">
         {/* Prvi red: Polazište, Odredište, Datum od, Datum do */}
         <div className="first-row">
           <div className="form-group">
-            <label>Polazište:</label>
+            <label>{t('flights.from')}:</label>
             <select
               name="polaziste"
               value={filters.polaziste}
               onChange={handleFilterChange}
               className="input-field select-field"
             >
-              <option value="">Sva polazista</option>
+              <option value="">{t('flights.allDestinations')}</option>
               {destinacije.map((dest) => (
                 <option key={`polaziste-${dest._id}`} value={dest.grad}>
                   {dest.grad} - {dest.nazivAerodroma}
@@ -199,14 +201,14 @@ const Letovi = () => {
             </select>
           </div>
           <div className="form-group">
-            <label>Odredište:</label>
+            <label>{t('flights.to')}:</label>
             <select
               name="odrediste"
               value={filters.odrediste}
               onChange={handleFilterChange}
               className="input-field select-field"
             >
-              <option value="">Sve destinacije</option>
+              <option value="">{t('flights.allDestinations')}</option>
               {destinacije.map((dest) => (
                 <option key={`odrediste-${dest._id}`} value={dest.grad}>
                   {dest.grad} - {dest.nazivAerodroma}
@@ -215,7 +217,7 @@ const Letovi = () => {
             </select>
           </div>
           <div className="form-group">
-            <label>Datum od:</label>
+            <label>{t('flights.dateFrom')}:</label>
             <input
               type="date"
               name="datumOd"
@@ -226,7 +228,7 @@ const Letovi = () => {
             />
           </div>
           <div className="form-group">
-            <label>Datum do:</label>
+            <label>{t('flights.dateTo')}:</label>
             <input
               type="date"
               name="datumDo"
@@ -240,14 +242,14 @@ const Letovi = () => {
         {/* Drugi red: Aviokompanija, Vrijeme polaska od, Vrijeme polaska do */}
         <div className="second-row">
           <div className="form-group">
-            <label>Aviokompanija:</label>
+            <label>{t('flights.airline')}:</label>
             <select
               name="aviokompanija"
               value={filters.aviokompanija}
               onChange={handleFilterChange}
               className="input-field select-field"
             >
-              <option value="">Sve aviokompanije</option>
+              <option value="">{t('flights.allAirlines')}</option>
               {aviokompanije.map((avio) => (
                 <option key={avio._id} value={avio._id}>
                   {avio.naziv} ({avio.kod})
@@ -256,7 +258,7 @@ const Letovi = () => {
             </select>
           </div>
           <div className="form-group">
-            <label>Vrijeme polaska od:</label>
+            <label>{t('flights.departureTimeFrom')}:</label>
             <input
               type="time"
               name="vrijemePolaskaOd"
@@ -266,7 +268,7 @@ const Letovi = () => {
             />
           </div>
           <div className="form-group">
-            <label>Vrijeme polaska do:</label>
+            <label>{t('flights.departureTimeTo')}:</label>
             <input
               type="time"
               name="vrijemePolaskaDo"
@@ -279,18 +281,16 @@ const Letovi = () => {
         {/* Treći red: Vrijeme dolaska od, Vrijeme dolaska do, Dugme Pretraži */}
         <div className="third-row">
           <div className="form-group">
-            <label htmlFor="klasa">Klasa</label>
+            <label htmlFor="klasa">{t('flights.class')}</label>
             <select id="klasa" name="klasa" value={filters.klasa} onChange={handleFilterChange} required>
-              <option value="">-- Odaberite klasu --</option>
-              {["Ekonomska", "Biznis", "Prva"].map((klasa) => (
-                <option key={klasa} value={klasa}>
-                  {klasa}
-                </option>
-              ))}
+              <option value="">-- {t('common.select')} {t('flights.class').toLowerCase()} --</option>
+              <option value="Ekonomska">{t('flights.economy')}</option>
+              <option value="Biznis">{t('flights.business')}</option>
+              <option value="Prva">{t('flights.first')}</option>
             </select>
           </div>
           <div className="form-group">
-            <label>Vrijeme dolaska od:</label>
+            <label>{t('flights.arrivalTimeFrom')}:</label>
             <input
               type="time"
               name="vrijemeDolaskaOd"
@@ -300,7 +300,7 @@ const Letovi = () => {
             />
           </div>
           <div className="form-group">
-            <label>Vrijeme dolaska do:</label>
+            <label>{t('flights.arrivalTimeTo')}:</label>
             <input
               type="time"
               name="vrijemeDolaskaDo"
@@ -312,12 +312,12 @@ const Letovi = () => {
         </div>
         <div className="form-group btn-row">
           <button type="submit" className="pretrazi-dugme" disabled={loading}>
-            Pretraži
+            {t('flights.search')}
           </button>
         </div>
       </form>
       
-      {loading && <div className="loading">Učitavanje...</div>}
+      {loading && <div className="loading">{t('flights.loading')}</div>}
       {error && <div className="error">{error}</div>}
       
       {/* Prikaz letova tek nakon pretrage */}
@@ -327,18 +327,18 @@ const Letovi = () => {
             ? letovi.map((let_) => (
                 <div key={let_._id || `let-${let_.polaziste}-${let_.odrediste}`} className="let-kartica">
                   <div className="let-info">
-                    <h3>Let {let_.brojLeta}</h3>
+                    <h3>{t('flights.flightNumber')} {let_.brojLeta}</h3>
                     <p>
                       Ruta: {let_.polaziste} → {let_.odrediste}
                     </p>
                     <p>
-                      Datum: {let_.datumPolaska} - {let_.datumDolaska}
+                      {t('flights.date')}: {let_.datumPolaska} - {let_.datumDolaska}
                     </p>
                     <p>
                       Vrijeme: {let_.vrijemePolaska} - {let_.vrijemeDolaska}
                     </p>
                     <p>
-                      Cijena {let_.cijenaBezPopusta && "s popustom"}:{" "}
+                      {t('flights.price')} {let_.cijenaBezPopusta && "s popustom"}:{" "}
                       {let_.cijenaBezPopusta && (
                         <span className="slanted-strike mr-2">
                           {let_.cijenaBezPopusta} KM
@@ -348,31 +348,29 @@ const Letovi = () => {
                     </p>
                     {let_.aviokompanija && (
                       <p>
-                        Aviokompanija: {let_.aviokompanija.naziv}
+                        {t('flights.airline')}: {let_.aviokompanija.naziv}
                         {let_.aviokompanija.kod && ` (${let_.aviokompanija.kod})`}
                       </p>
                     )}
                     {let_.avionId && (
                       <p className="avion-info">
-                        Avion: {let_.avionId.naziv} ({let_.avionId.model})
+                        {t('flights.aircraft')}: {let_.avionId.naziv} ({let_.avionId.model})
                       </p>
                     )}
                   </div>
                   <button
                     className="rezervisi-dugme"
                     onClick={() =>
-                      navigate(`/rezervacija/${let_._id}`, { state: { flight: let_, klasa: filters.klasa } })
+                      navigate(`/rezervacija/${let_._id}`, {
+                        state: { flight: let_, klasa: filters.klasa },
+                      })
                     }
                   >
-                    Rezerviši
+                    {t('flights.book')}
                   </button>
                 </div>
               ))
-            : !loading && !error && (
-                <div className="no-results">
-                  Nema dostupnih letova za odabrane kriterije.
-                </div>
-              )}
+            : <div className="no-flights">{t('flights.noFlightsFound')}</div>}
         </div>
       )}
     </div>

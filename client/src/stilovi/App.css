@@ -291,6 +291,25 @@ form {
   gap: 1rem;
 }
 
+/* Language switcher integration */
+.navigacija-desno .language-switcher .language-switcher-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  min-width: 70px;
+  padding: 6px 10px;
+}
+
+.navigacija-desno .language-switcher .language-switcher-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.navigacija-desno .language-switcher .language-switcher-button:focus {
+  border-color: #646cff;
+  box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
+}
+
 .navigacija-link {
   color: white;
   text-decoration: none;
@@ -315,6 +334,33 @@ form {
 
 .navigacija-dugme:hover {
   background-color: #535bf2;
+}
+
+/* Responsive navigation */
+@media (max-width: 768px) {
+  .navigacija {
+    padding: 0.5rem 1rem;
+  }
+
+  .navigacija-desno {
+    gap: 0.5rem;
+  }
+
+  .navigacija-link {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .navigacija-dugme {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .navigacija-desno .language-switcher .language-switcher-button {
+    min-width: 60px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
 }
 
 /* Početna Stranica Styles */

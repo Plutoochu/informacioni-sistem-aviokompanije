@@ -8,6 +8,7 @@ import {
   resetujLozinku,
   dohvatiNotifikacijeZaKorisnika,
   oznaciKaoProcitano,
+  updateLanguagePreference,
 } from "../kontroleri/userKontroleri.js";
 import { autentifikacija } from "../middlewares.js";
 import bcrypt from "bcryptjs";
@@ -22,6 +23,9 @@ router.post("/registracija", registracija);
 // Rute za profil
 router.get("/me", autentifikacija, dohvatiProfil);
 router.put("/profil", autentifikacija, azurirajProfil);
+
+// Ruta za language preference
+router.put("/language-preference", autentifikacija, updateLanguagePreference);
 
 // Ruta za resetovanje lozinke
 router.post("/forgot-password", zaboravljenaLozinka);

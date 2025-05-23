@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "../stilovi/Rezervacija.css"; // Uvozimo stilove
 import { useAuth } from "../kontekst/AuthContext";
+import { useLanguage } from "../kontekst/LanguageContext";
 
 const getBaseUrl = () => {
   if (window.location.hostname === "localhost") {
@@ -20,6 +21,7 @@ const Rezervacija = () => {
 
   // Pozivamo useAuth jednom na vrhu
   const { korisnik } = useAuth();
+  const { t } = useLanguage();
 
   // Stanja za mapu sjedista
   const [showSeatMap, setShowSeatMap] = useState(false);
@@ -48,7 +50,7 @@ const Rezervacija = () => {
       const response = await axios.get(`${getBaseUrl()}/api/aviokompanije`);
       setAviokompanije(response.data);
     } catch (err) {
-      console.error("Greška pri dohvatanju aviokompanija:", err);
+      console.error(t('booking.errorFetchingAirlines'), err);
     }
   };
 
@@ -77,7 +79,7 @@ const Rezervacija = () => {
           await fetchAviokompanije();
         } catch (err) {
           console.error("Greška pri dohvatanju leta:", err);
-          setGreska("Nismo mogli dohvatiti podatke o letu.");
+          setGreska(t('booking.errorFetchingFlight'));
         } finally {
           setLoading(false);
         }
@@ -88,7 +90,7 @@ const Rezervacija = () => {
       setBookingNumber(generisiBookingBroj());
       fetchAviokompanije();
     }
-  }, [id, passedFlight]);
+  }, [id, passedFlight, t]);
 
   // Ažuriramo listu putnika kad se promijeni broj odabranih putnika
   useEffect(() => {
@@ -118,22 +120,22 @@ const Rezervacija = () => {
     const cleanedCardNumber = cardNumber;
     const cardNumberRegex = /^\d{16}$/;
     if (!cardNumberRegex.test(cleanedCardNumber)) {
-      alert("Nevažeći broj kartice. Unesite točno 16 cifara.");
+      alert(t('booking.invalidCardNumber'));
       return false;
     }
     const cvcRegex = /^\d{3}$/;
     if (!cvcRegex.test(cardCVC)) {
-      alert("Nevažeći CVC. Unesite točno 3 cifre.");
+      alert(t('booking.invalidCVC'));
       return false;
     }
     if (!cardExpiryMonth || !cardExpiryYear) {
-      alert("Molimo odaberite datum isteka kartice.");
+      alert(t('booking.selectExpiryDate'));
       return false;
     }
     const expiryString = `${cardExpiryYear}-${cardExpiryMonth}`;
     const expiryRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
     if (!expiryRegex.test(expiryString)) {
-      alert("Nevažeći datum isteka. Koristite format YYYY-MM.");
+      alert(t('booking.invalidExpiryFormat'));
       return false;
     }
     const currentDate = new Date();
@@ -142,7 +144,7 @@ const Rezervacija = () => {
     const expiryYearInt = parseInt(cardExpiryYear);
     const expiryMonthInt = parseInt(cardExpiryMonth);
     if (expiryYearInt < currentYearTwo || (expiryYearInt === currentYearTwo && expiryMonthInt < currentMonth)) {
-      alert("Kreditna kartica je istekla. Unesite važeći datum isteka.");
+      alert(t('booking.cardExpired'));
       return false;
     }
     return true;
@@ -178,13 +180,8 @@ const Rezervacija = () => {
       console.error("Greška pri pribavljanju loyalty podataka:", error);
     }
   
-    /* 
-       Ako je discount aktivan, pretpostavljamo da je 
-       passedFlight.cijena već diskontirana (npr. 280 KM) te je originalna cijena zapravo dvostruka (560),
-       dok u slučaju da discount nije aktivan, passedFlight.cijena je već originalna.
-    */
     const originalPrice = activeDiscount > 0 ? passedFlight.cijena * 2 : passedFlight.cijena;
-    const finalPrice = originalPrice * (1 - activeDiscount); // npr. 560 * 0.5 = 280
+    const finalPrice = originalPrice * (1 - activeDiscount);
   
     const bookingData = {
       bookingNumber,
@@ -197,35 +194,38 @@ const Rezervacija = () => {
       passengers,
       paymentMethod,
       cardDetails: paymentMethod === "Kartica" ? cardDetails : undefined,
-      cijenaKarte: finalPrice,         // finalna cijena (npr. 280 KM)
-      originalCijena: originalPrice,    // originalna cijena (npr. 560 KM)
+      cijenaKarte: finalPrice,
+      originalCijena: originalPrice,
     };
   
-    // Spremamo u state rezervacije (npr. za daljnje korake)
     setReservationData(bookingData);
     setShowSeatMap(true);
-  
-    console.log("Booking data:", bookingData);
-  
-    try {
-      // Resetiramo activeDiscount u bazi (popust vrijedi samo za ovu rezervaciju)
-      await axios.post(`${getBaseUrl()}/api/loyalty/resetDiscount`, { userId: korisnik.id });
-    } catch (error) {
-      console.error("Greška pri resetiranju discounta:", error);
-    }
-  
-    // Prosljeđujemo bookingData na stranicu za odabir sjedala
-    navigate("/mapa-sjedista", {
-      state: { reservation: bookingData, flight: letInfo, discount: activeDiscount },
-    });
   };
-  
-   
-  if (loading) return <div>Učitavanje...</div>;
-  if (greska) return <div>{greska}</div>;
-  if (!letInfo) return <div>Nema informacija o letu.</div>;
 
-  // Opcije za mjesec i godinu za karticu
+  if (loading) {
+    return <div>{t('common.loading')}</div>;
+  }
+
+  if (greska) {
+    return <div className="error-message">{greska}</div>;
+  }
+
+  if (!letInfo) {
+    return <div className="error-message">{t('booking.errorFetchingFlight')}</div>;
+  }
+
+  if (showSeatMap) {
+    return (
+      <div className="seat-map-placeholder">
+        <h2>{t('booking.seatSelection')}</h2>
+        <p>Ova funkcionalnost će biti implementirana u budućnosti.</p>
+        <button onClick={() => navigate("/rezervacije")} className="rezervisi-dugme">
+          {t('booking.confirm')}
+        </button>
+      </div>
+    );
+  }
+
   const monthOptions = Array.from({ length: 12 }, (_, i) => {
     const month = (i + 1).toString().padStart(2, "0");
     return (
@@ -247,40 +247,40 @@ const Rezervacija = () => {
 
   return (
     <div className="booking-container">
-      <h2>Detalji rezervacije</h2>
+      <h2>{t('booking.reservationDetails')}</h2>
       <p>
-        <strong>Booking broj:</strong> {bookingNumber}
+        <strong>{t('booking.bookingNumber')}:</strong> {bookingNumber}
       </p>
       <p>
-        <strong>Aviokompanija:</strong>{" "}
+        <strong>{t('booking.airline')}:</strong>{" "}
         {letInfo.aviokompanija?.naziv ||
           aviokompanije.find((a) => a._id === letInfo.aviokompanija?._id)?.naziv ||
           aviokompanije.find((a) => a._id === letInfo.aviokompanija)?.naziv ||
-          "Nepoznato"}
+          t('booking.unknown')}
       </p>
       <p>
-        <strong>Broj leta:</strong> {letInfo.brojLeta}
+        <strong>{t('booking.flightNumber')}:</strong> {letInfo.brojLeta}
       </p>
       <p>
-        <strong>Polazak:</strong> {letInfo.polaziste}, {letInfo.vrijemePolaska}
+        <strong>{t('booking.departure')}:</strong> {letInfo.polaziste}, {letInfo.vrijemePolaska}
       </p>
       <p>
-        <strong>Dolazak:</strong> {letInfo.odrediste}, {letInfo.vrijemeDolaska}
+        <strong>{t('booking.arrival')}:</strong> {letInfo.odrediste}, {letInfo.vrijemeDolaska}
       </p>
       <p>
-        <strong>Prtljag dozvoljen:</strong> 1 ručni + 1 čekirani (23kg)
+        <strong>{t('booking.luggage')}:</strong> {t('booking.luggageInfo')}
       </p>
       <p>
-        <strong>Cijena jedne karte:</strong> {cijenaKarte} KM
+        <strong>{t('booking.ticketPrice')}:</strong> {cijenaKarte} KM
       </p>
       <p>
-        <strong>Klasa:</strong> {classType}
+        <strong>{t('booking.class')}:</strong> {classType}
       </p>
 
-      <h3>Odaberi opcije rezervacije</h3>
+      <h3>{t('booking.reservationOptions')}</h3>
       <form className="rezervacija-forma" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Tip karte:</label>
+          <label>{t('booking.ticketType')}:</label>
           <div>
             <label>
               <input
@@ -290,7 +290,7 @@ const Rezervacija = () => {
                 checked={ticketType === "Jednosmjerna"}
                 onChange={(e) => setTicketType(e.target.value)}
               />
-              Jednosmjerna (One way)
+              {t('booking.oneWay')}
             </label>
             <label>
               <input
@@ -300,24 +300,24 @@ const Rezervacija = () => {
                 checked={ticketType === "Povratna"}
                 onChange={(e) => setTicketType(e.target.value)}
               />
-              Povratna (Round trip)
+              {t('booking.roundTrip')}
             </label>
           </div>
         </div>
 
         <div className="form-group">
-          <label>Putnici:</label>
+          <label>{t('booking.passengers')}:</label>
           <div className="passengers-count">
             <div>
-              <label>Odrasli:</label>
+              <label>{t('booking.adults')}:</label>
               <input type="number" min="1" value={adultsCount} onChange={(e) => setAdultsCount(e.target.value)} />
             </div>
             <div>
-              <label>Djeca:</label>
+              <label>{t('booking.children')}:</label>
               <input type="number" min="0" value={childrenCount} onChange={(e) => setChildrenCount(e.target.value)} />
             </div>
             <div>
-              <label>Bebe:</label>
+              <label>{t('booking.infants')}:</label>
               <input type="number" min="0" value={infantsCount} onChange={(e) => setInfantsCount(e.target.value)} />
             </div>
           </div>
@@ -325,14 +325,14 @@ const Rezervacija = () => {
 
         {parseInt(adultsCount) + parseInt(childrenCount) + parseInt(infantsCount) > 0 && (
           <div className="passengers-details">
-            <h4>Unesite podatke putnika</h4>
+            <h4>{t('booking.enterPassengerData')}</h4>
             {passengers.map((passenger, index) => (
               <div key={index} className="passenger-form">
-                <h5>Putnik {index + 1}</h5>
+                <h5>{t('booking.passenger')} {index + 1}</h5>
                 <div className="form-group">
                   <input
                     type="text"
-                    placeholder="Ime"
+                    placeholder={t('booking.namePlaceholder')}
                     value={passenger.ime}
                     onChange={(e) => handlePassengerChange(index, "ime", e.target.value)}
                     required
@@ -341,7 +341,7 @@ const Rezervacija = () => {
                 <div className="form-group">
                   <input
                     type="text"
-                    placeholder="Prezime"
+                    placeholder={t('booking.surnamePlaceholder')}
                     value={passenger.prezime}
                     onChange={(e) => handlePassengerChange(index, "prezime", e.target.value)}
                     required
@@ -350,7 +350,7 @@ const Rezervacija = () => {
                 <div className="form-group">
                   <input
                     type="text"
-                    placeholder="Broj pasoša ili ID (XXXXXXXX)"
+                    placeholder={t('booking.idPlaceholder')}
                     maxLength="8"
                     pattern="[A-Z0-9]{1,8}"
                     value={passenger.idNumber}
@@ -361,7 +361,7 @@ const Rezervacija = () => {
                 <div className="form-group">
                   <input
                     type="date"
-                    placeholder="Datum rođenja"
+                    placeholder={t('booking.birthDatePlaceholder')}
                     value={passenger.datumRodjenja}
                     onChange={(e) => handlePassengerChange(index, "datumRodjenja", e.target.value)}
                     required
@@ -370,7 +370,7 @@ const Rezervacija = () => {
                 <div className="form-group">
                   <input
                     type="email"
-                    placeholder="Email"
+                    placeholder={t('booking.emailPlaceholder')}
                     value={passenger.email}
                     onChange={(e) => handlePassengerChange(index, "email", e.target.value)}
                     required
@@ -379,7 +379,7 @@ const Rezervacija = () => {
                 <div className="form-group">
                   <input
                     type="tel"
-                    placeholder="Telefon"
+                    placeholder={t('booking.phonePlaceholder')}
                     maxLength="9"
                     pattern="[0-9]{9}"
                     value={passenger.telefon}
@@ -393,7 +393,7 @@ const Rezervacija = () => {
         )}
 
         <div className="form-group">
-          <label>Način plaćanja:</label>
+          <label>{t('booking.paymentMethod')}:</label>
           <div>
             <label>
               <input
@@ -403,7 +403,7 @@ const Rezervacija = () => {
                 checked={paymentMethod === "Kartica"}
                 onChange={(e) => setPaymentMethod(e.target.value)}
               />
-              Kartica (Visa/Mastercard)
+              {t('booking.cardPayment')}
             </label>
             <label>
               <input
@@ -421,11 +421,11 @@ const Rezervacija = () => {
         {paymentMethod === "Kartica" && (
           <div className="credit-card-details">
             <div className="form-group">
-              <label>Broj kartice:</label>
+              <label>{t('booking.cardNumber')}:</label>
               <input
                 type="text"
                 name="cardNumber"
-                placeholder="1234456787654321"
+                placeholder={t('booking.cardNumberPlaceholder')}
                 value={cardNumber}
                 onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, ""))}
                 maxLength={16}
@@ -433,14 +433,14 @@ const Rezervacija = () => {
               />
             </div>
             <div className="form-group">
-              <label>Datum isteka:</label>
+              <label>{t('booking.expiryDate')}:</label>
               <select
                 name="cardExpiryMonth"
                 value={cardExpiryMonth}
                 onChange={(e) => setCardExpiryMonth(e.target.value)}
                 required
               >
-                <option value="">Mjesec</option>
+                <option value="">{t('booking.month')}</option>
                 {monthOptions}
               </select>
               <select
@@ -449,12 +449,12 @@ const Rezervacija = () => {
                 onChange={(e) => setCardExpiryYear(e.target.value)}
                 required
               >
-                <option value="">Godina</option>
+                <option value="">{t('booking.year')}</option>
                 {yearOptions}
               </select>
             </div>
             <div className="form-group">
-              <label>CVC:</label>
+              <label>{t('booking.cvc')}:</label>
               <input
                 type="text"
                 name="cardCVC"
@@ -469,7 +469,7 @@ const Rezervacija = () => {
         )}
 
         <button type="submit" className="rezervisi-dugme">
-          Dalje na odabir sjedišta
+          {t('booking.nextToSeatSelection')}
         </button>
       </form>
     </div>

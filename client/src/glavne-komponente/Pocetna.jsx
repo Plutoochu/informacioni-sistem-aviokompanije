@@ -1,10 +1,12 @@
 import { Link, Navigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../kontekst/AuthContext";
+import { useLanguage } from "../kontekst/LanguageContext";
 import { dohvatiNotifikacije, oznaciKaoProcitano } from "../pomocne-funkcije/fetch-funkcije";
 
 const Pocetna = () => {
   const { korisnik } = useAuth();
+  const { t } = useLanguage();
   const [notifikacije, setNotifikacije] = useState([]);
 
   useEffect(() => {
@@ -44,10 +46,10 @@ const Pocetna = () => {
   return (
     <div className="pocetna-container">
       <div className="pocetna-card">
-        <h2>Dobrodošli, {korisnik.ime}!</h2>
+        <h2>{t('dashboard.welcome')}, {korisnik.ime}!</h2>
         {notifikacije && notifikacije.length > 0 ? (
           <div className="notifikacije-banner">
-            <h3>📢 Obavijesti:</h3>
+            <h3>📢 {t('notifications.title')}:</h3>
             <ul>
               {notifikacije.map((n) => (
                 <li key={n._id}>
@@ -57,7 +59,7 @@ const Pocetna = () => {
                       onClick={() => handleMarkAsRead(n._id)}
                       className="mark-as-read-button"
                     >
-                      Oznaci kao pročitan
+                      {t('notifications.markAsRead')}
                     </button>
                   )}
                 </li>
@@ -65,35 +67,35 @@ const Pocetna = () => {
             </ul>
           </div>
         ) : (
-          <p>Nema novih obavijesti</p>
+          <p>{t('notifications.noNewNotifications')}</p>
         )}
 
-        <p>Gdje želite putovati danas?</p>
+        <p>{t('home.subtitle')}</p>
         <div className="pocetna-opcije">
           <Link to="/profil" className="pocetna-opcija">
             <div className="pocetna-opcija-kartica">
-              <h3>Profil</h3>
-              <p>Upravljajte svojim podacima i lozinkom</p>
+              <h3>{t('nav.profile')}</h3>
+              <p>{t('dashboard.manageProfile')}</p>
             </div>
           </Link>
           <Link to="/letovi" className="pocetna-opcija">
             <div className="pocetna-opcija-kartica">
-              <h3>Letovi</h3>
-              <p>Pretražite i rezervišite letove</p>
+              <h3>{t('nav.flights')}</h3>
+              <p>{t('home.searchFlights')}</p>
             </div>
           </Link>
           {/* Kartica za Rezervacije */}
           <Link to="/rezervacije" className="pocetna-opcija">
             <div className="pocetna-opcija-kartica">
-              <h3>Rezervacije</h3>
-              <p>Ažurirajte ili otkažite vaše rezervacije</p>
+              <h3>{t('nav.reservations')}</h3>
+              <p>{t('home.manageBookings')}</p>
             </div>
           </Link>
           {/* Nova kartica za Loyalty */}
           <Link to="/loyalty" className="pocetna-opcija">
             <div className="pocetna-opcija-kartica">
-              <h3>Loyalty</h3>
-              <p>Pogledajte vaše Loyalty poene</p>
+              <h3>{t('nav.loyalty')}</h3>
+              <p>{t('dashboard.loyaltyPoints')}</p>
             </div>
           </Link>
         </div>

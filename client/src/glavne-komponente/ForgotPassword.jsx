@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useLanguage } from "../kontekst/LanguageContext";
 
 const getBaseUrl = () => {
   if (window.location.hostname === "localhost") {
@@ -10,6 +11,7 @@ const getBaseUrl = () => {
 };
 
 const ForgotPassword = () => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -32,28 +34,28 @@ const ForgotPassword = () => {
         resetLink: response.data.resetLink,
       });
 
-      setMessage("Token za resetovanje je generisan. Koristite link ispod za resetovanje lozinke:");
+      setMessage(t('auth.tokenGenerated'));
     } catch (err) {
-      setError(err.response?.data?.message || "Došlo je do greške. Pokušajte ponovo.");
+      setError(err.response?.data?.message || t('auth.resetError'));
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Zaboravljena lozinka</h2>
-        <p className="text-gray-600">Unesite vašu email adresu da generišemo link za resetovanje lozinke.</p>
+        <h2>{t('auth.forgotPasswordTitle')}</h2>
+        <p className="text-gray-600">{t('auth.forgotPasswordDescription')}</p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email adresa</label>
+            <label htmlFor="email">{t('auth.emailAddress')}</label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="Unesite vaš email"
+              placeholder={t('auth.enterYourEmail')}
             />
           </div>
 
@@ -62,21 +64,21 @@ const ForgotPassword = () => {
 
           {resetInfo && (
             <div className="reset-info">
-              <p>Token: {resetInfo.token}</p>
+              <p>{t('auth.token')}: {resetInfo.token}</p>
               <p>
-                Link za resetovanje: <a href={resetInfo.resetLink}>{resetInfo.resetLink}</a>
+                {t('auth.resetLink')}: <a href={resetInfo.resetLink}>{resetInfo.resetLink}</a>
               </p>
             </div>
           )}
 
           <button type="submit" className="auth-button">
-            Generiši link
+            {t('auth.generateLink')}
           </button>
 
           <div className="link-container">
-            <span>Vratite se na </span>
+            <span>{t('auth.returnTo')} </span>
             <span className="link" onClick={() => navigate("/prijava")}>
-              prijavu
+              {t('auth.login')}
             </span>
           </div>
         </form>
